@@ -1,8 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
-import { Link } from '@inertiajs/react';
-
+import { useInitials } from '@/hooks/use-initials';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
+import { User } from '@/types';
+import { Link, router } from '@inertiajs/react';
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react';
 import {
     DropdownMenu,
@@ -14,16 +15,19 @@ import {
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
-export function NavUser({
-    user,
-}: {
-    user: {
-        name: string;
-        email: string;
-        avatar: string;
-    };
-}) {
+interface NavUserProps {
+    user: User;
+}
+
+export function NavUser({ user }: NavUserProps) {
     const { isMobile } = useSidebar();
+    const getInitials = useInitials();
+    const cleanup = useMobileNavigation();
+
+    const handleLogout = () => {
+        cleanup();
+        router.flushAll(); // opsional, jika ingin clear route
+    };
 
     return (
         <SidebarMenu>
@@ -32,31 +36,26 @@ export function NavUser({
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                             <Avatar className="h-8 w-8 rounded-lg">
-                                <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="rounded-lg">SN</AvatarFallback>
+                                <AvatarImage src={user.karyawan.user_image || ''} alt={user.karyawan.nama || 'User'} />
+                                <AvatarFallback className="rounded-lg">{getInitials(user.karyawan.nama || '')}</AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-semibold">{user.name}</span>
-                                <span className="truncate text-xs">{user.email}</span>
+                                <span className="truncate font-semibold">{user.karyawan.nama}</span>
+                                <span className="truncate text-xs">{user.role.name}</span>
                             </div>
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                        side={isMobile ? 'bottom' : 'right'}
-                        align="end"
-                        sideOffset={4}
-                    >
+                    <DropdownMenuContent className="min-w-56 rounded-lg" side={isMobile ? 'bottom' : 'right'} align="end" sideOffset={4}>
                         <DropdownMenuLabel className="p-0 font-normal">
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                 <Avatar className="h-8 w-8 rounded-lg">
-                                    <AvatarImage src={user.avatar} alt={user.name} />
-                                    <AvatarFallback className="rounded-lg">SN</AvatarFallback>
+                                    <AvatarImage src={user.karyawan.user_image || ''} alt={user.karyawan.nama || 'User'} />
+                                    <AvatarFallback className="rounded-lg">{getInitials(user.karyawan.nama || '')}</AvatarFallback>
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">{user.name}</span>
-                                    <span className="truncate text-xs">{user.email}</span>
+                                    <span className="truncate font-semibold">{user.karyawan.nama}</span>
+                                    <span className="truncate text-xs">{user.role.name}</span>
                                 </div>
                             </div>
                         </DropdownMenuLabel>
@@ -89,9 +88,11 @@ export function NavUser({
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <LogOut />
-                            Log out
+                        <DropdownMenuItem asChild>
+                            <Link href={route('logout')} method="post" as="button" onClick={handleLogout} className="block w-full">
+                                <LogOut />
+                                Log out
+                            </Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

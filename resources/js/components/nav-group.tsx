@@ -1,3 +1,5 @@
+'use client';
+
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -20,13 +22,14 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import { NavCollapsible, NavItem, NavLink, type NavGroup } from '@/types/layout';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 import { ReactNode } from 'react';
 
 export function NavGroup({ title, items }: NavGroup) {
     const { state } = useSidebar();
-    const href = typeof window !== 'undefined' ? window.location.href : '';
+    const { url } = usePage();
+
     return (
         <SidebarGroup>
             <SidebarGroupLabel>{title}</SidebarGroupLabel>
@@ -34,11 +37,10 @@ export function NavGroup({ title, items }: NavGroup) {
                 {items.map((item) => {
                     const key = `${item.title}-${item.url}`;
 
-                    if (!item.items) return <SidebarMenuLink key={key} item={item} href={href} />;
+                    if (!item.items) return <SidebarMenuLink key={key} item={item} href={url} />;
+                    if (state === 'collapsed') return <SidebarMenuCollapsedDropdown key={key} item={item} href={url} />;
 
-                    if (state === 'collapsed') return <SidebarMenuCollapsedDropdown key={key} item={item} href={href} />;
-
-                    return <SidebarMenuCollapsible key={key} item={item} href={href} />;
+                    return <SidebarMenuCollapsible key={key} item={item} href={url} />;
                 })}
             </SidebarMenu>
         </SidebarGroup>
@@ -75,7 +77,7 @@ const SidebarMenuCollapsible = ({ item, href }: { item: NavCollapsible; href: st
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="CollapsibleContent">
+                <CollapsibleContent>
                     <SidebarMenuSub>
                         {item.items.map((subItem: NavLink) => (
                             <SidebarMenuSubItem key={subItem.title}>
@@ -114,7 +116,7 @@ const SidebarMenuCollapsedDropdown = ({ item, href }: { item: NavCollapsible; hr
                     <DropdownMenuSeparator />
                     {item.items.map((sub: NavLink) => (
                         <DropdownMenuItem key={`${sub.title}-${sub.url}`} asChild>
-                            <Link href={sub.url} className={`${checkIsActive(href, sub) ? 'bg-secondary' : ''}`}>
+                            <Link href={sub.url} className={checkIsActive(href, sub) ? 'bg-secondary' : ''}>
                                 {sub.icon && <sub.icon />}
                                 <span className="max-w-52 text-wrap">{sub.title}</span>
                                 {sub.badge && <span className="ml-auto text-xs">{sub.badge}</span>}
@@ -127,11 +129,19 @@ const SidebarMenuCollapsedDropdown = ({ item, href }: { item: NavCollapsible; hr
     );
 };
 
-function checkIsActive(href: string, item: NavItem, mainNav = false) {
-    return (
-        href === item.url ||
-        href.split('?')[0] === item.url ||
-        !!item?.items?.filter((i: NavLink) => i.url === href).length ||
-        (mainNav && href.split('/')[1] !== '' && href.split('/')[1] === item?.url?.split('/')[1])
-    );
+function checkIsActive(href: string, item: NavItem, mainNav = false): boolean {
+    const cleanedHref = href.split('?')[0];
+    const cleanedItemUrl = item.url?.split('?')[0] ?? '';
+
+    if (cleanedHref === cleanedItemUrl) return true;
+
+    if (item.items?.some((i) => cleanedHref === i.url?.split('?')[0])) return true;
+
+    if (mainNav) {
+        const hrefSegment = cleanedHref.split('/')[1];
+        const itemSegment = cleanedItemUrl.split('/')[1];
+        if (hrefSegment && itemSegment && hrefSegment === itemSegment) return true;
+    }
+
+    return false;
 }

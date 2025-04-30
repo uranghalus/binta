@@ -31,11 +31,40 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
-export interface User {
+export interface Karyawan {
+    id_karyawan: number;
+    nama: string;
+    nama_alias: string;
+    call_sign: string;
+    nik: string;
+    no_ktp: string;
+    alamat: string;
+    telp: string;
+    gender: 'L' | 'P'; // "L" = Laki-laki, "P" = Perempuan
+    jabatan: string;
+    status_karyawan: string;
+    tmk: string; // Tanggal Masuk Kerja (format: YYYY-MM-DD)
+    keterangan: string;
+    department_id: number;
+    user_image: string | null;
+    create_date: string;
+    create_id_user: number | null;
+    modified_date: string | null;
+    modified_id_user: number | null;
+    created_at: string;
+    updated_at: string;
+}
+export interface Role {
     id: number;
     name: string;
+    created_at: string;
+    updated_at: string;
+}
+export interface User {
+    id: number;
+    karyawan: Karyawan;
+    role: Role;
     email: string;
-    avatar?: string;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;

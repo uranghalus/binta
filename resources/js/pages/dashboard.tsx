@@ -4,9 +4,11 @@ import { ProfileDropdown } from '@/components/profile-dropdown';
 import Search from '@/components/search';
 import ThemeSwitcher from '@/components/theme-switcher';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
+import { SharedData } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 
 export default function Dashboard() {
+    const { auth } = usePage<SharedData>().props;
     return (
         <AppLayout>
             <Head title="Dashboard" />
@@ -16,7 +18,7 @@ export default function Dashboard() {
                 <div className="ml-auto flex items-center space-x-4">
                     <Search />
                     <ThemeSwitcher />
-                    <ProfileDropdown />
+                    <ProfileDropdown user={auth.user} />
                 </div>
             </Header>
             <Main>

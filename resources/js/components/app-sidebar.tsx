@@ -1,4 +1,6 @@
 import { sidebarData } from '@/data/sidebar-data';
+import { SharedData } from '@/types';
+import { usePage } from '@inertiajs/react';
 import { BaggageClaim } from 'lucide-react';
 import React from 'react';
 import { NavGroup } from './nav-group';
@@ -6,6 +8,8 @@ import { NavUser } from './nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from './ui/sidebar';
 
 export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { auth } = usePage<SharedData>().props;
+
     return (
         <Sidebar collapsible="icon" variant="floating" {...props}>
             <SidebarHeader>
@@ -35,7 +39,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                 ))}
             </SidebarContent>
             <SidebarFooter>
-                <NavUser user={sidebarData.user} />
+                <NavUser user={auth.user} />
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

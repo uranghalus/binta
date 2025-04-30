@@ -13,6 +13,7 @@
 }
 
 @custom-variant dark (&:is(.dark *));
+
 :root {
     --radius: 0.625rem;
     --background: oklch(1 0 0);
@@ -21,8 +22,8 @@
     --card-foreground: oklch(0.129 0.042 264.695);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.129 0.042 264.695);
-    --primary: oklch(0.208 0.042 265.755);
-    --primary-foreground: oklch(0.984 0.003 247.858);
+    --primary: oklch(0.351 0.079 228.94);
+    --primary-foreground: oklch(0.98 0 0);
     --secondary: oklch(0.968 0.007 247.896);
     --secondary-foreground: oklch(0.208 0.042 265.755);
     --muted: oklch(0.968 0.007 247.896);
@@ -47,8 +48,6 @@
     --sidebar-accent-foreground: var(--accent-foreground);
     --sidebar-border: var(--border);
     --sidebar-ring: var(--ring);
-
-    --font-qurova: 'Qurova-Medium', 'sans-serif';
 }
 
 .dark {
@@ -58,8 +57,8 @@
     --card-foreground: oklch(0.984 0.003 247.858);
     --popover: oklch(0.208 0.042 265.755);
     --popover-foreground: oklch(0.984 0.003 247.858);
-    --primary: oklch(0.929 0.013 255.508);
-    --primary-foreground: oklch(0.208 0.042 265.755);
+    --primary: oklch(0.351 0.079 228.94);
+    --primary-foreground: oklch(0.98 0 0);
     --secondary: oklch(0.279 0.041 260.031);
     --secondary-foreground: oklch(0.984 0.003 247.858);
     --muted: oklch(0.279 0.041 260.031);
@@ -75,14 +74,6 @@
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: hsl(240 5.9% 10%);
-    --sidebar-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-primary: hsl(224.3 76.3% 48%);
-    --sidebar-primary-foreground: hsl(0 0% 100%);
-    --sidebar-accent: hsl(240 3.7% 15.9%);
-    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-border: hsl(240 3.7% 15.9%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 @theme inline {
@@ -136,7 +127,6 @@
         @apply overflow-x-hidden;
     }
     body {
-        font-family: 'Poppins', 'sans-serif';
         @apply bg-background text-foreground min-h-svh w-full;
     }
 
@@ -200,19 +190,5 @@
     }
     to {
         height: 0;
-    }
-}
-@layer utilities {
-    .font-qurova {
-        font-family: var(--font-qurova);
-    }
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-    }
-  body {
-    @apply bg-background text-foreground;
     }
 }
