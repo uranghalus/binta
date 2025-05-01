@@ -1,51 +1,71 @@
-import { type SidebarData } from "../js/types/layout";
-import {
-    LayoutDashboard,
-    ListTodo,
-    MessageCircle,
-    Package2,
-    UserCog,
-} from "lucide-react";
+import { DatabaseZap, LayoutDashboard, ListTodo, MessageCircle, Package2, UserCog } from 'lucide-react';
+import { type SidebarData } from '../js/types/layout';
 export const sidebarData: SidebarData = {
     user: {
-        name: "satnaing",
-        email: "satnaingdev@gmail.com",
-        avatar: "/avatars/shadcn.jpg",
+        name: 'satnaing',
+        email: 'satnaingdev@gmail.com',
+        avatar: '/avatars/shadcn.jpg',
     },
     navGroups: [
         {
-            title: "General",
+            title: 'General',
             items: [
                 {
-                    title: "Dashboard",
-                    url: "/dashboard",
+                    title: 'Dashboard',
+                    url: '/dashboard',
                     icon: LayoutDashboard,
                 },
                 {
-                    title: "Tasks",
-                    url: "/tasks",
+                    title: 'Data Master',
+                    icon: DatabaseZap,
+                    items: [
+                        {
+                            title: 'Data Pengguna',
+                            url: '/master-data/pengguna',
+                        },
+                        {
+                            title: 'Data Departemen',
+                            url: '/master-data/departemen',
+                        },
+                        {
+                            title: 'Data Role',
+                            url: '/master-data/role',
+                        },
+                        {
+                            title: 'Data Unit Bisnis',
+                            url: '/master-data/unit-bisnis',
+                        },
+                        {
+                            title: 'Data Karyawan',
+                            url: '/master-data/karyawan',
+                        },
+                    ],
+                },
+                {
+                    title: 'Tasks',
+                    url: '/tasks',
                     icon: ListTodo,
                 },
                 {
-                    title: "Apps",
-                    url: "/apps",
+                    title: 'Apps',
+                    url: '/apps',
                     icon: Package2,
                 },
                 {
-                    title: "Chats",
-                    url: "/chats",
-                    badge: "3",
+                    title: 'Chats',
+                    url: '/chats',
+                    badge: '3',
                     icon: MessageCircle,
                 },
                 {
-                    title: "Users",
-                    url: "/users",
+                    title: 'Users',
+                    url: '/users',
                     icon: UserCog,
                 },
             ],
         },
         // {
-        //     title: "Pages",
+        //     title: "Data Master",
         //     items: [
         //         {
         //             title: "Auth",
