@@ -1,7 +1,9 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
+import { OfficesTable } from './components/offices-table';
+import { Office } from './data/scheme';
 
-export default function index() {
+export default function index({ offices }: { offices: Office[] }) {
     return (
         <AppLayout title="Master Unit Bisnis">
             <Head title="Master Unit Bisnis" />
@@ -11,7 +13,9 @@ export default function index() {
                     <p className="text-muted-foreground">Manage your users and their roles here.</p>
                 </div>
             </div>
-            <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">Peler</div>
+            <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
+                <OfficesTable data={offices} columns={[]} />
+            </div>
         </AppLayout>
     );
 }
