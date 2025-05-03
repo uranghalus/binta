@@ -1,6 +1,6 @@
 import { DataTablePagination } from '@/components/datatable-pagination';
-import { DataTableToolbar } from '@/components/datatable-toolbar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DataTableToolbar } from '@/pages/master/offices/components/datatable-toolbar';
 import {
     ColumnDef,
     ColumnFiltersState,

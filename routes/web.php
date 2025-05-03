@@ -16,6 +16,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('unit-bisnis', OfficesController::class);
     });
 });
-
+Route::get('/captcha', function () {
+    return response()->json([
+        'captcha' => captcha_src('default'),
+    ]);
+});
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

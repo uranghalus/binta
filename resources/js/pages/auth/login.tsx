@@ -1,9 +1,8 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { LoaderCircle, RotateCcw } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,19 +12,31 @@ type LoginForm = {
     email: string;
     password: string;
     remember: boolean;
+    captcha: string;
 };
 
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
+    errors?: Record<string, string>; // optional if passed as prop
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
-    const { data, setData, post, processing, reset } = useForm<Required<LoginForm>>({
+    const [captchaImg, setCaptchaImg] = useState('');
+    const { data, setData, post, processing, reset, errors } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
+        captcha: '',
         remember: false,
     });
+
+    const refreshCaptcha = () => {
+        setCaptchaImg('/captcha?' + Math.random());
+    };
+
+    useEffect(() => {
+        refreshCaptcha();
+    }, []);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -53,7 +64,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             onChange={(e) => setData('email', e.target.value)}
                             placeholder="email@example.com"
                         />
-                        {/* <InputError message={errors.email} /> */}
+                        {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                     </div>
 
                     <div className="grid gap-2">
@@ -75,29 +86,40 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="Password"
                         />
-                        {/* <InputError message={errors.password} /> */}
+                        {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+                    </div>
+
+                    <div className="grid gap-2">
+                        <div className="gap- flex items-center">
+                            <img src={captchaImg} alt="CAPTCHA code" className="h-9 w-auto" />
+                            <Button type="button" variant="ghost" onClick={refreshCaptcha} className="h-10 w-10 p-0">
+                                <RotateCcw className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <Input
+                            type="text"
+                            value={data.captcha}
+                            onChange={(e) => setData('captcha', e.target.value)}
+                            placeholder="Masukkan kode CAPTCHA"
+                            tabIndex={3}
+                        />
+                        {errors.captcha && <p className="text-sm text-red-500">{errors.captcha}</p>}
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <Checkbox
-                            id="remember"
-                            name="remember"
-                            checked={data.remember}
-                            onClick={() => setData('remember', !data.remember)}
-                            tabIndex={3}
-                        />
+                        <Checkbox id="remember" checked={data.remember} onCheckedChange={(checked) => setData('remember', Boolean(checked))} />
                         <Label htmlFor="remember">Remember me</Label>
                     </div>
 
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                        {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Log in
                     </Button>
                 </div>
 
                 <div className="text-muted-foreground text-center text-sm">
                     Don't have an account?{' '}
-                    <Link href={route('register')} tabIndex={5}>
+                    <Link href={route('register')} tabIndex={6}>
                         Sign up
                     </Link>
                 </div>

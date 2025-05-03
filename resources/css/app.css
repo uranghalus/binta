@@ -74,6 +74,8 @@
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
+
+    --font-qurova: 'Qurova-Medium', 'sans-serif';
 }
 
 @theme inline {
@@ -190,5 +192,10 @@
     }
     to {
         height: 0;
+    }
+}
+@layer utilities {
+    .font-qurova {
+        font-family: var(--font-qurova);
     }
 }
