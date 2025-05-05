@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OfficeRequest;
 use App\Models\Office;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -32,9 +33,12 @@ class OfficesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(OfficeRequest $request)
     {
         //
+        $validated = $request->validated();
+        Office::create($validated);
+        return redirect()->route('unit-bisnis.index')->with('success', 'Data kantor berhasil ditambahkan.');
     }
 
     /**

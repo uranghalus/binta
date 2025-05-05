@@ -3,6 +3,7 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import { Toaster } from './components/ui/sonner';
 import ThemeProvider from './context/theme-context';
 import { initializeTheme } from './hooks/use-appearance';
 
@@ -16,6 +17,7 @@ createInertiaApp({
 
         root.render(
             <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+                <Toaster />
                 <App {...props} />
             </ThemeProvider>,
         );
