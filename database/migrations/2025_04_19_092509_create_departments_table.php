@@ -15,7 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('department_code')->unique();
             $table->string('name');
-            $table->foreignId('office_id')->constrained('tbl_offices')->onDelete('cascade');
+            $table->unsignedBigInteger('office_id')->nullable();
+            $table->foreign('office_id')
+                ->references('id')
+                ->on('tbl_offices')
+                ->onDelete('set null');
             $table->timestamps();
         });
     }

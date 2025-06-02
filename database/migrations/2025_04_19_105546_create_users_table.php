@@ -12,7 +12,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('karyawan_id');
             $table->foreign('karyawan_id')->references('id_karyawan')->on('tbl_karyawans')->onDelete('cascade');
-            $table->foreignId('role_id')->constrained('tbl_roles')->onDelete('cascade');
+            $table->unsignedBigInteger('role_id')->nullable();
+
+            $table->foreign('role_id')
+                ->references('id')
+                ->on('tbl_roles')
+                ->onDelete('set null');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

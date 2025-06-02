@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\OfficesController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,7 +14,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
     Route::prefix('master-data')->group(function () {
-        Route::resource('unit-bisnis', OfficesController::class);
+        Route::resource('unit-bisnis', OfficesController::class)->parameters(['unit-bisnis
+        ' => 'id'])
+            ->names('unit-bisnis');
+        Route::resource('role', RoleController::class);
     });
 });
 Route::get('/captcha', function () {

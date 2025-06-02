@@ -20,7 +20,11 @@ return new class extends Migration
             $table->text('alamat');
             $table->string('no_ktp');
             $table->string('telp');
-            $table->foreignId('department_id')->constrained('tbl_departments')->onDelete('cascade');
+            $table->unsignedBigInteger('department_id')->nullable();
+            $table->foreign('department_id')
+                ->references('id')
+                ->on('tbl_departments')
+                ->onDelete('set null');
             $table->string('jabatan');
             $table->string('call_sign')->nullable();
             $table->date('tmk'); // tanggal mulai kerja
