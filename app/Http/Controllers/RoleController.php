@@ -34,6 +34,14 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+        Roles::create([
+            'name' => $request->name,
+        ]);
+
+        return redirect()->route('role.index')->with('success', 'Role berhasil ditambahkan.');
     }
 
     /**

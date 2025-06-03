@@ -3,6 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { Role } from '../data/scheme';
+import RoleAction from './role-action';
 
 export const RoleColumn: ColumnDef<Role>[] = [
     {
@@ -12,12 +13,12 @@ export const RoleColumn: ColumnDef<Role>[] = [
                 checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
                 onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                 aria-label="Select all"
-                className="translate-y-[2px]"
+                className="size-4 translate-y-[2px]" // ukuran checkbox kecil
             />
         ),
         meta: {
             className: cn(
-                'sticky left-0 z-10 rounded-tl md:table-cell',
+                'sticky left-0 z-10 w-fit rounded-tl md:table-cell',
                 'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted transition-colors duration-200',
             ),
         },
@@ -26,7 +27,7 @@ export const RoleColumn: ColumnDef<Role>[] = [
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
                 aria-label="Select row"
-                className="translate-y-[2px]"
+                className="size-4 translate-y-[2px]" // ukuran checkbox kecil
             />
         ),
         enableSorting: false,
@@ -34,13 +35,12 @@ export const RoleColumn: ColumnDef<Role>[] = [
     },
     {
         accessorKey: 'name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Nama unit Bisnis" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Nama Role" />,
         cell: ({ row }) => <div className="w-fit text-nowrap">{row.getValue('name')}</div>,
-
         enableHiding: false,
     },
-    // {
-    //         id: 'actions',
-    //         cell: DataTableRowActions,
-    //     },
+    {
+        id: 'actions',
+        cell: RoleAction,
+    },
 ];
