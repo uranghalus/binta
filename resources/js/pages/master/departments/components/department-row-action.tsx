@@ -10,10 +10,10 @@ import {
 import { useDialog } from '@/context/dialog-context';
 import { Row } from '@tanstack/react-table';
 import { Ellipsis, SquarePen, Trash2 } from 'lucide-react';
-import { Department } from '../data/departmentSchema';
+import { DepartmentInter } from '../data/departmentSchema';
 
 interface DepartmentRowActionProps {
-    row: Row<Department>;
+    row: Row<DepartmentInter>;
 }
 
 export function DepartmentRowAction({ row }: DepartmentRowActionProps) {

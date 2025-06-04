@@ -4,9 +4,9 @@ import { Head } from '@inertiajs/react';
 import { DepartmentsColumn } from './components/department-column';
 import DepartmentPrimaryButton from './components/department-primary-button';
 import DepartmentsTable from './components/department-table';
-import { Department } from './data/departmentSchema';
+import { DepartmentInter } from './data/departmentSchema';
 
-export default function DepartmentIndex({ departments }: { departments: Department[] }) {
+export default function DepartmentIndex({ departments }: { departments: DepartmentInter[] }) {
     return (
         <AppLayout title="Master Departments">
             <Head title="Master Departments" />

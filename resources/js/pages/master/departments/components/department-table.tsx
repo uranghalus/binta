@@ -16,7 +16,8 @@ import {
     VisibilityState,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { Department } from '../data/departmentSchema';
+
+import { DepartmentInter } from '../data/departmentSchema';
 import DepartmentToolbar from './department-toolbar';
 
 declare module '@tanstack/react-table' {
@@ -27,8 +28,8 @@ declare module '@tanstack/react-table' {
 }
 
 interface DepartmentsTableProps {
-    columns: ColumnDef<Department>[];
-    data: Department[];
+    columns: ColumnDef<DepartmentInter>[];
+    data: DepartmentInter[];
 }
 
 export default function DepartmentsTable({ columns, data }: DepartmentsTableProps) {

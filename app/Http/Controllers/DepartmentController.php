@@ -14,7 +14,8 @@ class DepartmentController extends Controller
     public function index()
     {
         //
-        $departments = Departments::latest()->get();
+        $departments = Departments::with('office:id,office_code,name,address')->latest()->get();
+
         return Inertia::render('master/departments/index', [
             'departments' => $departments
         ]);

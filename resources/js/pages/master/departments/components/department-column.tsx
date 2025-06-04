@@ -2,11 +2,11 @@ import { DataTableColumnHeader } from '@/components/datatable-column-header';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
-import { Department } from '../data/departmentSchema';
+import { DepartmentInter } from '../data/departmentSchema';
 import { DepartmentRowAction } from './department-row-action';
 // import { DepartmentRowAction } from './department-row-action';
 
-export const DepartmentsColumn: ColumnDef<Department>[] = [
+export const DepartmentsColumn: ColumnDef<DepartmentInter>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -61,9 +61,9 @@ export const DepartmentsColumn: ColumnDef<Department>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: 'office_id',
+        accessorKey: 'office.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID Kantor" />,
-        cell: ({ row }) => <div className="text-base">{row.getValue('office_id')}</div>,
+        cell: ({ row }) => <div className="text-base">{row.getValue('office_id.name')}</div>,
         meta: {
             className: cn(
                 'drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] lg:drop-shadow-none dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)]',
