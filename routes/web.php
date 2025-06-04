@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\OfficesController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ' => 'id'])
             ->names('unit-bisnis');
         Route::resource('role', RoleController::class);
+        Route::resource('departemen', DepartmentController::class)
+            ->parameters(['departemen' => 'id'])
+            ->names('departemen');
     });
 });
 Route::get('/captcha', function () {

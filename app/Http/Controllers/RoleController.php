@@ -20,13 +20,6 @@ class RoleController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -40,8 +33,7 @@ class RoleController extends Controller
         Roles::create([
             'name' => $request->name,
         ]);
-
-        return redirect()->route('role.index')->with('success', 'Role berhasil ditambahkan.');
+        return redirect()->back()->with('success', 'Role created successfully.');
     }
 
     /**
@@ -63,16 +55,34 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Roles $roles)
+    public function update(Request $request, $id)
     {
+        $roles = Roles::findOrFail($id);
+        if (!$roles) {
+            return redirect()->back()->with('error', 'Role not found.');
+        }
         //
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+        $roles->update([
+            'name' => $request->name,
+        ]);
+        return redirect()->back()->with('success', 'Role updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Roles $roles)
+    public function destroy($id)
     {
         //
+        $roles = Roles::findOrFail($id);
+        if (!$roles) {
+            return redirect()->back()->with('error', 'Role not found.');
+        }
+
+        $roles->delete();
+        return redirect()->back()->with('success', 'Role deleted successfully.');
     }
 }

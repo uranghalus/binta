@@ -1,3 +1,5 @@
+import { DataTablePagination } from '@/components/datatable-pagination';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -14,23 +16,20 @@ import {
     VisibilityState,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { Role } from '../data/scheme';
-
-import { DataTablePagination } from '@/components/datatable-pagination';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { RoleToolbar } from './role-toolbar';
-
+import { Role } from '../data/rolescheme';
+import RoleToolbar from './role-toolbar';
 declare module '@tanstack/react-table' {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ColumnMeta<TData extends RowData, TValue> {
         className: string;
     }
 }
-interface RoleTableProps {
+interface RolesTableProps {
+    // Define any props if needed
     columns: ColumnDef<Role>[];
     data: Role[];
 }
-export default function RoleTable({ columns, data }: RoleTableProps) {
+export default function RolesTable({ columns, data }: RolesTableProps) {
     const [rowSelection, setRowSelection] = useState({});
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -57,7 +56,6 @@ export default function RoleTable({ columns, data }: RoleTableProps) {
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
     });
-
     return (
         <div className="space-y-4">
             <RoleToolbar table={table} />
