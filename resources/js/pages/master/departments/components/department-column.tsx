@@ -2,11 +2,10 @@ import { DataTableColumnHeader } from '@/components/datatable-column-header';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
-import { DepartmentInter } from '../data/departmentSchema';
+import { Department } from '../data/departmentSchema';
 import { DepartmentRowAction } from './department-row-action';
-// import { DepartmentRowAction } from './department-row-action';
 
-export const DepartmentsColumn: ColumnDef<DepartmentInter>[] = [
+export const DepartmentsColumn: ColumnDef<Department>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -36,46 +35,30 @@ export const DepartmentsColumn: ColumnDef<DepartmentInter>[] = [
     },
     {
         accessorKey: 'department_code',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Kode Departemen" />,
-        cell: ({ row }) => <div className="text-base">{row.getValue('department_code')}</div>,
-        meta: {
-            className: cn(
-                'drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] lg:drop-shadow-none dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)]',
-                'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted transition-colors duration-200',
-                'sticky left-6 md:table-cell',
-            ),
-        },
-        enableHiding: false,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Role Name" />,
+        cell: ({ row }) => <span className="text-base">{row.getValue('department_code')}</span>,
     },
     {
         accessorKey: 'name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Nama Departemen" />,
-        cell: ({ row }) => <div className="text-base">{row.getValue('name')}</div>,
-        meta: {
-            className: cn(
-                'drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] lg:drop-shadow-none dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)]',
-                'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted transition-colors duration-200',
-                'sticky left-6 md:table-cell',
-            ),
-        },
-        enableHiding: false,
+        cell: ({ row }) => <span className="text-base">{row.getValue('name')}</span>,
     },
     {
         accessorKey: 'office.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="ID Kantor" />,
-        cell: ({ row }) => <div className="text-base">{row.getValue('office_id.name')}</div>,
-        meta: {
-            className: cn(
-                'drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] lg:drop-shadow-none dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)]',
-                'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted transition-colors duration-200',
-                'sticky left-6 md:table-cell',
-            ),
-        },
-        enableHiding: false,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Kantor" />,
+        cell: ({ row }) => <span className="text-base">{row.original.office?.name || 'Tidak Ada'}</span>,
+    },
+    {
+        accessorKey: 'office.office_code',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Kode Kantor" />,
+        cell: ({ row }) => <span className="text-base">{row.original.office?.office_code || 'Tidak Ada'}</span>,
     },
     {
         id: 'actions',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
         cell: DepartmentRowAction,
+        meta: {
+            className: 'sticky right-0 z-10 rounded-tr md:table-cell',
+        },
     },
 ];

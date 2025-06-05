@@ -10,29 +10,20 @@ import {
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
-    RowData,
     SortingState,
     useReactTable,
     VisibilityState,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-
-import { DepartmentInter } from '../data/departmentSchema';
+import { Department } from '../data/departmentSchema';
 import DepartmentToolbar from './department-toolbar';
 
-declare module '@tanstack/react-table' {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interface ColumnMeta<TData extends RowData, TValue> {
-        className: string;
-    }
+interface Props {
+    columns: ColumnDef<Department>[];
+    data: Department[];
 }
 
-interface DepartmentsTableProps {
-    columns: ColumnDef<DepartmentInter>[];
-    data: DepartmentInter[];
-}
-
-export default function DepartmentsTable({ columns, data }: DepartmentsTableProps) {
+export default function DepartmentTable({ columns, data }: Props) {
     const [rowSelection, setRowSelection] = useState({});
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -59,7 +50,6 @@ export default function DepartmentsTable({ columns, data }: DepartmentsTableProp
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
     });
-
     return (
         <div className="space-y-4">
             <DepartmentToolbar table={table} />
@@ -68,11 +58,13 @@ export default function DepartmentsTable({ columns, data }: DepartmentsTableProp
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id} className="group/row">
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id} colSpan={header.colSpan} className={header.column.columnDef.meta?.className ?? ''}>
-                                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                    </TableHead>
-                                ))}
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id} colSpan={header.colSpan} className={header.column.columnDef.meta?.className ?? ''}>
+                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                        </TableHead>
+                                    );
+                                })}
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -90,7 +82,7 @@ export default function DepartmentsTable({ columns, data }: DepartmentsTableProp
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    Tidak ada hasil.
+                                    No results.
                                 </TableCell>
                             </TableRow>
                         )}

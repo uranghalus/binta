@@ -10,14 +10,15 @@ import {
 import { useDialog } from '@/context/dialog-context';
 import { Row } from '@tanstack/react-table';
 import { Ellipsis, SquarePen, Trash2 } from 'lucide-react';
-import { DepartmentInter } from '../data/departmentSchema';
+import { Department } from '../data/departmentSchema';
 
 interface DepartmentRowActionProps {
-    row: Row<DepartmentInter>;
+    row: Row<Department>;
 }
 
 export function DepartmentRowAction({ row }: DepartmentRowActionProps) {
     const { setOpen, setCurrentRow } = useDialog();
+
     return (
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>

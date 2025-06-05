@@ -1,12 +1,18 @@
 import { DialogProvider } from '@/context/dialog-context';
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
+import { Office } from '../offices/data/scheme';
 import { DepartmentsColumn } from './components/department-column';
+import DepartmentDialogs from './components/department-dialogs';
 import DepartmentPrimaryButton from './components/department-primary-button';
-import DepartmentsTable from './components/department-table';
-import { DepartmentInter } from './data/departmentSchema';
+import DepartmentTable from './components/department-table';
+import { Department } from './data/departmentSchema';
 
-export default function DepartmentIndex({ departments }: { departments: DepartmentInter[] }) {
+interface Props {
+    departments: Department[];
+    offices: Office[];
+}
+export default function DepartmentIndex({ departments, offices }: Props) {
     return (
         <AppLayout title="Master Departments">
             <Head title="Master Departments" />
@@ -19,9 +25,9 @@ export default function DepartmentIndex({ departments }: { departments: Departme
                     <DepartmentPrimaryButton />
                 </div>
                 <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
-                    <DepartmentsTable columns={DepartmentsColumn} data={departments} />
+                    <DepartmentTable columns={DepartmentsColumn} data={departments} />
                 </div>
-                {/* <DepartmentDialogs /> */}
+                <DepartmentDialogs offices={offices} />
             </DialogProvider>
         </AppLayout>
     );
