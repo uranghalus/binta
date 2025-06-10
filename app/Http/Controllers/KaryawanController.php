@@ -29,6 +29,10 @@ class KaryawanController extends Controller
     public function create()
     {
         //
+        $departments = Departments::all(['id', 'name']);
+        return Inertia::render('master/karyawan/create', [
+            'departments' => $departments,
+        ]);
     }
 
     /**
