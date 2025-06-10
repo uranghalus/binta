@@ -35,7 +35,7 @@ export const DepartmentsColumn: ColumnDef<Department>[] = [
     },
     {
         accessorKey: 'department_code',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Role Name" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Kode Dept" />,
         cell: ({ row }) => <span className="text-base">{row.getValue('department_code')}</span>,
     },
     {

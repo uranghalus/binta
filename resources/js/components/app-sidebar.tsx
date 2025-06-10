@@ -21,7 +21,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
                             <a href="#">
-                                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                                <div className="bg-sidebar-primary flex aspect-square size-8 items-center justify-center rounded-lg dark:text-black">
                                     <BaggageClaim className="size-4" />
                                 </div>
                                 <div className="grid flex-1 items-center text-left text-sm leading-tight">

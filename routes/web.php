@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OfficesController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('departemen', DepartmentController::class)
             ->parameters(['departemen' => 'id'])
             ->names('departemen');
+        Route::resource('karyawan', KaryawanController::class)
+            ->parameters(['karyawan' => 'id'])
+            ->names('karyawan');
     });
 });
 Route::get('/captcha', function () {

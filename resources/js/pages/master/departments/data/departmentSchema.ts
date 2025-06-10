@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const departmentSchema = z.object({
-    id: z.number().optional(),
+    id: z.string().optional(),
     department_code: z.string().min(1, 'Kode departemen wajib diisi'),
     name: z.string().min(1, 'Nama departemen wajib diisi'),
     office: z
