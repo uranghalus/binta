@@ -75,6 +75,10 @@ export default function KaryawanActionDialog({ onOpenChange, open, currentRow, d
                         handleClose();
                     }, 1000);
                 },
+                onError: (errors) => {
+                    console.log(errors);
+                },
+
                 preserveScroll: true,
             });
         }
