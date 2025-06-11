@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('tbl_departments', function (Blueprint $table) {
             $table->id();
-            $table->string('department_code')->unique();
+            $table->string('department_code', 8)->unique();
             $table->string('name');
             $table->unsignedBigInteger('office_id')->nullable();
-            $table->foreign('office_id')
+            $table->foreign('office_id', 16)
                 ->references('id')
                 ->on('tbl_offices')
                 ->onDelete('set null');

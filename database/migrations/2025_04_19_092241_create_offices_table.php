@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('tbl_offices', function (Blueprint $table) {
             $table->id();
-            $table->string('office_code')->unique();
+            $table->string('office_code', 16)->unique();
             $table->string('name');
-            $table->string('address');
+            $table->text('address');
             $table->timestamps();
         });
     }

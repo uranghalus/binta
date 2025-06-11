@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('nama_alias')->nullable();
             $table->enum('gender', ['L', 'P']);
             $table->text('alamat');
-            $table->string('no_ktp');
-            $table->string('telp');
+            $table->string('no_ktp', 16)->unique();
+            $table->string('telp', 16)->nullable();
             $table->unsignedBigInteger('department_id')->nullable();
             $table->foreign('department_id')
                 ->references('id')
@@ -28,9 +28,9 @@ return new class extends Migration
             $table->string('jabatan');
             $table->string('call_sign')->nullable();
             $table->date('tmk'); // tanggal mulai kerja
-            $table->string('status_karyawan');
+            $table->string('status_karyawan', 16);
             $table->text('keterangan')->nullable();
-            $table->string('user_image')->nullable();
+            $table->string('user_image', 50)->nullable();
             $table->timestamp('create_date')->nullable();
             $table->unsignedBigInteger('create_id_user')->nullable();
             $table->timestamp('modified_date')->nullable();
