@@ -41,26 +41,34 @@ class KaryawanController extends Controller
     public function store(Request $request)
     {
         //
-        $validatedData = $request->validate([
-            'nik' => 'required|string|max:20|unique:tbl_karyawans,nik',
-            'nama' => 'required|string|max:100',
-            'nama_alias' => 'nullable|string|max:100',
-            'gender' => 'required|string|max:10',
-            'alamat' => 'nullable|string|max:255',
-            'no_ktp' => 'nullable|string|max:20',
-            'telp' => 'nullable|string|max:15',
-            'department_id' => 'required|exists:departments,id',
-            'jabatan' => 'nullable|string|max:100',
-            'call_sign' => 'nullable|string|max:50',
-            'tmk' => 'nullable|date',
-            'status_karyawan' => 'required|string|max:50',
-            'keterangan' => 'nullable|string|max:255',
-            'user_image' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'nik'            => 'required|string|max:255',
+            'nama'           => 'required|string|max:255',
+            'nama_alias'     => 'nullable|string|max:255',
+            'gender'         => 'required|in:L,P',
+            'alamat'         => 'nullable|string|max:255',
+            'no_ktp'         => 'nullable|string|max:255',
+            'department_id'  => 'required|exists:departments,id',
+            'jabatan'        => 'nullable|string|max:255',
+            'status_karyawan' => 'nullable|in:aktif,tidak_aktif,cuti,resign',
+            'tmk'            => 'nullable|date',
+            'call_sign'      => 'nullable|string|max:255',
+            'keterangan'     => 'nullable|string|max:255',
+            'telp'           => 'nullable|string|max:255',
+            'user_image'     => 'nullable|image|max:2048', // max 2MB
         ]);
 
-        Karyawan::create($validatedData);
+        // Simpan file jika ada
+        if ($request->hasFile('user_image')) {
+            $path = $request->file('user_image')->store('karyawan', 'public');
+            $validated['user_image'] = $path; // Simpan path ke database
+        }
 
-        return redirect()->back()->with('success', 'Karyawan created successfully.');
+        Karyawan::create($validated);
+
+        return redirect()->route('karyawan.index')->with('success', 'Karyawan berhasil ditambahkan.');
+
+        // return redirect()->back()->with('success', 'Karyawan created successfully.');
     }
 
     /**

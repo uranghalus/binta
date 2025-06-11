@@ -12,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { formatDate, isValidDate } from '@/lib/utils';
+import { formatDate, toISODate } from '@/lib/utils';
 import { CalendarIcon, ChevronsUpDownIcon } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { toast } from 'sonner';
@@ -238,11 +238,11 @@ export default function Create({ departments }: Props) {
                                             className="bg-background pr-10"
                                             onChange={(e) => {
                                                 const date = new Date(e.target.value);
-                                                setData('tmk', e.target.value);
-                                                if (isValidDate(date)) {
-                                                    setDate(date);
-                                                    setMonth(date);
-                                                }
+                                                setData('tmk', toISODate(date) || '');
+                                                // if (isValidDate(date)) {
+                                                //     setDate(date);
+                                                //     setMonth(date);
+                                                // }
                                             }}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'ArrowDown') {

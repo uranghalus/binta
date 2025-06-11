@@ -4,11 +4,26 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
+export function toISODate(date: Date | null | undefined) {
+    if (!date) return null;
+    return date.toISOString().split('T')[0]; // "2025-06-11"
+}
+
+// format untuk ditampilkan ke user
+export function toDisplayDate(date: string | null | undefined) {
+    if (!date) return '';
+    const parsed = new Date(date);
+    return parsed.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    });
+}
 export function formatDate(date: Date | undefined) {
     if (!date) return '';
     return date.toLocaleDateString('id-ID', {
         day: '2-digit',
-        month: 'long',
+        month: '2-digit',
         year: 'numeric',
     });
 }
