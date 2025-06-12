@@ -24,6 +24,7 @@ interface ConfirmDialogProps {
     isLoading?: boolean;
     className?: string;
     children?: ReactNode;
+    confirmDisabled?: boolean; // Tambahkan ini
 }
 
 export default function ConfirmDialog(props: ConfirmDialogProps) {

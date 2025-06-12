@@ -3,14 +3,15 @@ import { Karyawan } from '../data/karyawanSchema';
 
 import { Department } from '../../departments/data/departmentSchema';
 import KaryawanActionDialog from './karyawan-action-dialogs';
-import KaryawanDeleteDialog from './karyawan-delete-dialogs';
+import KaryawanDeleteDialog from './karyawan-delete-dialog';
+// import KaryawanDeleteDialog from './karyawan-delete-dialogs';
 
 interface Props {
     departments: Department[];
 }
 
 export default function KaryawanDialogs({ departments }: Props) {
-    const { open, setOpen, currentRow } = useDialog();
+    const { open, setOpen, currentRow } = useDialog<Karyawan | null>();
 
     return (
         <>

@@ -54,7 +54,7 @@ export const KaryawanColumn: ColumnDef<Karyawan>[] = [
     {
         accessorKey: 'department.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID Departemen" />,
-        cell: ({ row }) => <span className="text-base">{row.original.department.name}</span>,
+        cell: ({ row }) => <span className="text-base">{row.original.department?.name ?? 'Tidak Ada'}</span>,
     },
     {
         accessorKey: 'jabatan',
@@ -65,12 +65,8 @@ export const KaryawanColumn: ColumnDef<Karyawan>[] = [
         accessorKey: 'status_karyawan',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Status Karyawan" />,
         cell: ({ row }) => (
-            <Badge variant={'success'} className="px-1.5">
-                {row.getValue('status_karyawan') === 'aktif' ? (
-                    <BadgeCheck className="size-3 text-[#00916E]" />
-                ) : (
-                    <BadgeAlert className="text-destructive size-3" />
-                )}
+            <Badge variant={row.getValue('status_karyawan') === 'aktif' ? 'success' : 'destructive'} className="px-1.5">
+                {row.getValue('status_karyawan') === 'aktif' ? <BadgeCheck className="size-3" /> : <BadgeAlert className="size-3" />}
                 {row.getValue('status_karyawan') === 'aktif' ? 'Aktif' : 'Nonaktif'}
             </Badge>
         ),

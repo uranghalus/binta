@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+import { ImageUploader } from '@/components/image-uploader';
 import { Calendar } from '@/components/ui/calendar';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
@@ -17,29 +18,32 @@ import { CalendarIcon, ChevronsUpDownIcon } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { toast } from 'sonner';
 import { Department } from '../departments/data/departmentSchema';
-import { karyawanSchema } from './data/karyawanSchema';
+import { Karyawan, karyawanSchema } from './data/karyawanSchema';
+
 interface Props {
     departments: Department[];
+    karyawan: Karyawan;
 }
-export default function Create({ departments }: Props) {
-    const [date, setDate] = useState<Date | undefined>(new Date());
+
+export default function Edit({ departments, karyawan }: Props) {
+    const [date, setDate] = useState<Date | undefined>(new Date(karyawan.tmk || ''));
     const [value, setValue] = useState(formatDate(date)); // Untuk tampilan
     const [tmkValue, setTmkValue] = useState(toISODate(date)); // Untuk form data
     const [month, setMonth] = useState<Date | undefined>(date);
-    const { post, processing, reset, data, setData } = useForm({
-        nama: '',
-        nik: '',
-        no_ktp: '',
-        gender: 'L',
-        department_id: 0,
-        jabatan: '',
-        status_karyawan: 'aktif', // ← gunakan salah satu nilai enum di schema
+    const { put, processing, reset, data, setData } = useForm({
+        nama: karyawan.nama || '',
+        nik: karyawan.nik || '',
+        no_ktp: karyawan.no_ktp || '',
+        gender: karyawan.gender || 'L',
+        department_id: karyawan.department_id || 0,
+        jabatan: karyawan.jabatan || '',
+        status_karyawan: karyawan.status_karyawan || 'aktif',
         tmk: tmkValue,
-        call_sign: '',
-        nama_alias: '',
-        alamat: '',
-        keterangan: '',
-        telp: '',
+        call_sign: karyawan.call_sign || '',
+        nama_alias: karyawan.nama_alias || '',
+        alamat: karyawan.alamat || '',
+        keterangan: karyawan.keterangan || '',
+        telp: karyawan.telp || '',
         user_image: undefined as File | undefined, // ← simpan File, bukan URL
     });
     const [zodError, setZodError] = useState<Record<string, string>>({});
@@ -48,7 +52,7 @@ export default function Create({ departments }: Props) {
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log('Data sebelum submit:', data);
+        // console.log('Data sebelum submit:', data);
         const result = karyawanSchema.safeParse(data);
         if (!result.success) {
             const errors: Record<string, string> = {};
@@ -60,9 +64,9 @@ export default function Create({ departments }: Props) {
             setZodError(errors);
             return;
         }
-        post(route('karyawan.store'), {
+        put(route('karyawan.update', karyawan.id_karyawan), {
             onSuccess: () => {
-                toast.success('Yeay!', { description: 'Data karyawan berhasil ditambah.' });
+                toast.success('Yeay!', { description: 'Data karyawan berhasil diperbarui.' });
                 reset();
             },
             onError: (errors) => {
@@ -73,6 +77,7 @@ export default function Create({ departments }: Props) {
             preserveScroll: true,
         });
     };
+
     return (
         <AppLayout title="Master Karyawan">
             <Head title="Master Karyawan" />
@@ -111,7 +116,7 @@ export default function Create({ departments }: Props) {
                                     <Label htmlFor="gender">Jenis Kelamin</Label>
                                     <RadioGroup
                                         className="flex flex-row items-center justify-between p-3"
-                                        onValueChange={(val) => setData('gender', val)}
+                                        onValueChange={(val) => setData('gender', val as 'L' | 'P')}
                                         value={data.gender}
                                     >
                                         <div className="flex items-center space-x-2">
@@ -214,7 +219,7 @@ export default function Create({ departments }: Props) {
                                     <Label htmlFor="status_karyawan">Status Karyawan</Label>
                                     <Select
                                         value={data.status_karyawan}
-                                        onValueChange={(val) => setData('status_karyawan', val)}
+                                        onValueChange={(val) => setData('status_karyawan', val as 'aktif' | 'tidak_aktif' | 'cuti' | 'resign')}
                                         defaultValue={data.status_karyawan}
                                     >
                                         <SelectTrigger className="w-full">
@@ -288,17 +293,15 @@ export default function Create({ departments }: Props) {
                                 </div>
                             </div>
                             {/* LINK User Image */}
-                            <div className="grid gap-2">
-                                <Label htmlFor="user_image">User Image</Label>
-                                <Input
-                                    id="user_image"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        if (e.target.files?.[0]) setData('user_image', e.target.files[0]);
-                                    }}
+                            <div className="space-y-2">
+                                <ImageUploader
+                                    initialImage={karyawan.user_image ? `/storage/${karyawan.user_image}` : null}
+                                    onImageChange={(file) => setData('user_image', file || undefined)}
+                                    label="Foto Karyawan"
+                                    previewClassName="h-32 w-32 rounded-md object-cover border"
                                 />
                                 {zodError.user_image && <p className="text-xs text-red-500">{zodError.user_image}</p>}
+                                {/* {zodError.user_image && <p className="text-xs text-red-500">{zodError.user_image}</p>} */}
                             </div>
                             {/* LINK Keterangan */}
                             <div className="grid gap-2">

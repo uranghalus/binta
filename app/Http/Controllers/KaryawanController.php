@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Departments;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class KaryawanController extends Controller
@@ -48,7 +49,7 @@ class KaryawanController extends Controller
             'gender'         => 'required|in:L,P',
             'alamat'         => 'nullable|string|max:255',
             'no_ktp'         => 'nullable|string|max:255',
-            'department_id'  => 'required|exists:departments,id',
+            'department_id'  => 'required|exists:tbl_departments,id',
             'jabatan'        => 'nullable|string|max:255',
             'status_karyawan' => 'nullable|in:aktif,tidak_aktif,cuti,resign',
             'tmk'            => 'nullable|date',
@@ -66,9 +67,9 @@ class KaryawanController extends Controller
 
         Karyawan::create($validated);
 
-        return redirect()->route('karyawan.index')->with('success', 'Karyawan berhasil ditambahkan.');
+        // return redirect()->route('karyawan.index')->with('success', 'Karyawan berhasil ditambahkan.');
 
-        // return redirect()->back()->with('success', 'Karyawan created successfully.');
+        return redirect()->back()->with('success', 'Karyawan created successfully.');
     }
 
     /**
@@ -82,9 +83,18 @@ class KaryawanController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Karyawan $karyawan)
+    public function edit($id)
     {
+        $karyawan = Karyawan::findOrFail($id);
+        if (!$karyawan) {
+            return redirect()->back()->with('error', 'Karyawan not found.');
+        }
         //
+        $departments = Departments::all(['id', 'name']);
+        return Inertia::render('master/karyawan/Edit', [
+            'karyawan' => $karyawan,
+            'departments' => $departments,
+        ]);
     }
 
     /**
@@ -93,10 +103,8 @@ class KaryawanController extends Controller
     public function update(Request $request, $id)
     {
         $karyawan = Karyawan::findOrFail($id);
-        if (!$karyawan) {
-            return redirect()->back()->with('error', 'Karyawan not found.');
-        }
-        //
+
+        // Validasi data
         $validatedData = $request->validate([
             'nik' => 'required|string|max:20|unique:tbl_karyawans,nik,' . $karyawan->id_karyawan . ',id_karyawan',
             'nama' => 'required|string|max:100',
@@ -105,18 +113,31 @@ class KaryawanController extends Controller
             'alamat' => 'nullable|string|max:255',
             'no_ktp' => 'nullable|string|max:20',
             'telp' => 'nullable|string|max:15',
-            'department_id' => 'required|exists:departments,id',
+            'department_id' => 'required|exists:tbl_departments,id',
             'jabatan' => 'nullable|string|max:100',
             'call_sign' => 'nullable|string|max:50',
             'tmk' => 'nullable|date',
             'status_karyawan' => 'required|string|max:50',
             'keterangan' => 'nullable|string|max:255',
-            'user_image' => 'nullable|string|max:255',
+            'user_image' => 'nullable|image|max:2048', // max 2MB
         ]);
 
+        // Jika ada file baru yang diunggah, hapus file lama dan simpan file baru
+        if ($request->hasFile('user_image')) {
+            // Hapus file lama jika ada
+            if ($karyawan->user_image && Storage::disk('public')->exists($karyawan->user_image)) {
+                Storage::disk('public')->delete($karyawan->user_image);
+            }
+
+            // Simpan file baru
+            $path = $request->file('user_image')->store('karyawan', 'public');
+            $validatedData['user_image'] = $path;
+        }
+
+        // Update data karyawan
         $karyawan->update($validatedData);
 
-        return redirect()->back()->with('success', 'Karyawan updated successfully.');
+        return redirect()->route('karyawan.index')->with('success', 'Data karyawan berhasil diperbarui.');
     }
 
     /**

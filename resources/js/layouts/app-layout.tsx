@@ -7,7 +7,6 @@ import { Main } from '@/components/__partials/main';
 import { ProfileDropdown } from '@/components/profile-dropdown';
 import Search from '@/components/search';
 import ThemeSwitcher from '@/components/theme-switcher';
-import ToastProvider from '@/components/toast-providers';
 import { cn } from '@/lib/utils';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
@@ -28,7 +27,7 @@ export default function AppLayout({ children, title, description }: AppLayoutPro
     }, []);
     return (
         <SearchProvider>
-            <ToastProvider />
+            {/* <ToastProvider /> */}
             <SidebarProvider defaultOpen={defaultOpen}>
                 <AppSidebar />
                 <div

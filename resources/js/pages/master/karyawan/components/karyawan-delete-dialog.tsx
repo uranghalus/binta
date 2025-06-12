@@ -6,7 +6,6 @@ import { Separator } from '@/components/ui/separator';
 import { useForm } from '@inertiajs/react';
 import { TriangleAlert } from 'lucide-react';
 import React, { useState } from 'react';
-import { toast } from 'sonner';
 import { Karyawan } from '../data/karyawanSchema';
 
 interface Props {
@@ -31,15 +30,10 @@ export default function KaryawanDeleteDialog({ open, onOpenChange, currentRow }:
             setErrorMessage('Nama karyawan tidak sesuai');
             return;
         }
-        destroy(route('karyawan.destroy', currentRow.id), {
+        destroy(route('karyawan.destroy', currentRow.id_karyawan), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success('Yeay!', {
-                    description: 'Data karyawan berhasil dihapus.',
-                });
-                setTimeout(() => {
-                    handleClose();
-                }, 1000);
+                handleClose();
             },
         });
     };

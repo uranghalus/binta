@@ -8,8 +8,9 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useDialog } from '@/context/dialog-context';
+import { Link } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
-import { Ellipsis, SquarePen, Trash2 } from 'lucide-react';
+import { Ellipsis, SquarePen, Trash2, View } from 'lucide-react';
 import { Karyawan } from '../data/karyawanSchema';
 
 interface Props {
@@ -26,16 +27,21 @@ export default function KaryawanRowAction({ row }: Props) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem
-                    onClick={() => {
-                        setCurrentRow(row.original);
-                        setOpen('edit');
-                    }}
-                >
-                    Edit
-                    <DropdownMenuShortcut>
-                        <SquarePen size={16} />
-                    </DropdownMenuShortcut>
+                <DropdownMenuItem asChild>
+                    <Link href={route('karyawan.show', { id: row.original.id_karyawan })} className="flex items-center gap-2">
+                        View
+                        <DropdownMenuShortcut>
+                            <View size={16} />
+                        </DropdownMenuShortcut>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href={route('karyawan.edit', { id: row.original.id_karyawan })}>
+                        Edit
+                        <DropdownMenuShortcut>
+                            <SquarePen size={16} />
+                        </DropdownMenuShortcut>
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

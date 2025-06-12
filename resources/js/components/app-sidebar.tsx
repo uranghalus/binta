@@ -26,7 +26,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                                 </div>
                                 <div className="grid flex-1 items-center text-left text-sm leading-tight">
                                     <span className="font-qurova">Binta App</span>
-                                    <span className="truncate text-xs">V.1.0.0</span>
+                                    <span className="text-muted-foreground truncate text-[10px]">V.1.0.0</span>
                                 </div>
                             </a>
                         </SidebarMenuButton>

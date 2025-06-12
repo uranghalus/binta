@@ -4,9 +4,9 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
-export function toISODate(date: Date | null | undefined) {
+export function toISODate(date: Date | null | undefined): string | null {
     if (!date) return null;
-    return date.toISOString().split('T')[0]; // "2025-06-11"
+    return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 }
 
 // format untuk ditampilkan ke user

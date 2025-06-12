@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const karyawanSchema = z.object({
-    id: z.string().optional(),
+    id_karyawan: z.string().optional(),
 
     nik: z.string().min(1, 'NIK wajib diisi').max(255, 'NIK maksimal 255 karakter'),
     nama: z.string().min(1, 'Nama wajib diisi').max(255, 'Nama maksimal 255 karakter'),
@@ -30,8 +30,10 @@ export const karyawanSchema = z.object({
 
     tmk: z
         .string()
-        .nullable()
-        .refine((v) => v === null || !Number.isNaN(Date.parse(v)), { message: 'Tanggal masuk kerja tidak valid' }),
+        .refine((val) => !isNaN(Date.parse(val)), {
+            message: 'Tanggal harus dalam format YYYY-MM-DD',
+        })
+        .optional(),
 
     status_karyawan: z.enum(['aktif', 'tidak_aktif', 'cuti', 'resign'], {
         errorMap: () => ({ message: 'Status karyawan tidak valid' }),
