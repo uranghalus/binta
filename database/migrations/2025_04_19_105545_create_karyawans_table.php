@@ -30,7 +30,7 @@ return new class extends Migration
             $table->date('tmk'); // tanggal mulai kerja
             $table->string('status_karyawan', 16);
             $table->text('keterangan')->nullable();
-            $table->string('user_image', 50)->nullable();
+            $table->string('user_image', 150)->nullable();
             $table->timestamp('create_date')->nullable();
             $table->unsignedBigInteger('create_id_user')->nullable();
             $table->timestamp('modified_date')->nullable();
