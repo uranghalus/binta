@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OfficesController;
-use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,10 +19,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('unit-bisnis', OfficesController::class)->parameters(['unit-bisnis
         ' => 'id'])
             ->names('unit-bisnis');
-        Route::resource('role', RoleController::class);
         Route::resource('departemen', DepartmentController::class)
             ->parameters(['departemen' => 'id'])
             ->names('departemen');
+        Route::resource('jabatan', JabatanController::class)
+            ->parameters(['jabatan' => 'id'])
+            ->names('jabatan');
         Route::resource('karyawan', KaryawanController::class)
             ->parameters(['karyawan' => 'id'])
             ->names('karyawan');

@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_roles', function (Blueprint $table) {
+        Schema::create('tbl_jabatan', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // pengaju, supervisor, akunting, gudang, purchasing
+            $table->string('nama_jabatan');
+            $table->unsignedBigInteger('department_id');
+            $table->foreign('department_id')
+                ->references('id')
+                ->on('tbl_departments')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -23,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_roles');
+        Schema::dropIfExists('tbl_jabatan');
     }
 };

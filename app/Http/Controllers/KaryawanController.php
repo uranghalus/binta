@@ -75,9 +75,16 @@ class KaryawanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Karyawan $karyawan)
+    public function show($id)
     {
         //
+        $karyawan = Karyawan::with('department')->findOrFail($id);
+        if (!$karyawan) {
+            return redirect()->back()->with('error', 'Karyawan not found.');
+        }
+        return Inertia::render('master/karyawan/Show', [
+            'karyawan' => $karyawan,
+        ]);
     }
 
     /**

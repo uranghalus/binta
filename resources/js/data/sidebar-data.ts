@@ -1,5 +1,6 @@
+import { type SidebarData } from '@/types/layout';
 import { DatabaseZap, LayoutDashboard, ListTodo, MessageCircle, Package2, UserCog } from 'lucide-react';
-import { type SidebarData } from '../js/types/layout';
+
 export const sidebarData: SidebarData = {
     user: {
         name: 'satnaing',
@@ -26,6 +27,10 @@ export const sidebarData: SidebarData = {
                         {
                             title: 'Data Departemen',
                             url: '/master-data/departemen',
+                        },
+                        {
+                            title: 'Data Jabatan',
+                            url: '/master-data/jabatan',
                         },
                         {
                             title: 'Data Role',

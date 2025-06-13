@@ -5,11 +5,13 @@ namespace Database\Seeders;
 use App\Models\Departments;
 use App\Models\Karyawan;
 use App\Models\Office;
-use App\Models\Roles;
+
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class InitialUserSeeder extends Seeder
 {
@@ -38,7 +40,7 @@ class InitialUserSeeder extends Seeder
         );
 
         // 3. Buat Role
-        $role = Roles::firstOrCreate(['name' => 'SuperUser']);
+
 
         // 4. Buat Karyawan
         $karyawan = Karyawan::create([
@@ -63,11 +65,14 @@ class InitialUserSeeder extends Seeder
         ]);
 
         // 5. Buat User login
-        User::create([
+        $user = User::create([
             'karyawan_id' => $karyawan->id_karyawan,
             'email' => 'fauzan@dutamall.com',
             'password' => 'admin123', // Ganti jika perlu
-            'role_id' => $role->id,
         ]);
+        $permisssion = Permission::all();
+        $role = Role::find(1);
+        $role->syncPermissions($permisssion);
+        $user->assignRole($role);
     }
 }

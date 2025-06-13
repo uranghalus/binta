@@ -1,11 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-
-import AppLayout from '@/layouts/app-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
-
-import { ImageUploader } from '@/components/image-uploader';
 import { Calendar } from '@/components/ui/calendar';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +8,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
 import { formatDate, toISODate } from '@/lib/utils';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { CalendarIcon, ChevronsUpDownIcon } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { toast } from 'sonner';
@@ -26,10 +23,12 @@ interface Props {
 }
 
 export default function Edit({ departments, karyawan }: Props) {
-    const [date, setDate] = useState<Date | undefined>(new Date(karyawan.tmk || ''));
-    const [value, setValue] = useState(formatDate(date)); // Untuk tampilan
-    const [tmkValue, setTmkValue] = useState(toISODate(date)); // Untuk form data
+    // Inisialisasi tanggal dari data karyawan
+    const [date, setDate] = useState<Date | undefined>(karyawan.tmk ? new Date(karyawan.tmk) : undefined);
+    const [value, setValue] = useState(formatDate(date));
+    const [tmkValue, setTmkValue] = useState(toISODate(date));
     const [month, setMonth] = useState<Date | undefined>(date);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
     const { put, processing, reset, data, setData } = useForm({
         nama: karyawan.nama || '',
         nik: karyawan.nik || '',
@@ -44,7 +43,7 @@ export default function Edit({ departments, karyawan }: Props) {
         alamat: karyawan.alamat || '',
         keterangan: karyawan.keterangan || '',
         telp: karyawan.telp || '',
-        user_image: undefined as File | undefined, // ← simpan File, bukan URL
+        user_image: undefined as File | undefined, // File baru jika diubah
     });
     const [zodError, setZodError] = useState<Record<string, string>>({});
     const [openDepartment, setOpenDepartment] = useState(false);
@@ -52,7 +51,6 @@ export default function Edit({ departments, karyawan }: Props) {
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // console.log('Data sebelum submit:', data);
         const result = karyawanSchema.safeParse(data);
         if (!result.success) {
             const errors: Record<string, string> = {};
@@ -70,34 +68,31 @@ export default function Edit({ departments, karyawan }: Props) {
                 reset();
             },
             onError: (errors) => {
-                console.log(errors);
                 setZodError(errors);
             },
-
             preserveScroll: true,
         });
     };
 
     return (
-        <AppLayout title="Master Karyawan">
-            <Head title="Master Karyawan" />
-
+        <AppLayout title="Edit Karyawan">
+            <Head title="Edit Karyawan" />
             <Card>
                 <CardHeader>
-                    <CardTitle>Tambah Karyawan</CardTitle>
-                    <CardDescription className="text-muted-foreground">Tambah Data Karyawan</CardDescription>
+                    <CardTitle>Edit Karyawan</CardTitle>
+                    <CardDescription className="text-muted-foreground">Perbarui Data Karyawan</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={onSubmit} className="grid grid-cols-1 gap-6 md:grid-cols-2" id="itemForm">
                         <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
-                                {/* LINK NIK */}
+                                {/* NIK */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="nik">No Induk Karyawan</Label>
                                     <Input id="nik" value={data.nik} onChange={(e) => setData('nik', e.target.value)} />
                                     {zodError.nik && <p className="text-xs text-red-500">{zodError.nik}</p>}
                                 </div>
-                                {/* LINK KTP */}
+                                {/* KTP */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="no_ktp">No. KTP</Label>
                                     <Input id="no_ktp" value={data.no_ktp} onChange={(e) => setData('no_ktp', e.target.value)} />
@@ -109,9 +104,8 @@ export default function Edit({ departments, karyawan }: Props) {
                                 <Input id="nama" value={data.nama} onChange={(e) => setData('nama', e.target.value)} />
                                 {zodError.nama && <p className="text-xs text-red-500">{zodError.nama}</p>}
                             </div>
-                            {/* ANCHOR JENKEL dan Telpon */}
+                            {/* Gender dan Telpon */}
                             <div className="grid grid-cols-2 gap-4">
-                                {/* LINK Gender */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="gender">Jenis Kelamin</Label>
                                     <RadioGroup
@@ -130,28 +124,25 @@ export default function Edit({ departments, karyawan }: Props) {
                                     </RadioGroup>
                                     {zodError.gender && <p className="text-xs text-red-500">{zodError.gender}</p>}
                                 </div>
-                                {/* LINK No Telp */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="telp">No. Telp</Label>
                                     <Input id="telp" value={data.telp} onChange={(e) => setData('telp', e.target.value)} />
                                 </div>
                             </div>
-                            {/* ANCHOR Nama Panggilan dan Nama Alias */}
+                            {/* Nama Panggilan dan Alias */}
                             <div className="grid grid-cols-2 gap-4">
-                                {/* LINK Nama Panggilan*/}
                                 <div className="grid gap-2">
                                     <Label htmlFor="call_sign">Nama Panggilan</Label>
                                     <Input id="call_sign" value={data.call_sign} onChange={(e) => setData('call_sign', e.target.value)} />
-                                    {zodError.nama && <p className="text-xs text-red-500">{zodError.nama}</p>}
+                                    {zodError.call_sign && <p className="text-xs text-red-500">{zodError.call_sign}</p>}
                                 </div>
-                                {/* LINK Nama Alias */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="nama_alias">Nama Alias</Label>
                                     <Input id="nama_alias" value={data.nama_alias} onChange={(e) => setData('nama_alias', e.target.value)} />
                                     {zodError.nama_alias && <p className="text-xs text-red-500">{zodError.nama_alias}</p>}
                                 </div>
                             </div>
-                            {/* ANCHOR Alamat */}
+                            {/* Alamat */}
                             <div className="grid gap-2">
                                 <Label htmlFor="alamat">Alamat</Label>
                                 <Textarea id="alamat" className="h-2/12" value={data.alamat} onChange={(e) => setData('alamat', e.target.value)} />
@@ -160,7 +151,7 @@ export default function Edit({ departments, karyawan }: Props) {
                         </div>
                         <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
-                                {/* LINK Department */}
+                                {/* Department */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="department_id">Departemen</Label>
                                     <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
@@ -184,7 +175,7 @@ export default function Edit({ departments, karyawan }: Props) {
                                                                 key={department.id}
                                                                 onSelect={() => {
                                                                     setData('department_id', Number(department.id));
-                                                                    setOpenDepartment(false); // ← sebelumnya setOpen(false)
+                                                                    setOpenDepartment(false);
                                                                 }}
                                                             >
                                                                 {department.name}
@@ -197,7 +188,7 @@ export default function Edit({ departments, karyawan }: Props) {
                                     </Popover>
                                     {zodError.department_id && <p className="text-xs text-red-500">{zodError.department_id}</p>}
                                 </div>
-                                {/* LINK Jabatan */}
+                                {/* Jabatan */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="jabatan">Jabatan</Label>
                                     <Select value={data.jabatan} onValueChange={(value) => setData('jabatan', value)} defaultValue={data.jabatan}>
@@ -214,7 +205,7 @@ export default function Edit({ departments, karyawan }: Props) {
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                {/* LINK Status Karyawan */}
+                                {/* Status Karyawan */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="status_karyawan">Status Karyawan</Label>
                                     <Select
@@ -234,7 +225,7 @@ export default function Edit({ departments, karyawan }: Props) {
                                     </Select>
                                     {zodError.status_karyawan && <p className="text-xs text-red-500">{zodError.status_karyawan}</p>}
                                 </div>
-                                {/* LINK Tanggal Mulai Kerja */}
+                                {/* Tanggal Mulai Kerja */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="tmk">Tanggal Mulai Kerja</Label>
                                     <div className="relative flex gap-2">
@@ -278,7 +269,7 @@ export default function Edit({ departments, karyawan }: Props) {
                                                     onSelect={(date) => {
                                                         if (date) {
                                                             setDate(date);
-                                                            setValue(formatDate(date)); // Untuk tampilan
+                                                            setValue(formatDate(date));
                                                             const isoDate = toISODate(date);
                                                             setTmkValue(isoDate);
                                                             setData('tmk', isoDate || '');
@@ -292,18 +283,36 @@ export default function Edit({ departments, karyawan }: Props) {
                                     {zodError.tmk && <p className="text-xs text-red-500">{zodError.tmk}</p>}
                                 </div>
                             </div>
-                            {/* LINK User Image */}
-                            <div className="space-y-2">
-                                <ImageUploader
-                                    initialImage={karyawan.user_image ? `/storage/${karyawan.user_image}` : null}
-                                    onImageChange={(file) => setData('user_image', file || undefined)}
-                                    label="Foto Karyawan"
-                                    previewClassName="h-32 w-32 rounded-md object-cover border"
+                            {/* User Image */}
+                            <div className="grid gap-2">
+                                <Label htmlFor="user_image">User Image</Label>
+                                <Input
+                                    id="user_image"
+                                    type="file"
+                                    accept="image/jpeg, image/png, image/jpg"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        setData('user_image', file);
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => setPreviewImage(reader.result as string);
+                                            reader.readAsDataURL(file);
+                                        } else {
+                                            setPreviewImage(null);
+                                        }
+                                    }}
                                 />
+                                {/* Preview gambar baru jika ada, jika tidak tampilkan gambar lama */}
+                                {previewImage ? (
+                                    <img src={previewImage} alt="Preview User Image" className="mt-2 h-20 rounded" />
+                                ) : (
+                                    karyawan.user_image && (
+                                        <img src={`/storage/${karyawan.user_image}`} alt="User Image" className="mt-2 h-20 rounded" />
+                                    )
+                                )}
                                 {zodError.user_image && <p className="text-xs text-red-500">{zodError.user_image}</p>}
-                                {/* {zodError.user_image && <p className="text-xs text-red-500">{zodError.user_image}</p>} */}
                             </div>
-                            {/* LINK Keterangan */}
+                            {/* Keterangan */}
                             <div className="grid gap-2">
                                 <Label htmlFor="keterangan">Keterangan</Label>
                                 <Textarea

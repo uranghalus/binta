@@ -4,7 +4,26 @@ import type { Config } from 'ziggy-js';
 export interface Auth {
     user: User;
 }
-
+export type SidebarData = {
+    user: {
+        name: string;
+        email: string;
+        avatar: string;
+    };
+    navGroups: Array<{
+        title: string;
+        items: Array<{
+            title: string;
+            url?: string;
+            icon?: any;
+            badge?: string;
+            items?: Array<{
+                title: string;
+                url: string;
+            }>;
+        }>;
+    }>;
+};
 export interface BreadcrumbItem {
     title: string;
     href: string;
