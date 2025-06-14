@@ -41,7 +41,7 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm leading-none font-medium">{user.karyawan.nama}</p>
-                        <p className="text-muted-foreground text-xs leading-none">{user.role.name}</p>
+                        <p className="text-muted-foreground text-xs leading-none">{user.email}</p>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />

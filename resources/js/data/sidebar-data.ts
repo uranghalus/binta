@@ -1,5 +1,5 @@
 import { type SidebarData } from '@/types/layout';
-import { DatabaseZap, LayoutDashboard, ListTodo, MessageCircle, Package2, UserCog } from 'lucide-react';
+import { DatabaseZap, FireExtinguisher, LayoutDashboard, ListTodo, MessageCircle, Package2, UserCog, UserCog2 } from 'lucide-react';
 
 export const sidebarData: SidebarData = {
     user: {
@@ -15,6 +15,20 @@ export const sidebarData: SidebarData = {
                     title: 'Dashboard',
                     url: '/dashboard',
                     icon: LayoutDashboard,
+                },
+                {
+                    title: 'Role Management',
+                    icon: UserCog2,
+                    items: [
+                        {
+                            title: 'Perimission List',
+                            url: '/role-management/permission-list',
+                        },
+                        {
+                            title: 'Role List',
+                            url: '/role-management/role-list',
+                        },
+                    ],
                 },
                 {
                     title: 'Data Master',
@@ -43,6 +57,20 @@ export const sidebarData: SidebarData = {
                         {
                             title: 'Data Karyawan',
                             url: '/master-data/karyawan',
+                        },
+                    ],
+                },
+                {
+                    title: 'Data Fire Safety',
+                    icon: FireExtinguisher,
+                    items: [
+                        {
+                            title: 'Data Apar',
+                            url: '/fire-safety/apar',
+                        },
+                        {
+                            title: 'Data Hydrant',
+                            url: '/fire-safety/hydrant',
                         },
                     ],
                 },

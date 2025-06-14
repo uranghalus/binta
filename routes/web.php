@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\AparController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OfficesController;
+use App\Http\Controllers\PermissionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,6 +17,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+    Route::prefix('role-management')->group(function () {
+        Route::resource('permission-list', PermissionController::class)
+            ->parameters(['permission' => 'id'])
+            ->names('permission');
+    });
+    Route::prefix('fire-safety')->group(function () {
+        Route::resource('apar', AparController::class)
+            ->parameters(['apar' => 'id'])
+            ->names('apar');
+    });
     Route::prefix('master-data')->group(function () {
         Route::resource('unit-bisnis', OfficesController::class)->parameters(['unit-bisnis
         ' => 'id'])

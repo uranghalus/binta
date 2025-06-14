@@ -1,0 +1,33 @@
+import CrudPrimaryButton from '@/components/crud-primary-button';
+import { DialogProvider } from '@/context/dialog-context';
+import AppLayout from '@/layouts/app-layout';
+import { Head } from '@inertiajs/react';
+import { AparColumn } from './components/apar-columns';
+import AparDialog from './components/apar-dialogs';
+import AparTable from './components/apar-table';
+import { Apar } from './data/aparSchema';
+
+interface Props {
+    apar: Apar[];
+}
+export default function index({ apar }: Props) {
+    return (
+        <AppLayout title="Fire Safety - APAR" description="Fire Safety - APAR">
+            <Head title="Fire Safety - APAR" />
+            <DialogProvider>
+                <div className="mb-2 flex flex-wrap items-center justify-between space-y-2">
+                    <div>
+                        <h2 className="text-2xl font-bold tracking-tight">Data APAR</h2>
+                        <p className="text-muted-foreground">Pengelolaan data APAR</p>
+                    </div>
+                    <CrudPrimaryButton title="Tambah Apar" />
+                </div>
+                <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
+                    <AparTable columns={AparColumn} data={apar} />
+                </div>
+                {/* Content for APAR management will go here */}
+                <AparDialog />
+            </DialogProvider>
+        </AppLayout>
+    );
+}
