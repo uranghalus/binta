@@ -3,6 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { Apar } from '../data/aparSchema';
+import AparRowAction from './apar-row-action';
 
 export const AparColumn: ColumnDef<Apar>[] = [
     {
@@ -46,11 +47,6 @@ export const AparColumn: ColumnDef<Apar>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: 'regu',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Regu" />,
-        cell: ({ row }) => <div>{row.getValue('regu')}</div>,
-    },
-    {
         accessorKey: 'kode_apar',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Kode APAR" />,
         cell: ({ row }) => <div>{row.getValue('kode_apar')}</div>,
@@ -60,16 +56,7 @@ export const AparColumn: ColumnDef<Apar>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Lokasi" />,
         cell: ({ row }) => <div>{row.getValue('lokasi')}</div>,
     },
-    {
-        accessorKey: 'jenis',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Jenis" />,
-        cell: ({ row }) => <div>{row.getValue('jenis')}</div>,
-    },
-    {
-        accessorKey: 'size',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Ukuran" />,
-        cell: ({ row }) => <div>{row.getValue('size')}</div>,
-    },
+
     {
         accessorKey: 'date_refill',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Tanggal Refill" />,
@@ -80,20 +67,11 @@ export const AparColumn: ColumnDef<Apar>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Tanggal Expired" />,
         cell: ({ row }) => <div>{row.getValue('tanggal_expired')}</div>,
     },
-    {
-        accessorKey: 'kondisi',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Kondisi" />,
-        cell: ({ row }) => <div>{row.getValue('kondisi')}</div>,
-    },
-    {
-        accessorKey: 'tanggal_pengecekan',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Tgl Pengecekan" />,
-        cell: ({ row }) => <div>{row.getValue('tanggal_pengecekan') || '-'}</div>,
-    },
+
     // Tambahkan kolom aksi jika diperlukan, contoh:
-    // {
-    //     id: 'actions',
-    //     header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
-    //     cell: AparRowAction,
-    // },
+    {
+        id: 'actions',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
+        cell: AparRowAction,
+    },
 ];
