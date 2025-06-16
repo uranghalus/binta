@@ -23,7 +23,7 @@ export default function AparDeleteDialog({ open, onOpenChange, currentRow }: Pro
         onOpenChange(false);
     };
     const handleDelete = () => {
-        if (value !== currentRow.kode_unik) {
+        if (value !== currentRow.kode_apar) {
             setErrorMessage('Kode unik tidak sesuai');
             return;
         }
@@ -50,7 +50,7 @@ export default function AparDeleteDialog({ open, onOpenChange, currentRow }: Pro
             }
             desc={
                 <span className="text-gray-500">
-                    Apakah Anda yakin ingin menghapus APAR <span className="font-bold">{currentRow.kode_unik}</span>?
+                    Apakah Anda yakin ingin menghapus APAR <span className="font-bold">{currentRow.kode_apar}</span>?
                 </span>
             }
             confirmText={processing ? 'Menghapus...' : 'Delete'}
@@ -58,7 +58,7 @@ export default function AparDeleteDialog({ open, onOpenChange, currentRow }: Pro
         >
             <div className="grid gap-2">
                 <Label className="text-sm text-gray-500">
-                    Untuk mengkonfirmasi, silakan ketik kode unik <span className="font-bold">{currentRow.kode_unik}</span>:
+                    Untuk mengkonfirmasi, silakan ketik kode unik <span className="font-bold">{currentRow.kode_apar}</span>:
                 </Label>
                 <Alert variant={'destructive'}>
                     <AlertTitle>Perhatian!</AlertTitle>
@@ -67,7 +67,7 @@ export default function AparDeleteDialog({ open, onOpenChange, currentRow }: Pro
                 <Separator />
                 <div className="flex w-full items-center gap-2 rounded-md border border-red-300 bg-red-50 p-2 text-sm text-red-500">
                     <div className="text-sm">
-                        Ketik Ini: <span className="font-bold">{currentRow.kode_unik}</span>
+                        Ketik Ini: <span className="font-bold">{currentRow.kode_apar}</span>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,8 @@ export default function AparDeleteDialog({ open, onOpenChange, currentRow }: Pro
                     value={value}
                     onChange={handleChange}
                     className={`input w-full ${errorMessage ? 'input-error' : ''}`}
-                    placeholder={`Ketik "${currentRow.kode_unik}"`}
+                    placeholder={`Ketik "${currentRow.kode_apar}" untuk mengkonfirmasi penghapusan`}
+                    disabled={processing}
                 />
                 {errorMessage && <p className="text-xs text-red-500">{errorMessage}</p>}
             </div>

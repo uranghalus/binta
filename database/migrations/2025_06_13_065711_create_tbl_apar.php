@@ -13,39 +13,47 @@ return new class extends Migration
     {
         Schema::create('apar', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_unik', 15)->unique();  // Contoh: "APAR-001"
-            $table->enum('regu', ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])->default('Regu A'); // Pilihan regu
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->string('kode_apar', 25)->unique();                // Contoh: "APAR Utama"
-            $table->string('lokasi');              // Contoh: "Lantai 1, Ruang Server"
+            $table->string('kode_apar', 25)->unique(); // Contoh: "APAR Utama"
+            $table->string('lokasi'); // Contoh: "Lantai 1, Ruang Server"
             $table->enum('jenis', ['CO2', 'Powder', 'Foam', 'Air']);
-            $table->enum('size', ['2 kg', '4 kg', '6 kg', '9 kg',]);
-            $table->date('date_refill');
-            $table->date('tanggal_expired');
-            $table->string('kondisi')->default('Baik'); // Pilihan kondisi
-            $table->string('image', 150)->nullable(); // Menyimpan nama file gambar
-            $table->date('tanggal_pengecekan')->nullable(); // Tanggal terakhir pengecekan
+            $table->unsignedTinyInteger('size'); // Misalnya: 2, 4, 6, 9 (dalam kg)
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
+
         Schema::create('hydrant', function (Blueprint $table) {
             $table->id();
             $table->string('kode_unik')->unique();  // Contoh: "HYD-001"
             $table->string('kode_hydrant', 25)->unique(); // Contoh: "HYD Utama"
             $table->enum('tipe', ['Indoor', 'Outdoor']);
             $table->string('lokasi');
-            $table->string('selang_hydrant')->default('Ada');
-            $table->string('noozle_hydrant')->default('Ada');
-            $table->string('kaca_hydrant')->default('Bagus');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
-        Schema::create('inspections', function (Blueprint $table) {
+
+        Schema::create('apar_inspections', function (Blueprint $table) {
             $table->id();
-            $table->morphs('inspectable'); // polymorphic: apar, hydrant
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // pemeriksa
-            $table->date('tanggal_inspeksi');
+            $table->foreignId('apar_id')->constrained('apar')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
+            $table->enum('regu', ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])->default('Regu A');
+            $table->date('tanggal_kadaluarsa')->nullable(); // Bisa kosong jika tidak ada
+            $table->string('kondisi', 150)->nullable(); // Bisa input bebas
             $table->text('catatan')->nullable();
-            $table->string('foto')->nullable(); // path file gambar
+            $table->string('foto_apar')->nullable(); // Lebih spesifik
+            $table->timestamp('tanggal_inspeksi')->default(now());
+            $table->timestamps();
+        });
+
+        Schema::create('hydrant_inspections', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('hydrant_id')->constrained('hydrant')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
+            $table->enum('regu', ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])->default('Regu A');
+            // Kolom fleksibel untuk input bebas (tanpa enum)
+            $table->string('selang_hydrant', 150)->nullable();
+            $table->string('noozle_hydrant', 150)->nullable();
+            $table->string('kaca_box_hydrant', 150)->nullable();
+            $table->timestamp('tanggal_inspeksi')->default(now());
             $table->timestamps();
         });
     }

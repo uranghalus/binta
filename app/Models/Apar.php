@@ -2,33 +2,34 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Apar extends Model
 {
     //
+    use HasFactory;
+
     protected $table = 'apar';
+
     protected $fillable = [
-        'kode_unik',
-        'regu',
-        'user_id',
         'kode_apar',
         'lokasi',
         'jenis',
         'size',
-        'date_refill',
-        'tanggal_expired',
-        'kondisi',
-        'image',
-        'tanggal_pengecekan',
+        'user_id',
     ];
 
-    /**
-     * Relasi ke user (petugas/penanggung jawab)
-     */
-    public function user(): BelongsTo
+    // Relasi ke user (yang bertanggung jawab atas APAR, jika ada)
+    public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Relasi ke inspeksi APAR
+    public function inspections()
+    {
+        return $this->hasMany(AparInspection::class);
     }
 }
