@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { useForm } from '@inertiajs/react';
 import { TriangleAlert } from 'lucide-react';
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { Apar } from '../data/aparSchema';
 
 interface Props {
@@ -30,7 +31,10 @@ export default function AparDeleteDialog({ open, onOpenChange, currentRow }: Pro
         destroy(route('apar.destroy', currentRow.id), {
             preserveScroll: true,
             onSuccess: () => {
-                handleClose();
+                toast.success('Data APAR berhasil Di hapus', { description: 'Data APAR berhasil dihapus.' });
+                setTimeout(() => {
+                    handleClose();
+                }, 1000);
             },
         });
     };

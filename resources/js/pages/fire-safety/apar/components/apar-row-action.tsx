@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useDialog } from '@/context/dialog-context';
 import { Row } from '@tanstack/react-table';
-import { Ellipsis, SquarePen, Trash2 } from 'lucide-react';
+import { Download, Ellipsis, SquarePen, Trash2 } from 'lucide-react';
 import { Apar } from '../data/aparSchema';
 
 interface Props {
@@ -26,6 +26,16 @@ export default function AparRowAction({ row }: Props) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
+                <DropdownMenuItem
+                    onClick={() => {
+                        window.open(route('apar.qrcode', row.original.id), '_blank');
+                    }}
+                >
+                    Download QRCode
+                    <DropdownMenuShortcut>
+                        <Download size={16} />
+                    </DropdownMenuShortcut>
+                </DropdownMenuItem>
                 <DropdownMenuItem
                     onClick={() => {
                         setCurrentRow(row.original);

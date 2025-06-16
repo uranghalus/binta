@@ -21,6 +21,12 @@ export default function index({ apar }: Props) {
                         <p className="text-muted-foreground">Pengelolaan data APAR</p>
                     </div>
                     <CrudPrimaryButton title="Tambah Apar" />
+                    {/* <Button asChild>
+                        <Link href={route('apar.create')} className="space-x-1">
+                            <span>Tambah Apar</span>
+                            <Plus className="size-4" />
+                        </Link>
+                    </Button> */}
                 </div>
                 <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
                     <AparTable columns={AparColumn} data={apar} />

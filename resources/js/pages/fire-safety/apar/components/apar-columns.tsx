@@ -36,7 +36,7 @@ export const AparColumn: ColumnDef<Apar>[] = [
     {
         accessorKey: 'kode_apar',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Kode APAR" />,
-        cell: ({ row }) => <div>{row.getValue('kode_apar')}</div>,
+        cell: ({ row }) => <div className="font-bold">{row.getValue('kode_apar')}</div>,
     },
     {
         accessorKey: 'lokasi',
@@ -51,7 +51,7 @@ export const AparColumn: ColumnDef<Apar>[] = [
     {
         accessorKey: 'size',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Ukuran" />,
-        cell: ({ row }) => <div>{row.getValue('size')}</div>,
+        cell: ({ row }) => <div>{row.getValue('size')} Kg</div>,
     },
     // Tambahkan kolom aksi jika diperlukan, contoh:
     {
