@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7109f977fe5bc0d94faacdef3143030f",
+    "content-hash": "df352e1d9e037bc31c299c518a660c4b",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1528,16 +1528,16 @@
         },
         {
             "name": "intervention/image",
-            "version": "3.11.2",
+            "version": "3.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/image.git",
-                "reference": "ebbb711871fb261c064cf4c422f5f3c124fe1842"
+                "reference": "d0f097b8a3fa8fb758efc9440b513aa3833cda17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/image/zipball/ebbb711871fb261c064cf4c422f5f3c124fe1842",
-                "reference": "ebbb711871fb261c064cf4c422f5f3c124fe1842",
+                "url": "https://api.github.com/repos/Intervention/image/zipball/d0f097b8a3fa8fb758efc9440b513aa3833cda17",
+                "reference": "d0f097b8a3fa8fb758efc9440b513aa3833cda17",
                 "shasum": ""
             },
             "require": {
@@ -1584,7 +1584,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Intervention/image/issues",
-                "source": "https://github.com/Intervention/image/tree/3.11.2"
+                "source": "https://github.com/Intervention/image/tree/3.11.3"
             },
             "funding": [
                 {
@@ -1600,7 +1600,7 @@
                     "type": "ko_fi"
                 }
             ],
-            "time": "2025-02-27T13:08:55+00:00"
+            "time": "2025-05-22T17:26:23+00:00"
         },
         {
             "name": "laravel/framework",
@@ -7354,16 +7354,16 @@
         },
         {
             "name": "laravel/sail",
-            "version": "v1.41.1",
+            "version": "v1.43.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sail.git",
-                "reference": "e5692510f1ef8e0f5096cde2b885d558f8d86592"
+                "reference": "3e7d899232a8c5e3ea4fc6dee7525ad583887e72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/e5692510f1ef8e0f5096cde2b885d558f8d86592",
-                "reference": "e5692510f1ef8e0f5096cde2b885d558f8d86592",
+                "url": "https://api.github.com/repos/laravel/sail/zipball/3e7d899232a8c5e3ea4fc6dee7525ad583887e72",
+                "reference": "3e7d899232a8c5e3ea4fc6dee7525ad583887e72",
                 "shasum": ""
             },
             "require": {
@@ -7413,7 +7413,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-            "time": "2025-04-22T13:39:39+00:00"
+            "time": "2025-05-19T13:19:21+00:00"
         },
         {
             "name": "mockery/mockery",

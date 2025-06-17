@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->names('apar');
     });
     Route::get('/apar/qrcode/{id}', [AparController::class, 'generateQRCode'])->name('apar.qrcode');
+    Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');
     Route::prefix('master-data')->group(function () {
         Route::resource('unit-bisnis', OfficesController::class)->parameters(['unit-bisnis
         ' => 'id'])

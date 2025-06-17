@@ -3,17 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Apar;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
-
+use Intervention\Image\Facades\Image;
 // third party
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class AparController extends Controller implements HasMiddleware
 {
+    protected $imageManager;
+
+    public function __construct()
+    {
+        $this->imageManager = new ImageManager(Driver::class); // atau 'imagick'
+    }
     public static function middleware()
     {
         return [
@@ -64,20 +72,81 @@ class AparController extends Controller implements HasMiddleware
 
         return redirect()->route('apar.index')->with('success', 'APAR berhasil ditambahkan.');
     }
+    // Cetak QR Code
+    /**
+     * Generate a QR code for the specified APAR and return it as a PDF.
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
     public function generateQRCode($id)
     {
         $apar = Apar::findOrFail($id);
-        $url = url('/apar-inspeksi/' . $apar->kode_apar); // misal: https://localhost:8000/apar-inspeksi/ABC123
+        $url = url('/apar-inspeksi/' . $apar->kode_apar);
 
-        $qrCodeBase64 = QrCode::format('png')->size(200)->generate($url);
-        $qrCodeImage = 'data:image/png;base64,' . base64_encode($qrCodeBase64);
+        // Generate QR code binary PNG
+        $qrCode = QrCode::format('png')
+            ->size(300)
+            ->generate($url);
 
+        // Convert to stream
+        $tempStream = fopen('php://memory', 'r+');
+        fwrite($tempStream, $qrCode);
+        rewind($tempStream);
+
+        // Intervention Image V3
+
+        $canvas = $this->imageManager->create(300, 300)->fill('#ffffff');
+        $qr = $this->imageManager->read($tempStream)->resize(275, 275);
+        $canvas->place($qr, 'center', 0, 0);
+
+        // Convert to base64
+        $encoded = (string) $canvas->toJpeg(); // or toPng()
+        $base64 = 'data:image/jpeg;base64,' . base64_encode($encoded);
+
+        // Generate PDF from Blade
         $pdf = Pdf::loadView('apar.qrcode', [
-            'qrCodeImage' => $qrCodeImage,
             'kode_apar' => $apar->kode_apar,
-        ]);
+            'qr_base64' => $base64,
+        ])->setPaper('A4');
 
-        return $pdf->download('qrcode-' . $apar->kode_apar . '.pdf');
+        return $pdf->download("qr_apar_{$apar->kode_apar}.pdf");
+    }
+    // generate Mass QR Code
+    public function generateMassQRCode()
+    {
+        $apar = Apar::all();
+        $qrDataList = [];
+        foreach ($apar as $item) {
+            $url = url('/apar-inspeksi/' . $item->kode_apar);
+
+            // Generate QR code binary PNG
+            $qrCode = QrCode::format('png')
+                ->size(300)
+                ->generate($url);
+
+            // Convert to stream
+            $tempStream = fopen('php://memory', 'r+');
+            fwrite($tempStream, $qrCode);
+            rewind($tempStream);
+
+            // Intervention Image V3
+
+            $canvas = $this->imageManager->create(300, 300)->fill('#ffffff');
+            $qr = $this->imageManager->read($tempStream)->resize(275, 275);
+            $canvas->place($qr, 'center', 0, 0);
+
+            // Convert to base64
+            $encoded = (string) $canvas->toJpeg(); // or toPng()
+            $base64 = 'data:image/jpeg;base64,' . base64_encode($encoded);
+            $qrDataList[] = [
+                'kode_apar' => $item->kode_apar,
+                'qr_base64' => $base64,
+            ];
+        }
+        $pdf = Pdf::loadView('apar.qrexports_pdf', [
+            'qrList' => $qrDataList,
+        ])->setPaper('A4', 'portrait');
+        return $pdf->download("qr_apar_semua.pdf");
     }
     /**
      * Update the specified resource in storage.

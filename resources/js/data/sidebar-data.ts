@@ -1,5 +1,5 @@
 import { type SidebarData } from '@/types/layout';
-import { DatabaseZap, FireExtinguisher, LayoutDashboard, ListTodo, MessageCircle, Package2, UserCog, UserCog2 } from 'lucide-react';
+import { DatabaseZap, FilesIcon, FireExtinguisher, LayoutDashboard, ListTodo, UserCog2 } from 'lucide-react';
 
 export const sidebarData: SidebarData = {
     user: {
@@ -75,25 +75,32 @@ export const sidebarData: SidebarData = {
                     ],
                 },
                 {
-                    title: 'Tasks',
-                    url: '/tasks',
+                    title: 'Data Inspeksi',
                     icon: ListTodo,
+                    items: [
+                        {
+                            title: 'Data Apar',
+                            url: '/fire-safety/apar',
+                        },
+                        {
+                            title: 'Data Hydrant',
+                            url: '/fire-safety/hydrant',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            title: 'Reports',
+            items: [
+                {
+                    title: 'Laporan Apar',
+                    url: '/reports/apar',
+                    icon: FilesIcon,
                 },
                 {
-                    title: 'Apps',
-                    url: '/apps',
-                    icon: Package2,
-                },
-                {
-                    title: 'Chats',
-                    url: '/chats',
-                    badge: '3',
-                    icon: MessageCircle,
-                },
-                {
-                    title: 'Users',
-                    url: '/users',
-                    icon: UserCog,
+                    title: 'Laporan Hydrant',
+                    url: '/reports/hydrant',
                 },
             ],
         },

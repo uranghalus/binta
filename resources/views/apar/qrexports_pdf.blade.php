@@ -5,7 +5,16 @@
     <style>
         body {
             font-family: sans-serif;
-            text-align: center;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
         }
 
         .label {
@@ -23,8 +32,8 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             background: #000;
-            width: 200px;
-            height: 200px;
+            width: 150px;
+            height: 150px;
             display: inline-block;
         }
 
@@ -40,9 +49,19 @@
 </head>
 
 <body>
-    <div class="qr-code-container">
-        <img src="{{ $qr_base64 }}" alt="QR Code" class="qr-code">
-        <div class="label">Kode Apar: {{ $kode_apar }}</div>
+    <div class="grid grid-cols-4">
+        @foreach ($qrList as $index => $qr)
+        <div class="qr-code-container">
+            <img src="{{ $qr['qr_base64'] }}" alt="QR" class="qr-code">
+            <div class="label">{{ $qr['kode_apar'] }}</div>
+        </div>
+
+        @if (($index + 1) % 6 == 0)
+    </div>
+    <div class="page-break"></div>
+    <div class="grid">
+        @endif
+        @endforeach
     </div>
 </body>
 
