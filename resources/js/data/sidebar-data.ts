@@ -79,12 +79,12 @@ export const sidebarData: SidebarData = {
                     icon: ListTodo,
                     items: [
                         {
-                            title: 'Data Apar',
-                            url: '/fire-safety/apar',
+                            title: 'Inspeksi Apar',
+                            url: '/inspection/apar',
                         },
                         {
-                            title: 'Data Hydrant',
-                            url: '/fire-safety/hydrant',
+                            title: 'Inspeksi Hydrant',
+                            url: '/inspection/hydrant',
                         },
                     ],
                 },

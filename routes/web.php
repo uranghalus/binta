@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AparController;
+use App\Http\Controllers\AparInspectionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\JabatanController;
@@ -26,6 +27,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('apar', AparController::class)
             ->parameters(['apar' => 'id'])
             ->names('apar');
+    });
+    Route::prefix('inspection')->group(function () {
+        Route::resource('apar', AparInspectionController::class)
+            ->parameters(['apar' => 'id'])
+            ->names('inspection.apar');
     });
     Route::get('/apar/qrcode/{id}', [AparController::class, 'generateQRCode'])->name('apar.qrcode');
     Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');

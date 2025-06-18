@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AparInspection;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AparInspectionController extends Controller
 {
@@ -13,6 +14,10 @@ class AparInspectionController extends Controller
     public function index()
     {
         //
+        $aparInspections = AparInspection::with('apar')->get();
+        return Inertia::render('fire-safety/inspection/apar/index', [
+            'aparInspections' => $aparInspections,
+        ]);
     }
 
     /**

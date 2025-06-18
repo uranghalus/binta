@@ -8,20 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 // third party
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
+
 
 class AparController extends Controller implements HasMiddleware
 {
-    protected $imageManager;
-
-    public function __construct()
-    {
-        $this->imageManager = new ImageManager(Driver::class); // atau 'imagick'
-    }
     public static function middleware()
     {
         return [
@@ -95,8 +88,8 @@ class AparController extends Controller implements HasMiddleware
 
         // Intervention Image V3
 
-        $canvas = $this->imageManager->create(300, 300)->fill('#ffffff');
-        $qr = $this->imageManager->read($tempStream)->resize(275, 275);
+        $canvas = Image::create(300, 300)->fill('#ffffff');
+        $qr = Image::read($tempStream)->resize(275, 275);
         $canvas->place($qr, 'center', 0, 0);
 
         // Convert to base64
@@ -131,8 +124,8 @@ class AparController extends Controller implements HasMiddleware
 
             // Intervention Image V3
 
-            $canvas = $this->imageManager->create(300, 300)->fill('#ffffff');
-            $qr = $this->imageManager->read($tempStream)->resize(275, 275);
+            $canvas = Image::create(300, 300)->fill('#ffffff');
+            $qr = Image::read($tempStream)->resize(275, 275);
             $canvas->place($qr, 'center', 0, 0);
 
             // Convert to base64

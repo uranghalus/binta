@@ -1,7 +1,7 @@
 import { sidebarData } from '@/data/sidebar-data';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { BaggageClaim } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import React from 'react';
 import { NavGroup } from './nav-group';
 import { NavUser } from './nav-user';
@@ -22,10 +22,10 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                         >
                             <a href="#">
                                 <div className="bg-sidebar-primary flex aspect-square size-8 items-center justify-center rounded-lg dark:text-black">
-                                    <BaggageClaim className="size-4" />
+                                    <Activity className="size-4" />
                                 </div>
                                 <div className="grid flex-1 items-center text-left text-sm leading-tight">
-                                    <span className="font-qurova">Binta App</span>
+                                    <span className="font-qurova">E-Safety</span>
                                     <span className="text-muted-foreground truncate text-[10px]">V.1.0.0</span>
                                 </div>
                             </a>
