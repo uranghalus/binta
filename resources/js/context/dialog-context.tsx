@@ -17,7 +17,7 @@ interface Props {
 }
 
 export function DialogProvider<T>({ children }: Props) {
-    const [open, setOpen] = useDialogState<DialogType>(null);
+    const [open, setOpen] = useDialogState(null);
     const [currentRow, setCurrentRow] = useState<T | null>(null);
 
     return <DialogContext.Provider value={{ open, setOpen, currentRow, setCurrentRow }}>{children}</DialogContext.Provider>;

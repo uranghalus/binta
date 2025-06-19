@@ -5,6 +5,7 @@ import { cn, formatDate } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { TriangleAlert } from 'lucide-react';
 import { AparInspection } from '../data/inspectionAparSchema';
+import InspectionAparAction from './inspection-apar-action';
 
 export const InspectionAparColumns: ColumnDef<AparInspection>[] = [
     {
@@ -84,5 +85,10 @@ export const InspectionAparColumns: ColumnDef<AparInspection>[] = [
                 </div>
             );
         },
+    },
+    {
+        id: 'action',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
+        cell: InspectionAparAction,
     },
 ];

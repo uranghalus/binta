@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { InspectionAparColumns } from './components/inspection-apar-column';
+import InspectionAparDialogs from './components/inspection-apar-dialogs';
 import InspectionAparTable from './components/inspection-apar-table';
 import { AparInspection } from './data/inspectionAparSchema';
 
@@ -30,6 +31,7 @@ export default function index({ aparInspections }: Props) {
                 <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
                     <InspectionAparTable data={aparInspections} columns={InspectionAparColumns} />
                 </div>
+                <InspectionAparDialogs />
             </DialogProvider>
         </AppLayout>
     );
