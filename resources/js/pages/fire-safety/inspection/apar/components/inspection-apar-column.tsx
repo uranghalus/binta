@@ -1,7 +1,9 @@
 import { DataTableColumnHeader } from '@/components/datatable-column-header';
 import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn, formatDate } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
+import { TriangleAlert } from 'lucide-react';
 import { AparInspection } from '../data/inspectionAparSchema';
 
 export const InspectionAparColumns: ColumnDef<AparInspection>[] = [
@@ -35,7 +37,7 @@ export const InspectionAparColumns: ColumnDef<AparInspection>[] = [
     {
         accessorKey: 'user.karyawan.nama',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Nama Petugas" />,
-        cell: ({ row }) => <span className="font-medium">{row.getValue('user.karyawan.nama') || '-'}</span>,
+        cell: ({ row }) => <span className="font-medium">{row.original.user?.karyawan.nama}</span>,
     },
     {
         accessorKey: 'regu',
@@ -45,29 +47,41 @@ export const InspectionAparColumns: ColumnDef<AparInspection>[] = [
     {
         accessorKey: 'apar.kode_apar',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Kode Apar" />,
-        cell: ({ row }) => <span className="font-medium">{row.getValue('apar.kode_apar') || '-'}</span>,
+        cell: ({ row }) => <span className="font-medium">{row.original.apar?.kode_apar || '-'}</span>,
     },
     {
         accessorKey: 'apar.jenis',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Jenis Apar" />,
-        cell: ({ row }) => <span className="font-medium">{row.getValue('apar.jenis') || '-'}</span>,
+        cell: ({ row }) => <span className="font-medium">{row.original.apar?.jenis || '-'}</span>,
     },
     {
         accessorKey: 'apar.lokasi',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Lokasi Apar" />,
-        cell: ({ row }) => <span className="font-medium">{row.getValue('apar.lokasi') || '-'}</span>,
+        cell: ({ row }) => <span className="font-medium">{row.original.apar?.lokasi || '-'}</span>,
     },
     {
         accessorKey: 'tanggal_kadaluarsa',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Tanggal Kadaluarsa" />,
         cell: ({ row }) => {
-            const date = row.getValue('tanggal_kadaluarsa');
+            const rawDate = row.getValue('tanggal_kadaluarsa');
+            const kadaluarsaDate = new Date(rawDate as string);
+            const today = new Date();
+
+            const isExpired = kadaluarsaDate < today;
             return (
-                <span className="font-medium">
-                    {date && (typeof date === 'string' || typeof date === 'number' || date instanceof Date)
-                        ? new Date(date).toLocaleDateString()
-                        : '-'}
-                </span>
+                <div className="flex items-center space-x-1">
+                    <span className={cn('text-sm font-medium')}>{formatDate(kadaluarsaDate)}</span>
+                    {isExpired && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <TriangleAlert className="text-destructive size-4 animate-bounce" />
+                            </TooltipTrigger>
+                            <TooltipContent className="w-[150px]">
+                                <span className="text-muted">Apar telah kadaluarsa harap lakukan pengisian ulang </span>
+                            </TooltipContent>
+                        </Tooltip>
+                    )}
+                </div>
             );
         },
     },

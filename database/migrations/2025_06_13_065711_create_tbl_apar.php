@@ -37,7 +37,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
             $table->enum('regu', ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])->default('Regu A');
             $table->date('tanggal_kadaluarsa')->nullable(); // Bisa kosong jika tidak ada
-            $table->date('tanggal_pengisian')->nullable(); // Bisa kosong jika tidak ada
+            $table->date('tanggal_refill')->nullable(); // Bisa kosong jika tidak ada
             $table->string('kondisi', 150)->nullable(); // Bisa input bebas
             $table->text('catatan')->nullable();
             $table->string('foto_apar')->nullable(); // Lebih spesifik

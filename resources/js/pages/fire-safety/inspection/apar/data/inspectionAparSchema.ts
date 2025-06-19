@@ -1,3 +1,5 @@
+import { User } from '@/types';
+
 export interface AparInspection {
     id: number;
     apar_id: number;
@@ -18,9 +20,5 @@ export interface AparInspection {
         jenis: 'CO2' | 'Powder' | 'Foam' | 'Air';
         size: number;
     };
-    user?: {
-        id: number;
-        name: string;
-        // tambahkan field lain sesuai user
-    };
+    user?: User;
 }

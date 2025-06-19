@@ -21,6 +21,7 @@ class AparInspection extends Model
         'catatan',
         'foto_apar',
         'tanggal_inspeksi',
+        'tanggal_refill'
     ];
 
     // Relasi ke APAR
