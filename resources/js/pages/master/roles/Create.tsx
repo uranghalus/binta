@@ -5,11 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ChangeEvent, FormEvent } from 'react';
+import { FormEvent } from 'react';
 
-// Ubah tipe PermissionSchema sesuai struktur yang benar
 interface PermissionMap {
-    [group: string]: string[]; // contoh: { user: ["user.view", "user.edit"] }
+    [group: string]: string[];
 }
 
 interface Props {
@@ -25,16 +24,13 @@ export default function Create({ permissions }: Props) {
         selectedPermissions: [],
     });
 
-    const handleSelectedPermissions = (e: ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const checked = e.target.checked;
-
+    const handlePermissionToggle = (permission: string, checked: boolean) => {
         const items = [...data.selectedPermissions];
 
         if (checked) {
-            if (!items.includes(value)) items.push(value);
+            if (!items.includes(permission)) items.push(permission);
         } else {
-            const index = items.indexOf(value);
+            const index = items.indexOf(permission);
             if (index !== -1) items.splice(index, 1);
         }
 
@@ -44,9 +40,9 @@ export default function Create({ permissions }: Props) {
     const handleStoreData = (e: FormEvent) => {
         e.preventDefault();
 
-        post(route('roles.store'), {
+        post(route('role.store'), {
             onSuccess: () => {
-                // optionally redirect or show notification
+                // bisa tambahkan notifikasi di sini
             },
         });
     };
@@ -82,9 +78,8 @@ export default function Create({ permissions }: Props) {
                                             {permissionItems.map((permission) => (
                                                 <label key={permission} className="flex items-center space-x-2">
                                                     <Checkbox
-                                                        value={permission}
                                                         checked={data.selectedPermissions.includes(permission)}
-                                                        onChange={() => handleSelectedPermissions}
+                                                        onCheckedChange={(checked) => handlePermissionToggle(permission, Boolean(checked))}
                                                     />
                                                     <span className="text-sm">{permission}</span>
                                                 </label>

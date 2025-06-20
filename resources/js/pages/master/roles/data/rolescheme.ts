@@ -9,7 +9,7 @@ export const roleSchema = z.object({
 export interface IRole {
     id?: number;
     name: string;
-    permission: PermissionSchema[];
+    permissions: PermissionSchema[]; // ← harus plural
 }
 export type Role = z.infer<typeof roleSchema>;
 export const rolesListSchema = z.array(roleSchema);
