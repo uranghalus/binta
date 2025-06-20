@@ -1,10 +1,11 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
-import { SquarePen } from 'lucide-react';
+import { MapPin, SquarePen } from 'lucide-react';
 import { AparInspection } from './data/inspectionAparSchema';
 
 interface Props {
@@ -33,7 +34,10 @@ export default function Show({ aparData }: Props) {
                             </div>
                             <div className="grid gap-1">
                                 <Label className="text-sm font-bold">Lokasi Apar</Label>
-                                <div className="text-muted-foreground">{aparData.apar?.lokasi}</div>
+                                <div className="text-muted-foreground flex items-center gap-1">
+                                    <MapPin className="size-4" />
+                                    {aparData.apar?.lokasi}
+                                </div>
                             </div>
                             <div className="grid gap-1">
                                 <Label className="text-sm font-bold">Jenis Apar</Label>
@@ -53,7 +57,17 @@ export default function Show({ aparData }: Props) {
                             </div>
                             <div className="grid gap-1">
                                 <Label className="text-sm font-bold">Kondisi</Label>
-                                <div className="text-muted-foreground">{aparData.kondisi}</div>
+                                <div className="text-muted-foreground">
+                                    {
+                                        <Badge
+                                            variant={
+                                                aparData.kondisi === 'Rusak' ? 'destructive' : aparData.kondisi === 'Baik' ? 'success' : 'neutral'
+                                            }
+                                        >
+                                            {aparData.kondisi}
+                                        </Badge>
+                                    }
+                                </div>
                             </div>
                         </div>
                         <div className="space-y-2">

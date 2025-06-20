@@ -1,3 +1,4 @@
+import { PermissionSchema } from '@/pages/role-management/permission/data/permissionSchema';
 import { z } from 'zod';
 
 export const roleSchema = z.object({
@@ -5,5 +6,10 @@ export const roleSchema = z.object({
     name: z.string().min(1, 'Role name is required'),
 });
 
+export interface IRole {
+    id?: number;
+    name: string;
+    permission: PermissionSchema[];
+}
 export type Role = z.infer<typeof roleSchema>;
 export const rolesListSchema = z.array(roleSchema);

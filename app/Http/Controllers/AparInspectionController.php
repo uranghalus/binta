@@ -99,13 +99,15 @@ class AparInspectionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, AparInspection $aparInspection)
+    public function update(Request $request, $id)
     {
         //
+        $aparInspection = AparInspection::with(['apar', 'user.karyawan'])->findOrFail($id);
         $validated = $request->validate([
             'apar_id'            => ['required', 'exists:apar,id'],
             'regu'               => ['required', 'in:REGU A,REGU B,REGU C,MIDDLE'],
             'tanggal_kadaluarsa' => ['nullable', 'date'],
+            'tanggal_refill'     => ['nullable', 'date'],
             'kondisi'            => ['nullable', 'string', 'max:150'],
             'catatan'            => ['nullable', 'string'],
             'foto_apar'          => ['nullable', 'image', 'max:2048'],
@@ -119,8 +121,8 @@ class AparInspectionController extends Controller
                 Storage::disk('public')->delete("apar-inspections/{$aparInspection->foto_apar}");
             }
 
-            $path = $request->file('foto_apar')->store('apar-inspections', 'public');
-            $validated['foto_apar'] = basename($path);
+
+            $validated['foto_apar'] = $request->file('foto_apar')->store('apar-inspections', 'public');
         }
 
         $aparInspection->update($validated);
@@ -131,8 +133,18 @@ class AparInspectionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(AparInspection $aoarInspection)
+    public function destroy($id)
     {
-        //
+        $aparInspection = AparInspection::findOrFail($id);
+
+        // Hapus file foto jika ada
+        if ($aparInspection->foto_apar && Storage::disk('public')->exists($aparInspection->foto_apar)) {
+            Storage::disk('public')->delete($aparInspection->foto_apar);
+        }
+
+        // Hapus data dari database
+        $aparInspection->delete();
+
+        return redirect()->route('inspection.apar.index')->with('success', 'Data berhasil dihapus!');
     }
 }

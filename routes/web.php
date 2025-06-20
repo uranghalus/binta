@@ -4,10 +4,13 @@ use App\Http\Controllers\AparController;
 use App\Http\Controllers\AparInspectionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\HydrantController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OfficesController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+use App\Models\HydrantInspection;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -27,11 +30,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('apar', AparController::class)
             ->parameters(['apar' => 'id'])
             ->names('apar');
+        Route::resource('hydrant', HydrantController::class)
+            ->parameters(['hydrant' => 'id'])
+            ->names('hydrant');
     });
     Route::prefix('inspection')->group(function () {
         Route::resource('apar', AparInspectionController::class)
             ->parameters(['apar' => 'id'])
             ->names('inspection.apar');
+        Route::resource('hydrant', HydrantInspection::class)
+            ->parameters(['hydrant' => 'id'])
+            ->names('inspection.hydrant');
     });
     Route::get('/apar/qrcode/{id}', [AparController::class, 'generateQRCode'])->name('apar.qrcode');
     Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');
@@ -48,6 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('karyawan', KaryawanController::class)
             ->parameters(['karyawan' => 'id'])
             ->names('karyawan');
+        Route::resource('role', RoleController::class)->parameters(['role' => 'id'])->names('role');
     });
 });
 Route::get('/captcha', function () {

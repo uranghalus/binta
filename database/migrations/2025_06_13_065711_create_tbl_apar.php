@@ -33,7 +33,7 @@ return new class extends Migration
 
         Schema::create('apar_inspections', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('apar_id')->constrained('apar')->onDelete('cascade');
+            $table->foreignId('apar_id')->nullable()->constrained('apar')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
             $table->enum('regu', ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])->default('Regu A');
             $table->date('tanggal_kadaluarsa')->nullable(); // Bisa kosong jika tidak ada

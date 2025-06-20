@@ -26,12 +26,11 @@ export default function Edit({ aparData, aparInspection }: Props) {
     const [openApar, setOpenApar] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(aparInspection.foto_apar ? `/storage/${aparInspection.foto_apar}` : null);
 
-    const { data, setData, post, processing, errors } = useForm({
-        _method: 'put',
+    const { data, setData, put, processing, errors } = useForm({
         apar_id: String(aparInspection.apar_id),
         regu: aparInspection.regu.toUpperCase().replace('Regu ', 'REGU ') as string,
         tanggal_kadaluarsa: aparInspection.tanggal_kadaluarsa ?? '',
-        tanggal_refill: '', // kalau ada
+        tanggal_refill: aparInspection.tanggal_kadaluarsa, // kalau ada
         kondisi: aparInspection.kondisi ?? '',
         catatan: aparInspection.catatan ?? '',
         foto_apar: null as File | null,
@@ -39,7 +38,7 @@ export default function Edit({ aparData, aparInspection }: Props) {
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post(route('inspection.apar.update', aparInspection.id), {
+        put(route('inspection.apar.update', aparInspection.id), {
             onSuccess: () => toast.success('Data berhasil diperbarui!'),
             preserveScroll: true,
         });

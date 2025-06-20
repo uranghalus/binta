@@ -1,4 +1,5 @@
 import { DataTableColumnHeader } from '@/components/datatable-column-header';
+import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn, formatDate } from '@/lib/utils';
@@ -51,9 +52,13 @@ export const InspectionAparColumns: ColumnDef<AparInspection>[] = [
         cell: ({ row }) => <span className="font-medium">{row.original.apar?.kode_apar || '-'}</span>,
     },
     {
-        accessorKey: 'apar.jenis',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Jenis Apar" />,
-        cell: ({ row }) => <span className="font-medium">{row.original.apar?.jenis || '-'}</span>,
+        accessorKey: 'kondisi',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Kondisi Apar" />,
+        cell: ({ row }) => (
+            <Badge variant={row.original.kondisi === 'Rusak' ? 'destructive' : row.original.kondisi === 'Baik' ? 'success' : 'neutral'}>
+                {row.original.kondisi}
+            </Badge>
+        ),
     },
     {
         accessorKey: 'apar.lokasi',

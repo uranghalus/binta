@@ -1,11 +1,11 @@
 import { DataTableColumnHeader } from '@/components/datatable-column-header';
+import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
-import { Role } from '../data/rolescheme';
-import { RoleRowAction } from './role-row-action';
+import { IRole } from '../data/rolescheme';
 
-export const RolesColumn: ColumnDef<Role>[] = [
+export const RolesColumn: ColumnDef<IRole>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -47,8 +47,29 @@ export const RolesColumn: ColumnDef<Role>[] = [
         enableHiding: false,
     },
     {
-        id: 'actions',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
-        cell: RoleRowAction,
+        accessorFn: (row) => row.permission?.map((p: any) => p.name).join(', '), // untuk sorting/filtering
+        id: 'permissions',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Permission" />,
+        cell: ({ row }) =>
+            row.original.name === 'superadmin' ? (
+                <Badge variant="neutral">all-permissions</Badge>
+            ) : (
+                <div className="flex flex-wrap gap-1">
+                    {row.original.permission?.map((permission: any) => (
+                        <span
+                            key={permission.id || permission.name}
+                            className="inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-sm text-sky-700"
+                        >
+                            {permission.name === 'super-admin' ? 'all-permissions' : permission.name}
+                        </span>
+                    ))}
+                </div>
+            ),
     },
+
+    // {
+    //     id: 'actions',
+    //     header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
+    //     cell: RoleRowAction,
+    // },
 ];
