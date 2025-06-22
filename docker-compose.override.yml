@@ -1,0 +1,8 @@
+version: '3'
+services:
+  laravel.test:
+    volumes:
+      - './:/var/www/html'
+    environment:
+      APP_ENV: local
+      APP_DEBUG: true
