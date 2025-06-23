@@ -1,5 +1,5 @@
 import { type SidebarData } from '@/types/layout';
-import { DatabaseZap, FilesIcon, FireExtinguisher, LayoutDashboard, ListTodo, UserCog2 } from 'lucide-react';
+import { DatabaseZap, FilesIcon, FireExtinguisher, LayoutDashboard, ListTodo, ScanQrCode, UserCog2 } from 'lucide-react';
 
 export const sidebarData: SidebarData = {
     user: {
@@ -87,6 +87,11 @@ export const sidebarData: SidebarData = {
                             url: '/inspection/hydrant',
                         },
                     ],
+                },
+                {
+                    title: 'Scan Inspection',
+                    url: '/inspection/scan',
+                    icon: ScanQrCode,
                 },
             ],
         },

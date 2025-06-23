@@ -47,7 +47,7 @@ return new class extends Migration
 
         Schema::create('hydrant_inspections', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hydrant_id')->constrained('hydrant')->onDelete('cascade');
+            $table->foreignId('hydrant_id')->nullable()->constrained('hydrant')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
             $table->enum('regu', ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])->default('Regu A');
             // Kolom fleksibel untuk input bebas (tanpa enum)

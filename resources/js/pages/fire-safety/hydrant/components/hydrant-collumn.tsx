@@ -56,7 +56,7 @@ export const HydrantColumn: ColumnDef<Hydrant>[] = [
     {
         accessorKey: 'user_id.karyawan',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Penanggung Jawab" />,
-        cell: ({ row }) => <div>{row.original.user_id?.karyawan.nama ? row.original.user_id?.karyawan.nama : '-'}</div>,
+        cell: ({ row }) => <div>{row.original.user?.karyawan?.nama ? row.original.user.karyawan.nama : '-'}</div>,
     },
     {
         id: 'actions',

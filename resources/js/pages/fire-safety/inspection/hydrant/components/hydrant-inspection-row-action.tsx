@@ -8,14 +8,16 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useDialog } from '@/context/dialog-context';
+import { Link } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
-import { Download, Ellipsis, SquarePen, Trash2 } from 'lucide-react';
-import { Hydrant } from '../data/hydrantSchema';
+import { Ellipsis, SquarePen, TextSearch, Trash2 } from 'lucide-react';
+import { HydrantInspectionsc } from '../data/HydrantInspectionsc';
 
 interface Props {
-    row: Row<Hydrant>;
+    row: Row<HydrantInspectionsc>;
 }
-export default function HydrantRowAction({ row }: Props) {
+
+export default function HydrantInspectionRowAction({ row }: Props) {
     const { setOpen, setCurrentRow } = useDialog();
     return (
         <DropdownMenu modal={false}>
@@ -26,26 +28,21 @@ export default function HydrantRowAction({ row }: Props) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem
-                    onClick={() => {
-                        window.open(route('hydrant.qrcode', row.original.id), '_blank');
-                    }}
-                >
-                    Download QRCode
-                    <DropdownMenuShortcut>
-                        <Download size={16} />
-                    </DropdownMenuShortcut>
+                <DropdownMenuItem asChild>
+                    <Link href={route('inspection.hydrant.show', { id: row.original.id })}>
+                        Lihat Data
+                        <DropdownMenuShortcut>
+                            <TextSearch size={16} />
+                        </DropdownMenuShortcut>
+                    </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                    onClick={() => {
-                        setCurrentRow(row.original);
-                        setOpen('edit');
-                    }}
-                >
-                    Edit
-                    <DropdownMenuShortcut>
-                        <SquarePen size={16} />
-                    </DropdownMenuShortcut>
+                <DropdownMenuItem asChild>
+                    <Link href={route('inspection.hydrant.edit', { id: row.original.id })}>
+                        Edit
+                        <DropdownMenuShortcut>
+                            <SquarePen size={16} />
+                        </DropdownMenuShortcut>
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -53,7 +50,7 @@ export default function HydrantRowAction({ row }: Props) {
                         setCurrentRow(row.original);
                         setOpen('delete');
                     }}
-                    className="text-red-500!"
+                    className="text-red-500"
                 >
                     Delete
                     <DropdownMenuShortcut>

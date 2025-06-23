@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Hydrant;
 use App\Models\HydrantInspection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class HydrantInspectionController extends Controller
 {
@@ -13,6 +16,10 @@ class HydrantInspectionController extends Controller
     public function index()
     {
         //
+        $inspections = HydrantInspection::with(['hydrant', 'user.karyawan'])->latest()->get();
+        return Inertia::render('fire-safety/inspection/hydrant/Index', [
+            'inspections' => $inspections,
+        ]);
     }
 
     /**
@@ -21,6 +28,10 @@ class HydrantInspectionController extends Controller
     public function create()
     {
         //
+        $hydrants = Hydrant::all();
+        return Inertia::render('fire-safety/inspection/hydrant/Create', [
+            'hydrants' => $hydrants,
+        ]);
     }
 
     /**
@@ -29,6 +40,19 @@ class HydrantInspectionController extends Controller
     public function store(Request $request)
     {
         //
+        $validated = $request->validate([
+            'hydrant_id' => 'required|exists:hydrant,id',
+            'regu' => 'required|string|max:50',
+            'selang_hydrant' => 'required|string|max:255',
+            'noozle_hydrant' => 'required|string|max:255',
+            'kaca_box_hydrant' => 'required|string|max:255',
+        ]);
+        $user = Auth::user();
+
+        $validated['user_id'] = $user->id;
+        HydrantInspection::create($validated);
+
+        return redirect()->route('inspection.hydrant.index')->with('success', 'Inspeksi Hydrant berhasil ditambahkan.');
     }
 
     /**
@@ -42,24 +66,44 @@ class HydrantInspectionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(HydrantInspection $hydrantInspection)
+    public function edit($id)
     {
         //
+        $inspections = HydrantInspection::with(['hydrant', 'user.karyawan'])->findOrFail($id);
+        $hydrants = Hydrant::all();
+        return Inertia::render('fire-safety/inspection/hydrant/Edit', [
+            'inspection' => $inspections,
+            'hydrants' => $hydrants,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, HydrantInspection $hydrantInspection)
+    public function update(Request $request, $id)
     {
-        //
+        $validated = $request->validate([
+            'hydrant_id' => 'required|exists:hydrant,id',
+            'regu' => 'required|string|max:50',
+            'selang_hydrant' => 'required|string|max:255',
+            'noozle_hydrant' => 'required|string|max:255',
+            'kaca_box_hydrant' => 'required|string|max:255',
+        ]);
+
+        $inspection = HydrantInspection::findOrFail($id);
+        $inspection->update($validated);
+
+        return redirect()->route('inspection.hydrant.index')->with('success', 'Inspeksi Hydrant berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(HydrantInspection $hydrantInspection)
+    public function destroy($id)
     {
         //
+        $inspection = HydrantInspection::findOrFail($id);
+        $inspection->delete();
+        return redirect()->route('inspection.hydrant.index')->with('success', 'Data berhasil dihapus!');
     }
 }

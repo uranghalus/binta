@@ -74,7 +74,7 @@ class AparController extends Controller implements HasMiddleware
     public function generateQRCode($id)
     {
         $apar = Apar::findOrFail($id);
-        $url = url('/apar-inspeksi/' . $apar->kode_apar);
+        $url = url('/inspection/apar-inspeksi/' . $apar->id);
 
         // Generate QR code binary PNG
         $qrCode = QrCode::format('png')

@@ -5,12 +5,13 @@ use App\Http\Controllers\AparInspectionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HydrantController;
+use App\Http\Controllers\HydrantInspectionController;
+use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OfficesController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
-use App\Models\HydrantInspection;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -38,10 +39,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('apar', AparInspectionController::class)
             ->parameters(['apar' => 'id'])
             ->names('inspection.apar');
-        Route::resource('hydrant', HydrantInspection::class)
+        Route::resource('hydrant', HydrantInspectionController::class)
             ->parameters(['hydrant' => 'id'])
             ->names('inspection.hydrant');
     });
+    Route::get('/hydrant/qrcode/{id}', [HydrantController::class, 'generateQRCode'])->name('hydrant.qrcode');
     Route::get('/apar/qrcode/{id}', [AparController::class, 'generateQRCode'])->name('apar.qrcode');
     Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');
     Route::prefix('master-data')->group(function () {
@@ -58,6 +60,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->parameters(['karyawan' => 'id'])
             ->names('karyawan');
         Route::resource('role', RoleController::class)->parameters(['role' => 'id'])->names('role');
+    });
+    Route::prefix('inspection')->group(function () {
+        Route::get('scan', function () {
+            return Inertia::render('inspection/scan');
+        });
+        Route::get('apar-inspeksi/{id}', [InspectionController::class, 'aparinspeksi'])->name('apar.inspection');
     });
 });
 Route::get('/captcha', function () {

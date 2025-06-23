@@ -6,7 +6,7 @@ export interface Hydrant {
     kode_hydrant: string;
     tipe: 'Indoor' | 'Outdoor';
     lokasi: string;
-    user_id?: User;
+    user?: User;
     created_at: string; // ISO date string
     updated_at: string; // ISO date string
 }
