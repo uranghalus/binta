@@ -46,7 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('apar-inspeksi/{id}', [InspectionController::class, 'aparinspeksi'])->name('apar.inspection');
         Route::get('hydrant-inspeksi/{id}', [InspectionController::class, 'hydrantinspeksi'])->name('hydrant.inspection');
         Route::get('scan', function () {
-            return Inertia::render('inspection/scan');
+            return Inertia::render('inspection/react-scan');
         })->name('apar.scan');
     });
 

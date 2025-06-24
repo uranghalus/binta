@@ -28,7 +28,7 @@ export default function ReactScan() {
             <Head title="Scan" />
             <div className="flex flex-col items-center p-4">
                 <h2 className="mb-4 text-xl font-bold">Scan QR Code</h2>
-                <div className="aspect-square w-full max-w-sm overflow-hidden rounded-xl border border-gray-300 shadow-md">
+                <div className="h-[300px] w-full max-w-sm overflow-hidden rounded-xl border border-gray-300 shadow-md">
                     <Scanner onScan={handleScan} constraints={{ facingMode: 'environment' }} />
                 </div>
             </div>
