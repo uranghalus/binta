@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             PermissionsTableSeeder::class,
             RolesTableSeeder::class,
             InitialUserSeeder::class,
+            AparSeeder::class,
+            HydrantSeeder::class,
         ]);
     }
 }

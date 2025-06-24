@@ -3,14 +3,15 @@ import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import laravel from 'laravel-vite-plugin';
 import { resolve } from 'node:path';
+import path from 'path';
 import { defineConfig } from 'vite';
 export default defineConfig({
     server: {
         host: '0.0.0.0', // Penting: supaya bisa diakses dari luar container
         port: 5174, // Pastikan sesuai dengan yang digunakan
         https: {
-            key: fs.readFileSync('./192.168.20.185-key.pem'),
-            cert: fs.readFileSync('./192.168.20.185.pem'),
+            key: fs.readFileSync(path.resolve(__dirname, 'docker/ssl/dev-key.pem')),
+            cert: fs.readFileSync(path.resolve(__dirname, 'docker/ssl/dev-cert.pem')),
         },
         hmr: {
             host: 'localhost', // ganti dengan IP host kamu jika perlu (lihat di bawah)
