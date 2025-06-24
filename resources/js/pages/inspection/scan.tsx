@@ -6,14 +6,6 @@ import { useEffect } from 'react';
 
 export default function QrScanner() {
     useEffect(() => {
-        navigator.mediaDevices
-            .enumerateDevices()
-            .then((devices) => {
-                console.log('Device list:', devices);
-            })
-            .catch((err) => {
-                console.error('Camera detection error:', err);
-            });
         const scanner = new Html5QrcodeScanner(
             'reader',
             {
@@ -52,7 +44,7 @@ export default function QrScanner() {
             <Head title="Scan" />
             <div className="p-4">
                 <h2 className="mb-2 text-lg font-bold">Scan QR Code</h2>
-                <div id="reader" className="w-full rounded-md border" />
+                <div id="reader" className="w-[450px] rounded-md border" />
             </div>
         </AppLayout>
     );

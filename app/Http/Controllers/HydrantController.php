@@ -35,10 +35,10 @@ class HydrantController extends Controller implements HasMiddleware
         ]);
     }
 
-    public function generateQRCode($id)
+    public function HydrantQRCode($id)
     {
         $apar = Hydrant::findOrFail($id);
-        $url = url('/apar-inspeksi/' . $apar->kode_apar);
+        $url = url('/hydrant-inspeksi/' . $apar->id);
 
         // Generate QR code binary PNG
         $qrCode = QrCode::format('png')
@@ -67,6 +67,42 @@ class HydrantController extends Controller implements HasMiddleware
         ])->setPaper('A4');
 
         return $pdf->download("qr_apar_{$apar->kode_apar}.pdf");
+    }
+    public function MassHydrantQRCode()
+    {
+        $hydrant = Hydrant::all();
+        $qrDataList = [];
+        foreach ($hydrant as $item) {
+            $url = url('/inspection/hydrant-inspeksi/' . $item->id);
+
+            // Generate QR code binary PNG
+            $qrCode = QrCode::format('png')
+                ->size(300)
+                ->generate($url);
+
+            // Convert to stream
+            $tempStream = fopen('php://memory', 'r+');
+            fwrite($tempStream, $qrCode);
+            rewind($tempStream);
+
+            // Intervention Image V3
+
+            $canvas = Image::create(300, 300)->fill('#ffffff');
+            $qr = Image::read($tempStream)->resize(275, 275);
+            $canvas->place($qr, 'center', 0, 0);
+
+            // Convert to base64
+            $encoded = (string) $canvas->toJpeg(); // or toPng()
+            $base64 = 'data:image/jpeg;base64,' . base64_encode($encoded);
+            $qrDataList[] = [
+                'kode_hydrant' => $item->kode_hydrant,
+                'qr_base64' => $base64,
+            ];
+        }
+        $pdf = Pdf::loadView('hydrant.qrexports_pdf', [
+            'qrList' => $qrDataList,
+        ])->setPaper('A4', 'portrait');
+        return $pdf->download("data-qr-hydrant.pdf");
     }
     /**
      * Store a newly created resource in storage.

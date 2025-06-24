@@ -43,7 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->parameters(['hydrant' => 'id'])
             ->names('inspection.hydrant');
     });
-    Route::get('/hydrant/qrcode/{id}', [HydrantController::class, 'generateQRCode'])->name('hydrant.qrcode');
+    Route::get('/hydrant/qrcode/{id}', [HydrantController::class, 'HydrantQRCode'])->name('hydrant.qrcode');
+    Route::get('/hydrant/print-qrcode', [HydrantController::class, 'MassHydrantQRCode'])->name('hydrant.print-qrcode');
     Route::get('/apar/qrcode/{id}', [AparController::class, 'generateQRCode'])->name('apar.qrcode');
     Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');
     Route::prefix('master-data')->group(function () {
@@ -63,9 +64,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::prefix('inspection')->group(function () {
         Route::get('scan', function () {
-            return Inertia::render('inspection/scan');
-        });
+            return Inertia::render('inspection/react-scan');
+        })->name('apar.scan');
         Route::get('apar-inspeksi/{id}', [InspectionController::class, 'aparinspeksi'])->name('apar.inspection');
+        Route::get('hydrant-inspeksi/{id}', [InspectionController::class, 'hydrantinspeksi'])->name('hydrant.inspection');
     });
 });
 Route::get('/captcha', function () {

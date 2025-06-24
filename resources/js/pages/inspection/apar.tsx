@@ -88,7 +88,7 @@ export default function apar({ aparData }: Props) {
                                     <Label className="text-sm font-bold">Jenis Apar</Label>
                                     <div className="text-muted-foreground">{aparData.jenis}</div>
                                 </div>
-                                <Input type="text" value={String(aparData.id)} onChange={(e) => setData('apar_id', e.target.value)} />
+                                <Input type="hidden" value={String(aparData.id)} onChange={(e) => setData('apar_id', e.target.value)} />
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="regu">Regu</Label>

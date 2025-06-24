@@ -17,8 +17,8 @@ interface Props {
 
 export default function index({ hydrantdata }: Props) {
     return (
-        <AppLayout title="Fire Safety - Hydrant" description="Fire Safety - Hydrant">
-            <Head title="Fire Safety - Hydrant" />
+        <AppLayout title="Hydrant Data">
+            <Head title="Hydrant Data" />
             <DialogProvider>
                 <div className="mb-2 flex flex-wrap items-center justify-between space-y-2">
                     <div>

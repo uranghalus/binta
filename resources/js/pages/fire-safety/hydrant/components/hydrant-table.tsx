@@ -17,6 +17,7 @@ import {
 } from '@tanstack/react-table';
 import { useState } from 'react';
 import { Hydrant } from '../data/hydrantSchema';
+import HydrantToolbar from './hydrant-toolbar';
 
 declare module '@tanstack/react-table' {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -60,7 +61,7 @@ export default function HydrantTable({ columns, data }: HydrantTableProps) {
 
     return (
         <div className="space-y-4">
-            {/* <HydrantToolbar table={table} /> */}
+            <HydrantToolbar table={table} />
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

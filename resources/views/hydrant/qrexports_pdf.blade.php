@@ -47,7 +47,7 @@
     @foreach ($qrList as $index => $qr)
     <div class="label-wrapper">
         <img src="{{ $qr['qr_base64'] }}" alt="QR" class="qr">
-        <div class="label">{{ $qr['kode_apar'] }}</div>
+        <div class="label">{{ $qr['kode_hydrant'] }}</div>
     </div>
 
     @if (($index + 1) % 30 === 0)
