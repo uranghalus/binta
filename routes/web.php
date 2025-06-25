@@ -25,6 +25,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('permission-list', PermissionController::class)
             ->parameters(['permission' => 'id'])
             ->names('permission');
+        Route::post('/permissions/bulk-delete', [PermissionController::class, 'bulkDelete'])->name('permissions.bulk-delete');
+        Route::resource('role-list', RoleController::class)->parameters(['role' => 'id'])->names('role');
     });
     Route::prefix('fire-safety')->group(function () {
         Route::resource('apar', AparController::class)
@@ -66,7 +68,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('karyawan', KaryawanController::class)
             ->parameters(['karyawan' => 'id'])
             ->names('karyawan');
-        Route::resource('role', RoleController::class)->parameters(['role' => 'id'])->names('role');
     });
 });
 Route::get('/captcha', function () {

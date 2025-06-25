@@ -16,7 +16,7 @@ extendedKeyUsage = serverAuth
 [alt_names]
 DNS.1 = localhost
 DNS.2 = development.local
-IP.1 = 127.0.0.1
+IP.1 = 127.0.0.1:8000
 IP.2 = ::1
 IP.3 = 192.168.20.185
 IP.4 = 192.168.134.47

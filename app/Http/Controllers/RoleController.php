@@ -28,7 +28,7 @@ class RoleController extends Controller implements HasMiddleware
     {
         //
         $roles = Role::select('id', 'name')->with('permissions:id,name')->get();
-        return Inertia::render('master/roles/index', [
+        return Inertia::render('role-management/roles/index', [
             'roles' => $roles
         ]);
     }
@@ -51,7 +51,7 @@ class RoleController extends Controller implements HasMiddleware
             // Mengambil kata pertama
             return $words[0];
         });
-        return Inertia::render('master/roles/Create', [
+        return Inertia::render('role-management/roles/Create', [
             'permissions' => $permissions
         ]);
     }
@@ -77,21 +77,28 @@ class RoleController extends Controller implements HasMiddleware
         // render view
         return to_route('role.index');
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
         //
+        $role = Role::find($id);
+        $data = Permission::orderBy('name')->pluck('name', 'id');
+        $collection = collect($data);
+        $permissions = $collection->groupBy(function ($item, $key) {
+            // Memecah string menjadi array kata-kata
+            $words = explode(' ', $item);
+
+            // Mengambil kata pertama
+            return $words[0];
+        });
+
+        // load permissions
+        $role->load('permissions');
+
+        // render view
+        return inertia('role-management/roles/Edit', ['role' => $role, 'permissions' => $permissions]);
     }
 
     /**
@@ -100,6 +107,20 @@ class RoleController extends Controller implements HasMiddleware
     public function update(Request $request, string $id)
     {
         //
+        $role = Role::findOrFail($id);
+        $request->validate([
+            'name' => 'required|min:3|max:255|unique:roles,name,' . $role->id,
+            'selectedPermissions' => 'required|array|min:1',
+        ]);
+
+        // update role data
+        $role->update(['name' => $request->name]);
+
+        // give permissions to role
+        $role->syncPermissions($request->selectedPermissions);
+
+        // render view
+        return to_route('role.index');
     }
 
     /**
@@ -108,5 +129,7 @@ class RoleController extends Controller implements HasMiddleware
     public function destroy(string $id)
     {
         //
+        Role::destroy($id);
+        return back()->with('success', 'Role berhasil dihapus.');
     }
 }

@@ -21,7 +21,7 @@ export const sidebarData: SidebarData = {
                     icon: UserCog2,
                     items: [
                         {
-                            title: 'Perimission List',
+                            title: 'Permission List',
                             url: '/role-management/permission-list',
                         },
                         {
@@ -45,10 +45,6 @@ export const sidebarData: SidebarData = {
                         {
                             title: 'Data Jabatan',
                             url: '/master-data/jabatan',
-                        },
-                        {
-                            title: 'Data Role',
-                            url: '/master-data/role',
                         },
                         {
                             title: 'Data Unit Bisnis',

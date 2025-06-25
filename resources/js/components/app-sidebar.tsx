@@ -1,5 +1,6 @@
 import { sidebarData } from '@/data/sidebar-data';
-import HasAnyPermission from '@/lib/utils';
+
+import HasAnyPermission from '@/lib/permission';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { Activity } from 'lucide-react';
@@ -15,7 +16,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
             const filteredItems = group.items.filter((item) => {
                 // Cek judul menu yang perlu permission
                 if (item.title === 'Role Management') {
-                    return HasAnyPermission(['roles index', 'permissions index']);
+                    return HasAnyPermission(['roles index']);
                 }
 
                 if (item.title === 'Data Master') {

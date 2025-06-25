@@ -8,15 +8,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useDialog } from '@/context/dialog-context';
+import { Link } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
 import { Ellipsis, SquarePen, Trash2 } from 'lucide-react';
-import { Role } from '../data/rolescheme';
-
-interface RoleRowActionProps {
-    row: Row<Role>;
+import { PermissionSchema } from '../data/permissionSchema';
+interface Props {
+    row: Row<PermissionSchema>;
 }
-
-export function RoleRowAction({ row }: RoleRowActionProps) {
+export default function PermissionRowAction({ row }: Props) {
     const { setOpen, setCurrentRow } = useDialog();
     return (
         <DropdownMenu modal={false}>
@@ -27,16 +26,13 @@ export function RoleRowAction({ row }: RoleRowActionProps) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem
-                    onClick={() => {
-                        setCurrentRow(row.original);
-                        setOpen('edit');
-                    }}
-                >
-                    Edit
-                    <DropdownMenuShortcut>
-                        <SquarePen size={16} />
-                    </DropdownMenuShortcut>
+                <DropdownMenuItem asChild>
+                    <Link href={route('permission.edit', row.original.id)} className="space-x-2">
+                        Edit
+                        <DropdownMenuShortcut>
+                            <SquarePen size={16} />
+                        </DropdownMenuShortcut>
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

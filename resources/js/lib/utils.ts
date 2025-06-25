@@ -1,10 +1,5 @@
-import { usePage } from '@inertiajs/react';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-
-type AuthProps = {
-    permissions: Record<string, boolean>;
-};
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -37,12 +32,4 @@ export function isValidDate(date: Date | undefined) {
         return false;
     }
     return !isNaN(date.getTime());
-}
-
-export default function HasAnyPermission(permissions: string[]): boolean {
-    const { auth } = usePage<{ auth: AuthProps }>().props;
-
-    const allPermissions = auth.permissions;
-
-    return permissions.some((permission) => allPermissions[permission]);
 }

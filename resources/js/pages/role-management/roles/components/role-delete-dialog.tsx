@@ -6,12 +6,12 @@ import { Separator } from '@/components/ui/separator';
 import { useForm } from '@inertiajs/react';
 import { TriangleAlert } from 'lucide-react';
 import React, { useState } from 'react';
-import { Role } from '../data/rolescheme';
+import { IRole } from '../data/rolescheme';
 
 interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    currentRow: Role;
+    currentRow: IRole;
 }
 export default function RoleDeleteDialog({ open, onOpenChange, currentRow }: Props) {
     const [value, setValue] = useState('');
