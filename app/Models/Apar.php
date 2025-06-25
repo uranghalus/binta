@@ -32,4 +32,8 @@ class Apar extends Model
     {
         return $this->hasMany(AparInspection::class);
     }
+    public function lastInspection()
+    {
+        return $this->hasOne(AparInspection::class)->latestOfMany('tanggal_inspeksi');
+    }
 }

@@ -1,4 +1,5 @@
 import { sidebarData } from '@/data/sidebar-data';
+import HasAnyPermission from '@/lib/utils';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { Activity } from 'lucide-react';
@@ -9,7 +10,28 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 
 export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { auth } = usePage<SharedData>().props;
+    const filteredNavGroups = sidebarData.navGroups
+        .map((group) => {
+            const filteredItems = group.items.filter((item) => {
+                // Cek judul menu yang perlu permission
+                if (item.title === 'Role Management') {
+                    return HasAnyPermission(['roles index', 'permissions index']);
+                }
 
+                if (item.title === 'Data Master') {
+                    return HasAnyPermission(['users index', 'karyawan index']);
+                }
+
+                // Default tampilkan semua menu lainnya
+                return true;
+            });
+
+            return {
+                ...group,
+                items: filteredItems,
+            };
+        })
+        .filter((group) => group.items.length > 0);
     return (
         <Sidebar collapsible="icon" variant="floating" {...props}>
             <SidebarHeader>
@@ -34,7 +56,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                {sidebarData.navGroups.map((props) => (
+                {filteredNavGroups.map((props) => (
                     <NavGroup key={props.title} {...props} />
                 ))}
             </SidebarContent>

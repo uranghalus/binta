@@ -3,6 +3,7 @@
 use App\Http\Controllers\AparController;
 use App\Http\Controllers\AparInspectionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HydrantController;
 use App\Http\Controllers\HydrantInspectionController;
@@ -19,9 +20,7 @@ Route::get('/', [AuthenticatedSessionController::class, 'create'])
     ->name('login');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::prefix('role-management')->group(function () {
         Route::resource('permission-list', PermissionController::class)
             ->parameters(['permission' => 'id'])

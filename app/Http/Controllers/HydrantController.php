@@ -38,7 +38,7 @@ class HydrantController extends Controller implements HasMiddleware
     public function HydrantQRCode($id)
     {
         $apar = Hydrant::findOrFail($id);
-        $url = url('/hydrant-inspeksi/' . $apar->id);
+        $url = url('/inspection/hydrant-inspeksi/' . $apar->id);
 
         // Generate QR code binary PNG
         $qrCode = QrCode::format('png')
