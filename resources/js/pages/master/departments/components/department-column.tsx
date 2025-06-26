@@ -1,9 +1,9 @@
 import { DataTableColumnHeader } from '@/components/datatable-column-header';
+import { RowAction } from '@/components/datatable-row-action';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { Department } from '../data/departmentSchema';
-import { DepartmentRowAction } from './department-row-action';
 
 export const DepartmentsColumn: ColumnDef<Department>[] = [
     {
@@ -56,7 +56,7 @@ export const DepartmentsColumn: ColumnDef<Department>[] = [
     {
         id: 'actions',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
-        cell: DepartmentRowAction,
+        cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('departemen.edit', id)} resourceName="Departemen" />,
         meta: {
             className: 'sticky right-0 z-10 rounded-tr md:table-cell',
         },

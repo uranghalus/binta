@@ -30,6 +30,7 @@ class OfficesController extends Controller
     public function create()
     {
         //
+        return Inertia::render('master/offices/Create');
     }
 
     /**
@@ -43,20 +44,17 @@ class OfficesController extends Controller
         return redirect()->route('unit-bisnis.index')->with('success', 'Data kantor berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Office $office)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Office $office)
+    public function edit($id)
     {
         //
+        $office = Office::find($id);
+        return Inertia::render('master/offices/Edit', [
+            'office' => $office,
+        ]);
     }
 
     /**
@@ -94,5 +92,16 @@ class OfficesController extends Controller
         $office->delete();
 
         return redirect()->back()->with('success', 'Data berhasil dihapus.');
+    }
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:permissions,id',
+        ]);
+
+        Office::whereIn('id', $request->ids)->delete();
+
+        return back()->with('success', 'Unit Bisnis berhasil dihapus.');
     }
 }

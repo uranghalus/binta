@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import HasAnyPermission from '@/lib/permission';
 import { router } from '@inertiajs/react';
 import { Table } from '@tanstack/react-table';
 import { startTransition, useState } from 'react';
@@ -57,33 +58,34 @@ export default function PermissionToolbar({ table }: Props) {
                 onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
                 className="w-full sm:w-[250px] md:w-[300px] lg:w-[400px]"
             />
-
-            <AlertDialog>
-                <AlertDialogTrigger asChild>
-                    <Button variant="destructive" disabled={selectedCount === 0 || isSubmitting}>
-                        {isSubmitting ? 'Menghapus...' : `Hapus Terpilih (${selectedCount})`}
-                    </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Yakin ingin menghapus?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Tindakan ini tidak dapat dibatalkan. Data yang telah dihapus akan hilang secara permanen.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isSubmitting}>Batal</AlertDialogCancel>
-                        <AlertDialogAction
-                            disabled={isSubmitting}
-                            onClick={() => {
-                                startTransition(handleBulkDelete);
-                            }}
-                        >
-                            Ya, Hapus
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            {HasAnyPermission(['permissions edit']) && (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="destructive" disabled={selectedCount === 0 || isSubmitting}>
+                            {isSubmitting ? 'Menghapus...' : `Hapus Terpilih (${selectedCount})`}
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Yakin ingin menghapus?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Tindakan ini tidak dapat dibatalkan. Data yang telah dihapus akan hilang secara permanen.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel disabled={isSubmitting}>Batal</AlertDialogCancel>
+                            <AlertDialogAction
+                                disabled={isSubmitting}
+                                onClick={() => {
+                                    startTransition(handleBulkDelete);
+                                }}
+                            >
+                                Ya, Hapus
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
         </div>
     );
 }

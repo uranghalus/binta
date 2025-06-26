@@ -12,4 +12,10 @@ export const departmentSchema = z.object({
         .optional(),
 });
 
-export type Department = z.infer<typeof departmentSchema>;
+export interface Department {
+    id: string;
+    department_code: string;
+    name: string;
+    office: { office_code: string; name: string };
+}
+// export type Department = z.infer<typeof departmentSchema>;

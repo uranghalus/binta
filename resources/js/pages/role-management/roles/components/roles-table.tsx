@@ -16,7 +16,8 @@ import {
     VisibilityState,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { Role } from '../data/rolescheme';
+
+import { IRole } from '../data/rolescheme';
 import RoleToolbar from './role-toolbar';
 declare module '@tanstack/react-table' {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -26,8 +27,8 @@ declare module '@tanstack/react-table' {
 }
 interface RolesTableProps {
     // Define any props if needed
-    columns: ColumnDef<Role>[];
-    data: Role[];
+    columns: ColumnDef<IRole>[];
+    data: IRole[];
 }
 export default function RolesTable({ columns, data }: RolesTableProps) {
     const [rowSelection, setRowSelection] = useState({});

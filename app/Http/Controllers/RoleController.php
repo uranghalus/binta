@@ -132,4 +132,15 @@ class RoleController extends Controller implements HasMiddleware
         Role::destroy($id);
         return back()->with('success', 'Role berhasil dihapus.');
     }
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:roles,id',
+        ]);
+
+        Role::whereIn('id', $request->ids)->delete();
+
+        return back()->with('success', 'Role berhasil dihapus.');
+    }
 }

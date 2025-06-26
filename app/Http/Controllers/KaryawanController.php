@@ -5,11 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\Departments;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
-class KaryawanController extends Controller
+class KaryawanController extends Controller implements HasMiddleware
 {
+
+    public static function middleware()
+    {
+        return [
+            new Middleware('permission:permissions index', only: ['index']),
+            new Middleware('permission:permissions create', only: ['create', 'store']),
+            new Middleware('permission:permissions edit', only: ['edit', 'update']),
+            new Middleware('permission:permissions delete', only: ['destroy'])
+        ];
+    }
     /**
      * Display a listing of the resource.
      */

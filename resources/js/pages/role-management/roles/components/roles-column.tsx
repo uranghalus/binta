@@ -1,10 +1,10 @@
 import { DataTableColumnHeader } from '@/components/datatable-column-header';
+import { RowAction } from '@/components/datatable-row-action';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { IRole } from '../data/rolescheme';
-import { RoleRowAction } from './role-row-action';
 
 export const RolesColumn: ColumnDef<IRole>[] = [
     {
@@ -76,6 +76,6 @@ export const RolesColumn: ColumnDef<IRole>[] = [
     {
         id: 'actions',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
-        cell: RoleRowAction,
+        cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('role.edit', id)} resourceName="Roles" />,
     },
 ];

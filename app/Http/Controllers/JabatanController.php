@@ -5,10 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Departments;
 use App\Models\Jabatan;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class JabatanController extends Controller
+class JabatanController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('permission:permissions index', only: ['index', 'generateQRCode']),
+            new Middleware('permission:permissions create', only: ['create', 'store']),
+            new Middleware('permission:permissions edit', only: ['edit', 'update']),
+            new Middleware('permission:permissions delete', only: ['destroy'])
+        ];
+    }
     public function index()
     {
         $jabatans = Jabatan::with('department')->get();

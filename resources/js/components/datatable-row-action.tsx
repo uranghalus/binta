@@ -1,46 +1,52 @@
 import { useDialog } from '@/context/dialog-context';
+import HasAnyPermission from '@/lib/permission';
+
 import { Link } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
-import { Ellipsis, SquarePen, Trash2 } from 'lucide-react';
-import { Button } from './ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+import { ScanSearch, SquarePen, Trash2 } from 'lucide-react';
 
 interface RowActionProps<T> {
     row: Row<T>;
-    editRoute: (id: number | string) => string; // fungsi pembuat route
-    resourceName?: string; // untuk label di UI
-    onDelete?: () => void; // bisa override fungsi delete
+    editRoute: (id: number | string) => string;
+    viewRoute?: (id: number | string) => string; // sekarang opsional
+    resourceName?: string;
+    onDelete?: () => void;
 }
 
-export function RowAction<T>({ row, editRoute, resourceName = 'Item', onDelete }: RowActionProps<T>) {
+export function RowAction<T>({ row, editRoute, viewRoute, resourceName = 'Item', onDelete }: RowActionProps<T>) {
     const { setOpen, setCurrentRow } = useDialog();
 
     return (
-        <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="data-[state=open]:bg-muted flex h-8 w-8 p-0">
-                    <Ellipsis className="h-4 w-4" />
-                    <span className="sr-only">Open menu</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem asChild>
-                    <Link href={editRoute((row.original as any).id)} className="space-x-2">
-                        Edit
-                        <DropdownMenuShortcut>
-                            <SquarePen size={16} />
-                        </DropdownMenuShortcut>
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+            {/* Edit Button */}
+            {HasAnyPermission([`${resourceName.toLowerCase()} edit`]) && (
+                <Link
+                    href={editRoute((row.original as any).id)}
+                    className="flex items-center space-x-2 rounded-l-md border border-amber-400 bg-amber-500 p-2.5 text-xs font-medium text-white hover:bg-amber-600 focus:z-10 focus:ring-1 focus:ring-amber-600 dark:border-gray-600 dark:bg-amber-600 dark:text-gray-100 dark:hover:bg-amber-700 dark:focus:ring-amber-700"
+                    title={`Edit ${resourceName}`}
+                >
+                    <SquarePen className="size-4" />
+                </Link>
+            )}
+
+            {/* View Button (hanya ditampilkan jika viewRoute diberikan) */}
+            {viewRoute && HasAnyPermission([`${resourceName.toLowerCase()} view`]) && (
+                <Link
+                    href={viewRoute((row.original as any).id)}
+                    className="flex items-center space-x-2 border-t border-b border-sky-300 bg-sky-400 p-2.5 text-xs font-medium text-white hover:bg-sky-500 focus:z-10 focus:ring-1 focus:ring-sky-500 dark:border-gray-600 dark:bg-sky-600 dark:text-gray-100 dark:hover:bg-sky-700 dark:focus:ring-sky-700"
+                    title={`View ${resourceName}`}
+                >
+                    <ScanSearch className="size-4" />
+                </Link>
+            )}
+
+            {/* Delete Button */}
+            {HasAnyPermission([`${resourceName.toLowerCase()} delete`]) && (
+                <button
+                    type="button"
+                    className={`flex items-center space-x-2 border border-red-300 p-2.5 text-xs font-medium text-white hover:bg-red-600 ${
+                        viewRoute || HasAnyPermission([`${resourceName.toLowerCase()} edit`]) ? 'rounded-r-md bg-red-500' : 'rounded-md bg-red-500'
+                    }`}
                     onClick={() => {
                         if (onDelete) {
                             onDelete();
@@ -49,14 +55,11 @@ export function RowAction<T>({ row, editRoute, resourceName = 'Item', onDelete }
                             setOpen('delete');
                         }
                     }}
-                    className="text-red-500!"
+                    title={`Delete ${resourceName}`}
                 >
-                    Delete {resourceName}
-                    <DropdownMenuShortcut>
-                        <Trash2 size={16} />
-                    </DropdownMenuShortcut>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                    <Trash2 className="size-4" />
+                </button>
+            )}
+        </div>
     );
 }

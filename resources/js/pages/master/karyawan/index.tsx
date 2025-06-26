@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { DialogProvider } from '@/context/dialog-context';
 import AppLayout from '@/layouts/app-layout';
+import HasAnyPermission from '@/lib/permission';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { Department } from '../departments/data/departmentSchema';
@@ -25,12 +26,14 @@ export default function KaryawanIndex({ karyawans, departments }: Props) {
                         <p className="text-muted-foreground">Pengelolaan Data Karyawan</p>
                     </div>
                     {/* <KaryawanPrimaryButton /> */}
-                    <Button asChild>
-                        <Link href={route('karyawan.create')} className="space-x-1">
-                            <span>Tambah Karyawan</span>
-                            <Plus className="h-4 w-4" />
-                        </Link>
-                    </Button>
+                    {HasAnyPermission(['karyawan create']) && (
+                        <Button asChild>
+                            <Link href={route('karyawan.create')} className="space-x-1">
+                                <span>Tambah Karyawan</span>
+                                <Plus className="h-4 w-4" />
+                            </Link>
+                        </Button>
+                    )}
                 </div>
                 <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
                     <KaryawanTable columns={KaryawanColumn} data={karyawans} departments={departments} />

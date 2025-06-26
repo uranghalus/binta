@@ -21,13 +21,17 @@ Route::get('/', [AuthenticatedSessionController::class, 'create'])
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // LINK Role Management
     Route::prefix('role-management')->group(function () {
         Route::resource('permission-list', PermissionController::class)
             ->parameters(['permission' => 'id'])
             ->names('permission');
-        Route::post('/permissions/bulk-delete', [PermissionController::class, 'bulkDelete'])->name('permissions.bulk-delete');
         Route::resource('role-list', RoleController::class)->parameters(['role' => 'id'])->names('role');
+        // Bulk Delete
+        Route::post('/permissions/bulk-delete', [PermissionController::class, 'bulkDelete'])->name('permissions.bulk-delete');
+        Route::post('/role/bulk-delete', [RoleController::class, 'bulkDelete'])->name('role.bulk-delete');
     });
+    // LINK Fire Safety
     Route::prefix('fire-safety')->group(function () {
         Route::resource('apar', AparController::class)
             ->parameters(['apar' => 'id'])
@@ -36,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->parameters(['hydrant' => 'id'])
             ->names('hydrant');
     });
+    // LINK Inspection
     Route::prefix('inspection')->group(function () {
         Route::resource('apar', AparInspectionController::class)
             ->parameters(['apar' => 'id'])
@@ -50,11 +55,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('inspection/react-scan');
         })->name('apar.scan');
     });
-
+    // LINK Scan
     Route::get('/hydrant/qrcode/{id}', [HydrantController::class, 'HydrantQRCode'])->name('hydrant.qrcode');
     Route::get('/hydrant/print-qrcode', [HydrantController::class, 'MassHydrantQRCode'])->name('hydrant.print-qrcode');
     Route::get('/apar/qrcode/{id}', [AparController::class, 'generateQRCode'])->name('apar.qrcode');
     Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');
+    // LINK Master Data
     Route::prefix('master-data')->group(function () {
         Route::resource('unit-bisnis', OfficesController::class)->parameters(['unit-bisnis
         ' => 'id'])
@@ -68,6 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('karyawan', KaryawanController::class)
             ->parameters(['karyawan' => 'id'])
             ->names('karyawan');
+        // ANCHOR Bulk Delete
+        Route::post('departemen/bulk-delete', [DepartmentController::class, 'bulkDelete'])->name('departemen.bulk-delete');
+        Route::post('unit-bisnis/bulk-delete', [OfficesController::class, 'bulkDelete'])->name('unit-bisnis.bulk-delete');
     });
 });
 Route::get('/captcha', function () {

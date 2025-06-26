@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { User } from '@/types';
 import { usePage } from '@inertiajs/react';
 

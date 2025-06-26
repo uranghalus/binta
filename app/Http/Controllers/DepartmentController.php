@@ -5,10 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Departments;
 use App\Models\Office;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class DepartmentController extends Controller
+class DepartmentController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('permission:permissions index', only: ['index', 'generateQRCode']),
+            new Middleware('permission:permissions create', only: ['create', 'store']),
+            new Middleware('permission:permissions edit', only: ['edit', 'update']),
+            new Middleware('permission:permissions delete', only: ['destroy'])
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
@@ -17,11 +28,10 @@ class DepartmentController extends Controller
         //
         $departments = Departments::with('office:id,office_code,name,address')->latest()->get();
         // Ambil data offices untuk dropdown
-        $offices = Office::all(['id', 'office_code', 'name']);
+
 
         return Inertia::render('master/departments/index', [
             'departments' => $departments,
-            'offices' => $offices,
         ]);
     }
 
@@ -31,6 +41,10 @@ class DepartmentController extends Controller
     public function create()
     {
         //
+        $offices = Office::all();
+        return Inertia::render('master/departments/Create', [
+            'offices' => $offices
+        ]);
     }
 
     /**
@@ -61,9 +75,15 @@ class DepartmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Departments $departments)
+    public function edit($id)
     {
         //
+        $departments = Departments::find($id);
+        $offices = Office::all();
+        return Inertia::render('master/departments/Edit', [
+            'department' => $departments,
+            'offices' => $offices,
+        ]);
     }
 
     /**
@@ -97,5 +117,16 @@ class DepartmentController extends Controller
         }
         $departments->delete();
         return redirect()->back()->with('success', 'Department deleted successfully.');
+    }
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:permissions,id',
+        ]);
+
+        Departments::whereIn('id', $request->ids)->delete();
+
+        return back()->with('success', 'Department berhasil dihapus.');
     }
 }

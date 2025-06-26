@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const karyawanSchema = z.object({
-    id_karyawan: z.string().optional(),
+    id: z.string().optional(),
 
     nik: z.string().min(1, 'NIK wajib diisi').max(255, 'NIK maksimal 255 karakter'),
     nama: z.string().min(1, 'Nama wajib diisi').max(255, 'Nama maksimal 255 karakter'),
@@ -48,4 +48,33 @@ export const karyawanSchema = z.object({
         .optional(),
 });
 
-export type Karyawan = z.infer<typeof karyawanSchema>;
+export interface Karyawan {
+    id_karyawan?: string;
+
+    nik: string;
+    nama: string;
+    nama_alias?: string;
+
+    gender: 'L' | 'P';
+
+    alamat?: string;
+    no_ktp?: string;
+    telp?: string;
+
+    department_id: number;
+    department?: {
+        department_code?: string;
+        name?: string;
+    };
+
+    jabatan?: string;
+    call_sign?: string;
+
+    tmk?: string; // diasumsikan ISO string (YYYY-MM-DD)
+
+    status_karyawan: 'aktif' | 'tidak_aktif' | 'cuti' | 'resign';
+
+    keterangan?: string;
+
+    user_image?: File;
+}

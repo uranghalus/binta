@@ -1,11 +1,11 @@
 import { DataTableColumnHeader } from '@/components/datatable-column-header';
+import { RowAction } from '@/components/datatable-row-action';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { BadgeAlert, BadgeCheck } from 'lucide-react';
 import { Karyawan } from '../data/karyawanSchema';
-import KaryawanRowAction from './karyawan-row-action';
 // import { KaryawanRowAction } from './karyawan-row-action';
 
 export const KaryawanColumn: ColumnDef<Karyawan>[] = [
@@ -74,7 +74,23 @@ export const KaryawanColumn: ColumnDef<Karyawan>[] = [
     {
         id: 'actions',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
-        cell: KaryawanRowAction,
+        cell: ({ row }) => {
+            const karyawan = row.original as Karyawan;
+
+            if (!karyawan.id_karyawan) {
+                console.error('ID tidak tersedia untuk baris ini:', karyawan);
+                return null; // atau tampilkan fallback UI
+            }
+
+            return (
+                <RowAction
+                    row={row}
+                    editRoute={() => route('karyawan.edit', karyawan.id_karyawan)}
+                    viewRoute={() => route('karyawan.show', karyawan.id_karyawan)}
+                    resourceName="Karyawan"
+                />
+            );
+        },
         meta: {
             className: 'sticky right-0 z-10 rounded-tr md:table-cell',
         },

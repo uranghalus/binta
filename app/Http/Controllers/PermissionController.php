@@ -46,14 +46,18 @@ class PermissionController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         //
-        $request->validate([
-            'name' => 'required|unique:permissions,name',
+        $validated = $request->validate([
+            'permissions' => 'required|array',
+            'permissions.*' => 'string|max:255',
+            'guard_name' => 'required|string|max:255',
         ]);
 
-        Permission::create(['name' => $request->name]);
-
-        return redirect()->route('permission.index')
-            ->with('success', 'Permission created successfully.');
+        foreach ($validated['permissions'] as $permissionName) {
+            Permission::firstOrCreate([
+                'name' => $permissionName,
+                'guard_name' => $validated['guard_name'],
+            ]);
+        }
     }
     /**
      * Show the form for editing the specified resource.

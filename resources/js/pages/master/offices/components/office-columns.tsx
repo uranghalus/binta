@@ -1,9 +1,9 @@
 import { DataTableColumnHeader } from '@/components/datatable-column-header';
+import { RowAction } from '@/components/datatable-row-action';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { Office } from '../data/scheme';
-import { DataTableRowActions } from './data-table-row-actions';
 
 export const officeColumn: ColumnDef<Office>[] = [
     {
@@ -62,6 +62,7 @@ export const officeColumn: ColumnDef<Office>[] = [
     },
     {
         id: 'actions',
-        cell: DataTableRowActions,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
+        cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('unit-bisnis.edit', id)} resourceName="Unit Bisnis" />,
     },
 ];

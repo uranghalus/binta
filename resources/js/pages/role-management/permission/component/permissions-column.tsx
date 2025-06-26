@@ -1,10 +1,10 @@
 import { DataTableColumnHeader } from '@/components/datatable-column-header';
+import { RowAction } from '@/components/datatable-row-action';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { PermissionSchema } from '../data/permissionSchema';
-import PermissionRowAction from './permission-row-action';
 // import PermissionRowAction from './permission-row-action'; // Uncomment if you have row actions
 
 export const PermissionColumn: ColumnDef<PermissionSchema>[] = [
@@ -53,6 +53,6 @@ export const PermissionColumn: ColumnDef<PermissionSchema>[] = [
     {
         id: 'actions',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
-        cell: PermissionRowAction,
+        cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('permission.edit', id)} resourceName="Permissions" />,
     },
 ];
