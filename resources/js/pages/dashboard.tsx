@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import AppLayout from '@/layouts/app-layout';
 
@@ -80,18 +80,25 @@ export default function Dashboard({ dataGrafikInspeksi, totalApar, totalAparExpi
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
                 <div className="space-y-4">
-                    <h2 className="mb-3 text-lg font-semibold">Grafik Inspeksi APAR & Hydrant (6 Bulan Terakhir)</h2>
-                    <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={dataGrafikInspeksi}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="bulan" tickLine={false} tickMargin={10} />
-                                <ChartTooltip content={<ChartTooltipContent />} />
-                                <Bar dataKey="apar" fill="var(--color-apar)" radius={4} />
-                                <Bar dataKey="hydrant" fill="var(--color-hydrant)" radius={4} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </ChartContainer>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Grafik Inspeksi APAR & Hydrant (6 Bulan Terakhir)</CardTitle>
+                            <CardDescription>test</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={dataGrafikInspeksi}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="bulan" tickLine={false} tickMargin={10} />
+                                        <ChartTooltip content={<ChartTooltipContent />} />
+                                        <Bar dataKey="apar" fill="var(--color-apar)" radius={4} />
+                                        <Bar dataKey="hydrant" fill="var(--color-hydrant)" radius={4} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </ChartContainer>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </AppLayout>

@@ -11,17 +11,23 @@ export default function AuthLayout({ children, description, title }: AuthLayoutP
         <div className="relative container grid h-svh flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div className="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
                 <div className="absolute inset-0 bg-zinc-900" />
-                <div className="relative z-20 flex items-center text-lg font-medium">
-                    <Activity className="mr-2 h-6 w-6" />
-                    <div className="font-qurova">E-Safety</div>
+                <div className="magicpattern absolute inset-0 z-20 h-[450px]" />
+                <div className="relative z-20 flex items-center gap-3 text-lg font-medium">
+                    <div className="rounded bg-zinc-400 p-2.5">
+                        <Activity className="h-6 w-6" />
+                    </div>
+                    <div className="flex flex-col">
+                        <div className="font-qurova">E-Safety</div>
+                        <div className="text-xs text-zinc-600">V.1.1.0</div>
+                    </div>
                 </div>
                 <div className="relative z-20 mt-auto">
                     <blockquote className="space-y-2">
                         <p className="text-lg">
-                            &ldquo;This template has saved me countless hours of work and helped me deliver stunning designs to my clients faster than
-                            ever before.&rdquo;
+                            &ldquo;Ilmu tanpa amal seperti pohon tanpa buah. Amal tanpa ikhlas seperti bangunan tanpa pondasi. Dan hati tanpa
+                            mengingat seperti malam tanpa bulan.&rdquo;
                         </p>
-                        <footer className="text-sm">John Doe</footer>
+                        <footer className="text-sm">Uwais Al Qarani</footer>
                     </blockquote>
                 </div>
             </div>
