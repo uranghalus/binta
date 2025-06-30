@@ -83,7 +83,7 @@ export default function Dashboard({ dataGrafikInspeksi, totalApar, totalAparExpi
                     <Card>
                         <CardHeader>
                             <CardTitle>Grafik Inspeksi APAR & Hydrant (6 Bulan Terakhir)</CardTitle>
-                            <CardDescription>test</CardDescription>
+                            <CardDescription className="text-sm">test</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
