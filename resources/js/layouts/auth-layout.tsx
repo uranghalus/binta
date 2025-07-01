@@ -1,4 +1,4 @@
-import { Activity } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface AuthLayoutProps {
@@ -14,10 +14,10 @@ export default function AuthLayout({ children, description, title }: AuthLayoutP
                 <div className="magicpattern absolute inset-0 z-20 h-[450px]" />
                 <div className="relative z-20 flex items-center gap-3 text-lg font-medium">
                     <div className="rounded bg-zinc-400 p-2.5">
-                        <Activity className="h-6 w-6" />
+                        <Flame className="h-6 w-6" />
                     </div>
                     <div className="flex flex-col">
-                        <div className="font-qurova">E-Safety</div>
+                        <div className="font-qurova">VeriFire</div>
                         <div className="text-xs text-zinc-600">V.1.1.0</div>
                     </div>
                 </div>

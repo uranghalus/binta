@@ -77,6 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // ANCHOR Bulk Delete
         Route::post('departemen/bulk-delete', [DepartmentController::class, 'bulkDelete'])->name('departemen.bulk-delete');
         Route::post('unit-bisnis/bulk-delete', [OfficesController::class, 'bulkDelete'])->name('unit-bisnis.bulk-delete');
+        Route::post('jabatan/bulk-delete', [JabatanController::class, 'bulkDelete'])->name('jabatan.bulk-delete');
     });
 });
 Route::get('/captcha', function () {

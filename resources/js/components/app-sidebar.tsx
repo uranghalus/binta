@@ -3,7 +3,7 @@ import { sidebarData } from '@/data/sidebar-data';
 import HasAnyPermission from '@/lib/permission';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { Activity } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import React from 'react';
 import { NavGroup } from './nav-group';
 import { NavUser } from './nav-user';
@@ -44,11 +44,11 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
                             <a href="#">
-                                <div className="bg-sidebar-primary flex aspect-square size-8 items-center justify-center rounded-lg dark:text-black">
-                                    <Activity className="size-4" />
+                                <div className="bg-sidebar-primary flex aspect-square size-8 items-center justify-center rounded-lg text-white dark:text-black">
+                                    <Flame className="size-5" />
                                 </div>
                                 <div className="grid flex-1 items-center text-left text-sm leading-tight">
-                                    <span className="font-qurova">E-Safety</span>
+                                    <span className="font-qurova">VeriFire</span>
                                     <span className="text-muted-foreground truncate text-[10px]">V.1.0.0</span>
                                 </div>
                             </a>

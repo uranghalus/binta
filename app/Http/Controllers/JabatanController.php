@@ -22,11 +22,18 @@ class JabatanController extends Controller implements HasMiddleware
     }
     public function index()
     {
-        $jabatans = Jabatan::with('department')->get();
+        $jabatans = Jabatan::with('department.office')->get();
         $departments = Departments::all();
-        return Inertia::render('Jabatan/Index', [
+        return Inertia::render('master/jabatan/Index', [
             'departments' => $departments,
             'jabatans' => $jabatans
+        ]);
+    }
+    public function create()
+    {
+        $departments = Departments::all();
+        return Inertia::render('master/jabatan/Create', [
+            'departments' => $departments,
         ]);
     }
 
@@ -37,7 +44,7 @@ class JabatanController extends Controller implements HasMiddleware
             'department_id' => 'required|exists:tbl_departments,id',
         ]);
         $jabatan = Jabatan::create($validated);
-        return response()->json($jabatan, 201);
+        return redirect()->back()->with('success', 'Jabatan created successfully.');
     }
 
     public function show($id)
@@ -45,6 +52,15 @@ class JabatanController extends Controller implements HasMiddleware
         $jabatan = Jabatan::with('department')->findOrFail($id);
         return Inertia::render('Jabatan/Show', [
             'jabatan' => $jabatan
+        ]);
+    }
+    public function edit($id)
+    {
+        $jabatan = Jabatan::with('department')->findOrFail($id);
+        $departments = Departments::all();
+        return Inertia::render('master/jabatan/Edit', [
+            'jabatan' => $jabatan,
+            'departments' => $departments,
         ]);
     }
 
@@ -56,13 +72,24 @@ class JabatanController extends Controller implements HasMiddleware
             'department_id' => 'sometimes|required|exists:tbl_departments,id',
         ]);
         $jabatan->update($validated);
-        return response()->json($jabatan);
+        return redirect()->back()->with('success', 'Jabatan updated successfully.');
     }
 
     public function destroy($id)
     {
         $jabatan = Jabatan::findOrFail($id);
         $jabatan->delete();
-        return response()->json(null, 204);
+        return redirect()->back()->with('success', 'Jabatan deleted successfully.');
+    }
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:permissions,id',
+        ]);
+
+        Jabatan::whereIn('id', $request->ids)->delete();
+
+        return back()->with('success', 'Jabatan berhasil dihapus.');
     }
 }
