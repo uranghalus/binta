@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { Department } from '../../departments/data/departmentSchema';
+import { Jabatan } from '../../jabatan/data/jabatanSchema';
 
 export const karyawanSchema = z.object({
     id: z.string().optional(),
@@ -62,12 +64,9 @@ export interface Karyawan {
     telp?: string;
 
     department_id: number;
-    department?: {
-        department_code?: string;
-        name?: string;
-    };
-
-    jabatan?: string;
+    department?: Department;
+    jabatan_id: number;
+    jabatan?: Jabatan;
     call_sign?: string;
 
     tmk?: string; // diasumsikan ISO string (YYYY-MM-DD)

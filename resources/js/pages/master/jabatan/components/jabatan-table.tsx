@@ -15,7 +15,6 @@ import {
     VisibilityState,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { Department } from '../../departments/data/departmentSchema';
 import { Jabatan } from '../data/jabatanSchema';
 import JabatanToolbar from './jabatan-toolbar';
 // import JabatanToolbar from './jabatan-toolbar';
@@ -23,10 +22,9 @@ import JabatanToolbar from './jabatan-toolbar';
 interface Props {
     columns: ColumnDef<Jabatan>[];
     data: Jabatan[];
-    departments: Department[];
 }
 
-export default function JabatanTable({ columns, data, departments }: Props) {
+export default function JabatanTable({ columns, data }: Props) {
     const [rowSelection, setRowSelection] = useState({});
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -56,7 +54,7 @@ export default function JabatanTable({ columns, data, departments }: Props) {
 
     return (
         <div className="space-y-4">
-            <JabatanToolbar table={table} departments={departments} />
+            <JabatanToolbar table={table} />
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

@@ -60,22 +60,19 @@ export interface Karyawan {
     alamat: string;
     telp: string;
     gender: 'L' | 'P'; // "L" = Laki-laki, "P" = Perempuan
-    jabatan: string;
+    jabatan_id: number;
     status_karyawan: string;
     tmk: string; // Tanggal Masuk Kerja (format: YYYY-MM-DD)
     keterangan: string;
     department_id: number;
+    department?: Department;
+    jabatan_id: number;
+    jabatan?: Jabatan;
     user_image: string | null;
     create_date: string;
     create_id_user: number | null;
     modified_date: string | null;
     modified_id_user: number | null;
-    created_at: string;
-    updated_at: string;
-}
-export interface Role {
-    id: number;
-    name: string;
     created_at: string;
     updated_at: string;
 }

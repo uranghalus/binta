@@ -18,7 +18,7 @@ export const JabatanColumn: ColumnDef<Jabatan>[] = [
         ),
         meta: {
             className: cn(
-                'sticky left-0 z-10 rounded-tl md:table-cell',
+                'sticky left-0 z-10 w-10 rounded-tl px-2 md:table-cell',
                 'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted transition-colors duration-200',
             ),
         },
@@ -35,26 +35,18 @@ export const JabatanColumn: ColumnDef<Jabatan>[] = [
     },
     {
         accessorKey: 'nama_jabatan',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Nama Jabatan" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Nama Jabatan" className="w-full" />,
         cell: ({ row }) => <span className="text-base">{row.getValue('nama_jabatan')}</span>,
     },
     {
-        id: 'department_id', // pakai id manual agar bisa difilter
-        accessorFn: (row) => String(row.department_id), //
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Departemen" />,
-        cell: ({ row }) => <span className="text-base">{row.original.department?.name || 'Tidak Ada'}</span>,
-    },
-    {
-        accessorKey: 'unit-bisnis',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Kantor" />,
-        cell: ({ row }) => <span className="text-base">{row.original.department?.office.name}</span>,
-    },
-    {
         id: 'actions',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" className="ml-auto" />,
         cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('jabatan.edit', id)} resourceName="Jabatan" />,
         meta: {
-            className: 'sticky right-0 z-10 rounded-tr md:table-cell',
+            className: cn(
+                'sticky right-0 z-10 w-[60px] px-2', // 👈 lebar tetap dan padding kecil
+                'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted transition-colors duration-200',
+            ),
         },
     },
 ];

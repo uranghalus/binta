@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Departments;
+use App\Models\Jabatan;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -28,11 +29,13 @@ class KaryawanController extends Controller implements HasMiddleware
     public function index()
     {
         //
-        $karyawans = Karyawan::with('department')->latest()->get();
+        $karyawans = Karyawan::with(['department', 'jabatan'])->latest()->get();
         $departments = Departments::all(['id', 'name']);
+        $jabatan = Jabatan::all();
         return Inertia::render('master/karyawan/index', [
             'karyawans' => $karyawans,
             'departments' => $departments,
+            'jabatans' => $jabatan
         ]);
     }
 
@@ -43,8 +46,10 @@ class KaryawanController extends Controller implements HasMiddleware
     {
         //
         $departments = Departments::all(['id', 'name']);
+        $jabatan = Jabatan::all();
         return Inertia::render('master/karyawan/Create', [
             'departments' => $departments,
+            'jabatans' => $jabatan
         ]);
     }
 
@@ -55,14 +60,14 @@ class KaryawanController extends Controller implements HasMiddleware
     {
         //
         $validated = $request->validate([
-            'nik'            => 'required|string|max:255',
-            'nama'           => 'required|string|max:255',
+            'nik' => 'required|string|max:255|unique:tbl_karyawans,nik',
+            'no_ktp' => 'nullable|string|max:16|unique:tbl_karyawans,no_ktp',
+            'nama' => 'required|string|max:255',
             'nama_alias'     => 'nullable|string|max:255',
             'gender'         => 'required|in:L,P',
             'alamat'         => 'nullable|string|max:255',
-            'no_ktp'         => 'nullable|string|max:255',
             'department_id'  => 'required|exists:tbl_departments,id',
-            'jabatan'        => 'nullable|string|max:255',
+            'jabatan_id'     => 'nullable|exists:tbl_jabatan,id',
             'status_karyawan' => 'nullable|in:aktif,tidak_aktif,cuti,resign',
             'tmk'            => 'nullable|date',
             'call_sign'      => 'nullable|string|max:255',
@@ -90,7 +95,7 @@ class KaryawanController extends Controller implements HasMiddleware
     public function show($id)
     {
         //
-        $karyawan = Karyawan::with('department')->findOrFail($id);
+        $karyawan = Karyawan::with(['department', 'jabatan'])->findOrFail($id);
         if (!$karyawan) {
             return redirect()->back()->with('error', 'Karyawan not found.');
         }
@@ -104,15 +109,17 @@ class KaryawanController extends Controller implements HasMiddleware
      */
     public function edit($id)
     {
-        $karyawan = Karyawan::findOrFail($id);
+        $karyawan = Karyawan::with(['department', 'jabatan'])->findOrFail($id);
         if (!$karyawan) {
             return redirect()->back()->with('error', 'Karyawan not found.');
         }
         //
         $departments = Departments::all(['id', 'name']);
+        $jabatan = Jabatan::all();
         return Inertia::render('master/karyawan/Edit', [
             'karyawan' => $karyawan,
             'departments' => $departments,
+            'jabatans' => $jabatan
         ]);
     }
 
@@ -133,7 +140,7 @@ class KaryawanController extends Controller implements HasMiddleware
             'no_ktp' => 'nullable|string|max:20',
             'telp' => 'nullable|string|max:15',
             'department_id' => 'required|exists:tbl_departments,id',
-            'jabatan' => 'nullable|string|max:100',
+            'jabatan_id' => 'nullable|exists:tbl_jabatan,id',
             'call_sign' => 'nullable|string|max:50',
             'tmk' => 'nullable|date',
             'status_karyawan' => 'required|string|max:50',

@@ -5,7 +5,7 @@ import { Head } from '@inertiajs/react';
 // import { HydrantColumn } from './components/hydrant-columns';
 // import HydrantDialog from './components/hydrant-dialogs';
 // import HydrantTable from './components/hydrant-table';
-import HasAnyPermission from '@/lib/utils';
+import HasAnyPermission from '@/lib/permission';
 import { HydrantColumn } from './components/hydrant-collumn';
 import HydrantDialogs from './components/hydrant-dialogs';
 import HydrantTable from './components/hydrant-table';

@@ -59,7 +59,7 @@ export const KaryawanColumn: ColumnDef<Karyawan>[] = [
     {
         accessorKey: 'jabatan',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Jabatan" />,
-        cell: ({ row }) => <span className="text-base">{row.getValue('jabatan') || 'Tidak Ada'}</span>,
+        cell: ({ row }) => <span className="text-base">{row.original.jabatan?.nama_jabatan}</span>,
     },
     {
         accessorKey: 'status_karyawan',

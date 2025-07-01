@@ -65,7 +65,7 @@ export const RolesColumn: ColumnDef<IRole>[] = [
                 <div className="flex flex-wrap gap-2">
                     {permissions.map((permission) => (
                         <Badge key={permission.id || permission.name} variant="success" className="text-xs font-normal">
-                            {permission.name === 'super-admin' ? 'all-permissions' : permission.name}
+                            {permission.name === 'superadmin' ? 'all-permissions' : permission.name}
                         </Badge>
                     ))}
                 </div>

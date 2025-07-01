@@ -1,4 +1,3 @@
-import { DataTableFacetedFilter } from '@/components/datatable-faceted-filter';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,17 +14,14 @@ import { Input } from '@/components/ui/input';
 import HasAnyPermission from '@/lib/permission';
 import { router } from '@inertiajs/react';
 import { Table } from '@tanstack/react-table';
-import { Trash2, X } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { startTransition, useState } from 'react';
 import { toast } from 'sonner';
-import { Department } from '../../departments/data/departmentSchema';
 import { Jabatan } from '../data/jabatanSchema';
 interface Props {
     table: Table<Jabatan>;
-    departments: Department[];
 }
-export default function JabatanToolbar({ table, departments }: Props) {
-    const isFiltered = table.getState().columnFilters.length > 0;
+export default function JabatanToolbar({ table }: Props) {
     const selectedRows = table.getSelectedRowModel().rows;
     const selectedCount = selectedRows.length;
     const selectedIds = selectedRows.map((row) => row.original.id);
@@ -59,26 +55,8 @@ export default function JabatanToolbar({ table, departments }: Props) {
                     onChange={(event) => table.getColumn('nama_jabatan')?.setFilterValue(event.target.value)}
                     className="h-8 w-[150px] lg:w-[250px]"
                 />
-                <div className="flex gap-x-2">
-                    {table.getColumn('department_id') && (
-                        <DataTableFacetedFilter
-                            column={table.getColumn('department_id')}
-                            title="Department"
-                            options={departments.map((dept) => ({
-                                label: dept.name,
-                                value: String(dept.id), // ✅ cocokkan dengan department_id
-                            }))}
-                        />
-                    )}
-                    {isFiltered && (
-                        <Button variant="ghost" onClick={() => table.resetColumnFilters()} className="h-8 px-2 lg:px-3">
-                            Reset
-                            <X className="ml-2 h-4 w-4" />
-                        </Button>
-                    )}
-                </div>
             </div>
-            {HasAnyPermission(['roles delete']) && (
+            {HasAnyPermission(['jabatan delete']) && (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
                         <Button variant="destructive" disabled={selectedCount === 0 || isSubmitting} size={'sm'} className="space-x-2">

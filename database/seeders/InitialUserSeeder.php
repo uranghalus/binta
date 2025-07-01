@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Departments;
+use App\Models\Jabatan;
 use App\Models\Karyawan;
 use App\Models\Office;
 use App\Models\User;
@@ -29,7 +30,16 @@ class InitialUserSeeder extends Seeder
             'office_id' => $office->id,
         ]);
 
-        // 3. Buat Permissions dasar (jika belum ada)
+        // 3. Buat Jabatan
+        $jabatanIT = Jabatan::firstOrCreate([
+            'nama_jabatan' => 'Staff',
+        ]);
+
+        $jabatanPetugas = Jabatan::firstOrCreate([
+            'nama_jabatan' => 'Petugas Lapangan',
+        ]);
+
+        // 4. Buat Permissions dasar
         $permissions = [
             'users index',
             'users create',
@@ -39,6 +49,18 @@ class InitialUserSeeder extends Seeder
             'roles create',
             'roles edit',
             'roles delete',
+            'department index',
+            'department create',
+            'department edit',
+            'department delete',
+            'jabatan index',
+            'jabatan create',
+            'jabatan edit',
+            'jabatan delete',
+            'unit bisnis index',
+            'unit bisnis create',
+            'unit bisnis edit',
+            'unit bisnis delete',
             'permissions index',
             'permissions create',
             'permissions edit',
@@ -49,19 +71,11 @@ class InitialUserSeeder extends Seeder
             Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
         }
 
-        // 4. Ambil Role yang sudah dibuat di RolesTableSeeder
-        $adminRole = Role::where('name', 'superadmin')->first();
-        $petugasRole = Role::where('name', 'petugas')->first();
+        // 5. Ambil atau buat Role
+        $adminRole = Role::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'web']);
+        $petugasRole = Role::firstOrCreate(['name' => 'petugas', 'guard_name' => 'web']);
 
-        // Jika belum ada (seharusnya tidak), buat fallback
-        if (!$adminRole) {
-            $adminRole = Role::create(['name' => 'superadmin', 'guard_name' => 'web']);
-        }
-        if (!$petugasRole) {
-            $petugasRole = Role::create(['name' => 'petugas', 'guard_name' => 'web']);
-        }
-
-        // 5. Assign permission ke masing-masing role
+        // 6. Assign permission ke masing-masing role
         $adminRole->syncPermissions(Permission::all());
 
         $petugasPermissions = Permission::where(function ($query) {
@@ -70,24 +84,24 @@ class InitialUserSeeder extends Seeder
         })->get();
         $petugasRole->syncPermissions($petugasPermissions);
 
-        // 6. Buat Karyawan & User Admin
+        // 7. Buat Karyawan & User Admin
         $adminKaryawan = Karyawan::firstOrCreate(
             ['nik' => 'IT001'],
             [
-                'nama' => 'Muhammad Fauzan',
-                'nama_alias' => 'Fauzan',
-                'gender' => 'L',
-                'alamat' => 'Jl. Lambung Mangkurat, Banjarmasin',
-                'no_ktp' => '6371000000000002',
-                'telp' => '081234567890',
-                'department_id' => $department->id,
-                'jabatan' => 'IT Support',
-                'call_sign' => 'FAUZAN',
-                'tmk' => now()->subYears(2),
-                'status_karyawan' => 'aktif',
-                'keterangan' => 'Staff IT utama',
-                'user_image' => null,
-                'create_date' => now(),
+                'nama'             => 'Muhammad Fauzan',
+                'nama_alias'       => 'Fauzan',
+                'gender'           => 'L',
+                'alamat'           => 'Jl. Lambung Mangkurat, Banjarmasin',
+                'no_ktp'           => '6371000000000002',
+                'telp'             => '081234567890',
+                'department_id'    => $department->id,
+                'jabatan_id'       => $jabatanIT->id,
+                'call_sign'        => 'FAUZAN',
+                'tmk'              => now()->subYears(2),
+                'status_karyawan'  => 'aktif',
+                'keterangan'       => 'Staff IT utama',
+                'user_image'       => null,
+                'create_date'      => now(),
             ]
         );
 
@@ -95,29 +109,29 @@ class InitialUserSeeder extends Seeder
             ['email' => 'fauzan@dutamall.com'],
             [
                 'karyawan_id' => $adminKaryawan->id_karyawan,
-                'password' => Hash::make('admin123'),
+                'password'    => Hash::make('admin123'),
             ]
         );
         $adminUser->assignRole($adminRole);
 
-        // 7. Buat Karyawan & User Petugas
+        // 8. Buat Karyawan & User Petugas
         $petugasKaryawan = Karyawan::firstOrCreate(
             ['nik' => 'PTG001'],
             [
-                'nama' => 'Petugas Hydrant',
-                'nama_alias' => 'Petugas',
-                'gender' => 'L',
-                'alamat' => 'Jl. Veteran, Banjarmasin',
-                'no_ktp' => '6371000000000001',
-                'telp' => '081234567891',
-                'department_id' => $department->id,
-                'jabatan' => 'Petugas Lapangan',
-                'call_sign' => 'PETUGAS1',
-                'tmk' => now()->subMonths(6),
-                'status_karyawan' => 'aktif',
-                'keterangan' => 'Petugas inspeksi hydrant',
-                'user_image' => null,
-                'create_date' => now(),
+                'nama'             => 'Petugas Hydrant',
+                'nama_alias'       => 'Petugas',
+                'gender'           => 'L',
+                'alamat'           => 'Jl. Veteran, Banjarmasin',
+                'no_ktp'           => '6371000000000001',
+                'telp'             => '081234567891',
+                'department_id'    => $department->id,
+                'jabatan_id'       => $jabatanPetugas->id,
+                'call_sign'        => 'PETUGAS1',
+                'tmk'              => now()->subMonths(6),
+                'status_karyawan'  => 'aktif',
+                'keterangan'       => 'Petugas inspeksi hydrant',
+                'user_image'       => null,
+                'create_date'      => now(),
             ]
         );
 
@@ -125,11 +139,11 @@ class InitialUserSeeder extends Seeder
             ['email' => 'petugas@dutamall.com'],
             [
                 'karyawan_id' => $petugasKaryawan->id_karyawan,
-                'password' => Hash::make('petugas123'),
+                'password'    => Hash::make('petugas123'),
             ]
         );
         $petugasUser->assignRole($petugasRole);
 
-        $this->command->info('✅ Admin & Petugas berhasil dibuat beserta role dan permission-nya.');
+        $this->command->info('✅ Admin & Petugas berhasil dibuat beserta jabatan, role, dan permission-nya.');
     }
 }

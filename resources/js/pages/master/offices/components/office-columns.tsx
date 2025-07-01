@@ -18,7 +18,7 @@ export const officeColumn: ColumnDef<Office>[] = [
         ),
         meta: {
             className: cn(
-                'sticky left-0 z-10 rounded-tl md:table-cell',
+                'sticky left-0 z-10 w-10 rounded-tl px-2 md:table-cell',
                 'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted transition-colors duration-200',
             ),
         },
@@ -35,11 +35,11 @@ export const officeColumn: ColumnDef<Office>[] = [
     },
     {
         accessorKey: 'office_code',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Office Code" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Office Code" className="w-fit" />,
         cell: ({ row }) => <div className="text-base">{row.getValue('office_code')}</div>,
         meta: {
             className: cn(
-                'drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] lg:drop-shadow-none dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)]',
+                'w-fit drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] lg:drop-shadow-none dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)]',
                 'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted transition-colors duration-200',
                 'sticky left-6 md:table-cell',
             ),
@@ -64,5 +64,11 @@ export const officeColumn: ColumnDef<Office>[] = [
         id: 'actions',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" />,
         cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('unit-bisnis.edit', id)} resourceName="Unit Bisnis" />,
+        meta: {
+            className: cn(
+                'sticky right-0 z-10 w-[60px] px-2', // 👈 lebar tetap dan padding kecil
+                'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted transition-colors duration-200',
+            ),
+        },
     },
 ];

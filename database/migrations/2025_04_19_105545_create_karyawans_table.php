@@ -20,12 +20,17 @@ return new class extends Migration
             $table->text('alamat');
             $table->string('no_ktp', 16)->unique();
             $table->string('telp', 16)->nullable();
+            $table->unsignedBigInteger('jabatan_id')->nullable();
+
+            $table->foreign('jabatan_id')
+                ->references('id')
+                ->on('tbl_jabatan')
+                ->onDelete('set null');
             $table->unsignedBigInteger('department_id')->nullable();
             $table->foreign('department_id')
                 ->references('id')
                 ->on('tbl_departments')
                 ->onDelete('set null');
-            $table->string('jabatan');
             $table->string('call_sign')->nullable();
             $table->date('tmk'); // tanggal mulai kerja
             $table->string('status_karyawan', 16);

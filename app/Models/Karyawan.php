@@ -24,7 +24,7 @@ class Karyawan extends Model
         'no_ktp',
         'telp',
         'department_id',
-        'jabatan',
+        'jabatan_id', // tambahkan ini
         'call_sign',
         'tmk',
         'status_karyawan',
@@ -44,5 +44,9 @@ class Karyawan extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'karyawan_id', 'id_karyawan');
+    }
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class, 'jabatan_id');
     }
 }

@@ -22,26 +22,21 @@ class JabatanController extends Controller implements HasMiddleware
     }
     public function index()
     {
-        $jabatans = Jabatan::with('department.office')->get();
-        $departments = Departments::all();
+        $jabatans = Jabatan::all();
+
         return Inertia::render('master/jabatan/Index', [
-            'departments' => $departments,
             'jabatans' => $jabatans
         ]);
     }
     public function create()
     {
-        $departments = Departments::all();
-        return Inertia::render('master/jabatan/Create', [
-            'departments' => $departments,
-        ]);
+        return Inertia::render('master/jabatan/Create');
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nama_jabatan' => 'required|string|max:255',
-            'department_id' => 'required|exists:tbl_departments,id',
         ]);
         $jabatan = Jabatan::create($validated);
         return redirect()->back()->with('success', 'Jabatan created successfully.');
@@ -57,10 +52,8 @@ class JabatanController extends Controller implements HasMiddleware
     public function edit($id)
     {
         $jabatan = Jabatan::with('department')->findOrFail($id);
-        $departments = Departments::all();
         return Inertia::render('master/jabatan/Edit', [
             'jabatan' => $jabatan,
-            'departments' => $departments,
         ]);
     }
 
@@ -69,7 +62,6 @@ class JabatanController extends Controller implements HasMiddleware
         $jabatan = Jabatan::findOrFail($id);
         $validated = $request->validate([
             'nama_jabatan' => 'sometimes|required|string|max:255',
-            'department_id' => 'sometimes|required|exists:tbl_departments,id',
         ]);
         $jabatan->update($validated);
         return redirect()->back()->with('success', 'Jabatan updated successfully.');

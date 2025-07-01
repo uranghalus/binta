@@ -14,11 +14,6 @@ return new class extends Migration
         Schema::create('tbl_jabatan', function (Blueprint $table) {
             $table->id();
             $table->string('nama_jabatan');
-            $table->unsignedBigInteger('department_id');
-            $table->foreign('department_id')
-                ->references('id')
-                ->on('tbl_departments')
-                ->onDelete('cascade');
             $table->timestamps();
         });
     }

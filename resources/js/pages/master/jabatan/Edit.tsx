@@ -2,21 +2,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderIcon } from 'lucide-react';
 import { FormEventHandler } from 'react';
 import { toast } from 'sonner';
-import { Department } from '../departments/data/departmentSchema';
 import { Jabatan } from './data/jabatanSchema';
 
 interface Props {
-    departments: Department[];
     jabatan: Jabatan;
 }
 
-export default function Edit({ departments, jabatan }: Props) {
+export default function Edit({ jabatan }: Props) {
     const {
         data,
         setData,
@@ -25,7 +22,6 @@ export default function Edit({ departments, jabatan }: Props) {
         errors: zodError,
     } = useForm({
         nama_jabatan: jabatan.nama_jabatan || '',
-        department_id: jabatan.department_id ? jabatan.department_id.toString() : '',
     });
 
     const onSubmit: FormEventHandler = (e) => {
@@ -62,26 +58,6 @@ export default function Edit({ departments, jabatan }: Props) {
                                 placeholder="Masukkan nama jabatan"
                             />
                             {zodError.nama_jabatan && <p className="text-xs text-red-500">{zodError.nama_jabatan}</p>}
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="department_id" className="text-sm font-medium">
-                                Departemen
-                            </Label>
-                            <Select value={data.department_id} onValueChange={(value) => setData('department_id', value)}>
-                                <SelectTrigger id="department_id" className="w-full">
-                                    <SelectValue placeholder="Pilih departemen" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {departments.map((dept) =>
-                                        dept.id !== undefined ? (
-                                            <SelectItem key={dept.id} value={dept.id.toString()}>
-                                                {dept.name} ({dept.department_code})
-                                            </SelectItem>
-                                        ) : null,
-                                    )}
-                                </SelectContent>
-                            </Select>
-                            {zodError.department_id && <p className="text-xs text-red-500">{zodError.department_id}</p>}
                         </div>
                     </form>
                 </CardContent>

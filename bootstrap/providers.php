@@ -2,5 +2,6 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    \Mews\Captcha\CaptchaServiceProvider::class,
+    App\Providers\AuthServiceProvider::class,
+    Mews\Captcha\CaptchaServiceProvider::class,
 ];
