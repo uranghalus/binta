@@ -31,13 +31,15 @@ class InitialUserSeeder extends Seeder
         ]);
 
         // 3. Buat Jabatan
-        $jabatanIT = Jabatan::firstOrCreate([
-            'nama_jabatan' => 'Staff',
-        ]);
+        $jabatanIT = Jabatan::updateOrCreate(
+            ['nama_jabatan' => 'Staff'],
+            ['roles' => ['superadmin']]
+        );
 
-        $jabatanPetugas = Jabatan::firstOrCreate([
-            'nama_jabatan' => 'Petugas Lapangan',
-        ]);
+        $jabatanPetugas = Jabatan::updateOrCreate(
+            ['nama_jabatan' => 'Petugas Lapangan'],
+            ['roles' => ['petugas']]
+        );
 
         // 4. Buat Permissions dasar
         $permissions = [
@@ -112,7 +114,9 @@ class InitialUserSeeder extends Seeder
                 'password'    => Hash::make('admin123'),
             ]
         );
-        $adminUser->assignRole($adminRole);
+        if ($adminKaryawan->jabatan && $adminKaryawan->jabatan->roles) {
+            $adminUser->syncRoles($adminKaryawan->jabatan->roles);
+        }
 
         // 8. Buat Karyawan & User Petugas
         $petugasKaryawan = Karyawan::firstOrCreate(
@@ -142,7 +146,9 @@ class InitialUserSeeder extends Seeder
                 'password'    => Hash::make('petugas123'),
             ]
         );
-        $petugasUser->assignRole($petugasRole);
+        if ($petugasKaryawan->jabatan && $petugasKaryawan->jabatan->roles) {
+            $petugasUser->syncRoles($petugasKaryawan->jabatan->roles);
+        }
 
         $this->command->info('✅ Admin & Petugas berhasil dibuat beserta jabatan, role, dan permission-nya.');
     }

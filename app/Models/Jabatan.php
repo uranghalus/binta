@@ -14,6 +14,10 @@ class Jabatan extends Model
     protected $fillable = [
         'nama_jabatan',
     ];
+
+    protected $casts = [
+        'roles' => 'array'
+    ];
     public function karyawans()
     {
         return $this->hasMany(Karyawan::class, 'jabatan_id', 'id');

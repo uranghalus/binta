@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tbl_jabatan', function (Blueprint $table) {
             $table->id();
             $table->string('nama_jabatan');
+            $table->json('roles')->nullable();
             $table->timestamps();
         });
     }

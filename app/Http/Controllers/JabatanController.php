@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Departments;
 use App\Models\Jabatan;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -51,7 +50,7 @@ class JabatanController extends Controller implements HasMiddleware
     }
     public function edit($id)
     {
-        $jabatan = Jabatan::with('department')->findOrFail($id);
+        $jabatan = Jabatan::findOrFail($id);
         return Inertia::render('master/jabatan/Edit', [
             'jabatan' => $jabatan,
         ]);
