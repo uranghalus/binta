@@ -2,13 +2,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MultiSelect } from '@/components/ui/multi-select';
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderIcon } from 'lucide-react';
 import { FormEventHandler } from 'react';
 import { toast } from 'sonner';
 
-export default function Create() {
+interface Props {
+    roles: string[];
+}
+export default function Create({ roles }: Props) {
     const {
         data,
         setData,
@@ -18,7 +22,7 @@ export default function Create() {
         errors: zodError,
     } = useForm({
         nama_jabatan: '',
-        department_id: '',
+        roles: [] as string[],
     });
 
     const onSubmit: FormEventHandler = (e) => {
@@ -56,6 +60,18 @@ export default function Create() {
                                 placeholder="Masukkan nama jabatan"
                             />
                             {zodError.nama_jabatan && <p className="text-xs text-red-500">{zodError.nama_jabatan}</p>}
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="role" className="text-sm font-medium">
+                                Hak Akses
+                            </Label>
+                            <MultiSelect
+                                options={roles.map((role) => ({ label: role, value: role }))}
+                                defaultValue={data.roles}
+                                onValueChange={(value) => setData('roles', value)}
+                                placeholder="Pilih Role"
+                                className="w-full"
+                            />
                         </div>
                     </form>
                 </CardContent>

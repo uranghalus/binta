@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class JabatanController extends Controller implements HasMiddleware
 {
@@ -29,13 +30,18 @@ class JabatanController extends Controller implements HasMiddleware
     }
     public function create()
     {
-        return Inertia::render('master/jabatan/Create');
+
+        return Inertia::render('master/jabatan/Create', [
+            'roles' => Role::pluck('name'),
+        ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nama_jabatan' => 'required|string|max:255',
+            'roles' => 'nullable|array',
+            'roles.*' => 'string|exist:roles,name'
         ]);
         $jabatan = Jabatan::create($validated);
         return redirect()->back()->with('success', 'Jabatan created successfully.');

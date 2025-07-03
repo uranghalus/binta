@@ -39,6 +39,11 @@ export const JabatanColumn: ColumnDef<Jabatan>[] = [
         cell: ({ row }) => <span className="text-base">{row.getValue('nama_jabatan')}</span>,
     },
     {
+        accessorKey: 'roles',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Hak Akses" />,
+        cell: ({ row }) => <span className="text-base">{row.original.roles.join(', ')}</span>,
+    },
+    {
         id: 'actions',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" className="ml-auto" />,
         cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('jabatan.edit', id)} resourceName="Jabatan" />,
