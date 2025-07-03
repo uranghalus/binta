@@ -10,6 +10,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Intervention\Image\Laravel\Facades\Image;
 
 class KaryawanController extends Controller implements HasMiddleware
 {
@@ -78,7 +79,11 @@ class KaryawanController extends Controller implements HasMiddleware
 
         // Simpan file jika ada
         if ($request->hasFile('user_image')) {
-            $path = $request->file('user_image')->store('karyawan', 'public');
+            $filename = uniqid() . '.webp';
+            $path = "uploads/karyawan/{$filename}";
+
+            $convertedImage = Image::read($request->file('user_image'))->toWebp(80);
+            Storage::disk('public')->put($path, (string) $convertedImage);
             $validated['user_image'] = $path; // Simpan path ke database
         }
 
@@ -156,7 +161,11 @@ class KaryawanController extends Controller implements HasMiddleware
             }
 
             // Simpan file baru
-            $path = $request->file('user_image')->store('karyawan', 'public');
+            $filename = uniqid() . '.webp';
+            $path = "uploads/karyawan/{$filename}";
+
+            $convertedImage = Image::read($request->file('user_image'))->toWebp(80);
+            Storage::disk('public')->put($path, (string) $convertedImage);
             $validatedData['user_image'] = $path;
         }
 
@@ -175,7 +184,9 @@ class KaryawanController extends Controller implements HasMiddleware
         if (!$karyawan) {
             return redirect()->back()->with('error', 'Karyawan not found.');
         }
-
+        if ($karyawan->user_image && Storage::disk('public')->exists($karyawan->user_image)) {
+            Storage::disk('public')->delete($karyawan->user_image);
+        }
         $karyawan->delete();
         return redirect()->back()->with('success', 'Karyawan deleted successfully.');
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Karyawan;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +21,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('auth/register');
+        return Inertia::render('auth/Register');
     }
 
     /**
@@ -31,20 +32,28 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'nik' => 'required|exists:tbl_karyawans,nik',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'karyawan_id' => 'required|exists:tbl_karyawans,nik',
         ]);
+
+        $karyawan = Karyawan::with('jabatan')->where('nik', $request->nik)->firstOrFail();
+
         $user = User::create([
-            'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'karyawan_id' => $request->karyawan_id
+            'karyawan_id' => $karyawan->id_karyawan,
         ]);
 
-        event(new Registered($user));
+        // ✅ Sinkronisasi Role dari Jabatan Karyawan
+        if (
+            $karyawan->jabatan &&
+            is_array($karyawan->jabatan->roles)
+        ) {
+            $user->syncRoles($karyawan->jabatan->roles);
+        }
 
+        event(new Registered($user));
         Auth::login($user);
 
         return to_route('dashboard');
