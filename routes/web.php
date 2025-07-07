@@ -80,6 +80,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('jabatan/bulk-delete', [JabatanController::class, 'bulkDelete'])->name('jabatan.bulk-delete');
     });
 });
+Route::prefix('reports')->group(function () {
+    Route::get('/apar-rekap', [AparInspectionController::class, 'rekap'])->name('apar.rekap');
+});
 Route::get('/captcha', function () {
     return response()->json([
         'captcha' => captcha_src('default'),

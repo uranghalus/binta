@@ -90,13 +90,14 @@ export const sidebarData: SidebarData = {
             title: 'Reports',
             items: [
                 {
-                    title: 'Laporan Apar',
-                    url: '/reports/apar',
+                    title: 'Laporan Rekap Apar',
+                    url: '/reports/apar-rekap',
                     icon: FilesIcon,
                 },
                 {
-                    title: 'Laporan Hydrant',
-                    url: '/reports/hydrant',
+                    title: 'Laporan Rekap Hydrant',
+                    url: '/reports/hydrant-rekap',
+                    icon: FilesIcon,
                 },
             ],
         },

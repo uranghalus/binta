@@ -158,4 +158,19 @@ class AparInspectionController extends Controller implements HasMiddleware
 
         return redirect()->route('inspection.apar.index')->with('success', 'Data berhasil dihapus!');
     }
+    public function rekap(Request $request)
+    {
+        $bulan = $request->input('bulan', now()->format('m'));
+        $tahun = $request->input('tahun', now()->format('Y'));
+        $rekap = AparInspection::where(['apar', 'user'])
+            ->whereMonth('tanggal_inspeksi', $bulan)
+            ->whereYear('tanggal_inspeksi', $tahun)
+            ->orderByDesc('tanggal_inspeksi')
+            ->get();
+        return Inertia::render('Laporan/AparRekap', [
+            'rekap' => $rekap,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
+        ]);
+    }
 }

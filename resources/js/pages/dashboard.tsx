@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 
 import { Head } from '@inertiajs/react';
@@ -11,6 +12,7 @@ interface Props {
     totalHydrant: number;
     totalAparExpired: number;
     totalInspeksiApar: number;
+    aparBermasalah;
 }
 const chartConfig = {
     apar: {
@@ -22,7 +24,7 @@ const chartConfig = {
         color: '#60a5fa',
     },
 } satisfies ChartConfig;
-export default function Dashboard({ dataGrafikInspeksi, totalApar, totalAparExpired, totalHydrant, totalInspeksiApar }: Props) {
+export default function Dashboard({ dataGrafikInspeksi, totalApar, totalAparExpired, totalHydrant, totalInspeksiApar, aparBermasalah }: Props) {
     console.log(dataGrafikInspeksi);
 
     return (
@@ -100,6 +102,47 @@ export default function Dashboard({ dataGrafikInspeksi, totalApar, totalAparExpi
                         </CardContent>
                     </Card>
                 </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Apar Bermasalah</CardTitle>
+                        <CardDescription className="text-xs">Data Apar Bermasalah Terbaru</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>#</TableHead>
+                                    <TableHead>Kode APAR</TableHead>
+                                    <TableHead>Lokasi</TableHead>
+                                    <TableHead>Kondisi</TableHead>
+                                    <TableHead>Tanggal</TableHead>
+                                    <TableHead>Foto</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {aparBermasalah.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="text-center">
+                                            Tidak ada data bermasalah
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                                {aparBermasalah.map((item, i) => (
+                                    <TableRow key={item.id}>
+                                        <TableCell>{i + 1}</TableCell>
+                                        <TableCell>{item.apar?.kode_apar ?? '-'}</TableCell>
+                                        <TableCell>{item.apar?.lokasi ?? '-'}</TableCell>
+                                        <TableCell className="font-semibold text-red-600">{item.kondisi ?? '-'}</TableCell>
+                                        <TableCell>{new Date(item.tanggal_inspeksi).toLocaleDateString()}</TableCell>
+                                        <TableCell>
+                                            {item.foto_apar ? <img src={`/storage/${item.foto_apar}`} alt="foto" className="h-14 rounded-md" /> : '-'}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
             </div>
         </AppLayout>
     );

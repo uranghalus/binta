@@ -41,12 +41,20 @@ class DashboardController extends Controller
                 'hydrant' => $hydrant,
             ];
         }
+        $aparBermasalah = AparInspection::with('apar')
+            ->where(function ($q) {
+                $q->where('kondisi', 'NOT LIKE', '%baik%')->orWhereNull('kondisi');
+            })
+            ->orderByDesc('tanggal_inspeksi')
+            ->take(5)
+            ->get();
         return Inertia::render('dashboard', [
             'totalApar' => $totalApar,
             'totalHydrant' => $totalHydrant,
             'totalAparExpired' => $totalAparExpired,
             'totalInspeksiApar' => $totalInspeksiApar,
             'dataGrafikInspeksi' => $dataGrafik,
+            'aparBermasalah' => $aparBermasalah
         ]);
     }
 }
