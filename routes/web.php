@@ -82,6 +82,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 Route::prefix('reports')->group(function () {
     Route::get('/apar-rekap', [AparInspectionController::class, 'rekap'])->name('apar.rekap');
+    Route::get('/hydrant-rekap', [HydrantInspectionController::class, 'rekap'])->name('hydrant.rekap');
+    Route::get('/apar-rekap/pdf', [AparInspectionController::class, 'exportPdf'])->name('apar.pdf');
 });
 Route::get('/captcha', function () {
     return response()->json([

@@ -117,4 +117,21 @@ class HydrantInspectionController extends Controller implements HasMiddleware
         $inspection->delete();
         return redirect()->route('inspection.hydrant.index')->with('success', 'Data berhasil dihapus!');
     }
+    public function rekap(Request $request)
+    {
+        $bulan = $request->input('bulan', now()->format('m'));
+        $tahun = $request->input('tahun', now()->format('Y'));
+
+        $rekap = HydrantInspection::with(['hydrant', 'user'])
+            ->whereMonth('tanggal_inspeksi', $bulan)
+            ->whereYear('tanggal_inspeksi', $tahun)
+            ->orderByDesc('tanggal_inspeksi')
+            ->get();
+
+        return inertia('Laporan/hydrant-rekap', [
+            'rekap' => $rekap,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
+        ]);
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Apar;
 use App\Models\AparInspection;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -162,15 +163,29 @@ class AparInspectionController extends Controller implements HasMiddleware
     {
         $bulan = $request->input('bulan', now()->format('m'));
         $tahun = $request->input('tahun', now()->format('Y'));
-        $rekap = AparInspection::where(['apar', 'user'])
+        $rekap = AparInspection::with(['apar', 'user.karyawan'])
             ->whereMonth('tanggal_inspeksi', $bulan)
             ->whereYear('tanggal_inspeksi', $tahun)
             ->orderByDesc('tanggal_inspeksi')
             ->get();
-        return Inertia::render('Laporan/AparRekap', [
+        return Inertia::render('Laporan/apar-rekap', [
             'rekap' => $rekap,
             'bulan' => $bulan,
             'tahun' => $tahun,
         ]);
+    }
+    public function exportPdf(Request $request)
+    {
+        $bulan = $request->input('bulan', now()->format('m'));
+        $tahun = $request->input('tahun', now()->format('Y'));
+
+        $rekap = AparInspection::with(['apar', 'user.karyawan'])
+            ->whereMonth('tanggal_inspeksi', $bulan)
+            ->whereYear('tanggal_inspeksi', $tahun)
+            ->orderByDesc('tanggal_inspeksi')
+            ->get();
+
+        $pdf = Pdf::loadView('report.rekap_apar', compact('rekap', 'bulan', 'tahun'));
+        return $pdf->download("rekap_apar_{$bulan}_{$tahun}.pdf");
     }
 }
