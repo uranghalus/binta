@@ -38,7 +38,7 @@ export default function HydrantRekap({ bulan, rekap, tahun }: Props) {
     };
 
     const handleExport = () => {
-        window.open(route('laporan.hydrant.rekap.pdf', { bulan, tahun }), '_blank');
+        window.open(route('hydrant.pdf', { bulan, tahun }), '_blank');
     };
     return (
         <AppLayout title="Rekap Laporan Hydrant">
@@ -47,7 +47,7 @@ export default function HydrantRekap({ bulan, rekap, tahun }: Props) {
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight">Rekap Laporan Inspeksi Hydrant</h2>
                     <p className="text-muted-foreground">
-                        Periode bulan {bulan}/{tahun}
+                        Periode bulan {bulanList.find((b) => b.value === bulan)?.label} {tahun}
                     </p>
                 </div>
             </div>
@@ -151,7 +151,7 @@ export default function HydrantRekap({ bulan, rekap, tahun }: Props) {
                                         <TableCell>{index + 1}</TableCell>
                                         <TableCell>{item.hydrant?.kode_hydrant || '-'}</TableCell>
                                         <TableCell>{item.hydrant?.lokasi || '-'}</TableCell>
-                                        <TableCell>{item.user?.name || '-'}</TableCell>
+                                        <TableCell>{item.user.karyawan.nama || '-'}</TableCell>
                                         <TableCell>{item.selang_hydrant || '-'}</TableCell>
                                         <TableCell>{item.noozle_hydrant || '-'}</TableCell>
                                         <TableCell>{item.kaca_box_hydrant || '-'}</TableCell>

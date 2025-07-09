@@ -9,6 +9,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HydrantInspectionController extends Controller implements HasMiddleware
 {
@@ -122,7 +123,7 @@ class HydrantInspectionController extends Controller implements HasMiddleware
         $bulan = $request->input('bulan', now()->format('m'));
         $tahun = $request->input('tahun', now()->format('Y'));
 
-        $rekap = HydrantInspection::with(['hydrant', 'user'])
+        $rekap = HydrantInspection::with(['hydrant', 'user.karyawan'])
             ->whereMonth('tanggal_inspeksi', $bulan)
             ->whereYear('tanggal_inspeksi', $tahun)
             ->orderByDesc('tanggal_inspeksi')
@@ -133,5 +134,19 @@ class HydrantInspectionController extends Controller implements HasMiddleware
             'bulan' => $bulan,
             'tahun' => $tahun,
         ]);
+    }
+    public function exportPdf(Request $request)
+    {
+        $bulan = $request->input('bulan', now()->format('m'));
+        $tahun = $request->input('tahun', now()->format('Y'));
+
+        $rekap = HydrantInspection::with(['hydrant', 'user.karyawan'])
+            ->whereMonth('tanggal_inspeksi', $bulan)
+            ->whereYear('tanggal_inspeksi', $tahun)
+            ->orderByDesc('tanggal_inspeksi')
+            ->get();
+
+        $pdf = Pdf::loadView('report.rekap_hydrant', compact('rekap', 'bulan', 'tahun'));
+        return $pdf->download("rekap_hydrant_{$bulan}_{$tahun}.pdf");
     }
 }

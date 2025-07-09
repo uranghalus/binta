@@ -61,7 +61,7 @@ export default function hydrant({ hydrantData }: Props) {
                     <CardDescription className="text-muted-foreground">Tambah data inspeksi apar</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={onSubmit} className="space-y-4">
+                    <form onSubmit={onSubmit} className="space-y-4" id="inspeksiForm">
                         <div className="space-y-2">
                             <h2 className="font-bold text-gray-800">Data Hydrantr</h2>
                             <Separator />

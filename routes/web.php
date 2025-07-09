@@ -16,8 +16,6 @@ use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', [AuthenticatedSessionController::class, 'create'])
-    ->name('login');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -83,7 +81,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::prefix('reports')->group(function () {
     Route::get('/apar-rekap', [AparInspectionController::class, 'rekap'])->name('apar.rekap');
     Route::get('/hydrant-rekap', [HydrantInspectionController::class, 'rekap'])->name('hydrant.rekap');
+
     Route::get('/apar-rekap/pdf', [AparInspectionController::class, 'exportPdf'])->name('apar.pdf');
+    Route::get('/hydrant-rekap/pdf', [HydrantInspectionController::class, 'exportPdf'])->name('hydrant.pdf');
 });
 Route::get('/captcha', function () {
     return response()->json([
