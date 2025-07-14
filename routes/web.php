@@ -13,6 +13,7 @@ use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OfficesController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -60,6 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');
     // LINK Master Data
     Route::prefix('master-data')->group(function () {
+        Route::resource('pengguna', UserController::class)->parameters(['user' => 'id'])->names('pengguna');
         Route::resource('unit-bisnis', OfficesController::class)->parameters(['unit-bisnis
         ' => 'id'])
             ->names('unit-bisnis');

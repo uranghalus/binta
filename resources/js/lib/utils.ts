@@ -27,6 +27,19 @@ export function formatDate(date: Date | undefined) {
         year: 'numeric',
     });
 }
+export function toTimestamp(date: string | null | undefined): string {
+    if (!date) return '';
+    const parsed = new Date(date);
+    return parsed.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+    });
+}
 export function isValidDate(date: Date | undefined) {
     if (!date) {
         return false;

@@ -1,3 +1,4 @@
+import { Jabatan } from '@/pages/master/jabatan/data/jabatanSchema';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
