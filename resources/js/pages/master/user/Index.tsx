@@ -6,6 +6,7 @@ import { User } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { UserColumn } from './components/user-column';
+import UserDialog from './components/user-dialogs';
 import UserTable from './components/user-table';
 
 interface Props {
@@ -33,6 +34,7 @@ export default function Index({ user }: Props) {
                 <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
                     <UserTable columns={UserColumn} data={user} />
                 </div>
+                <UserDialog />
             </DialogProvider>
         </AppLayout>
     );

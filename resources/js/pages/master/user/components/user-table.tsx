@@ -16,6 +16,7 @@ import {
     VisibilityState,
 } from '@tanstack/react-table';
 import { useState } from 'react';
+import UserToolbar from './user-toolbar';
 // import UserToolbar from './user-toolbar';
 
 interface Props {
@@ -53,7 +54,7 @@ export default function UserTable({ columns, data }: Props) {
 
     return (
         <div className="space-y-4">
-            {/* <UserToolbar table={table} /> */}
+            <UserToolbar table={table} />
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
