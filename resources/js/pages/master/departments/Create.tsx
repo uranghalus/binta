@@ -45,7 +45,7 @@ export default function Create({ offices }: Props) {
                     <CardDescription className="text-muted-foreground">Tambah Data Permission</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={onSubmit} className="space-y-4 p-0.5">
+                    <form onSubmit={onSubmit} className="space-y-4 p-0.5" id="departmentForm">
                         <div className="grid gap-2">
                             <Label htmlFor="department_code" className="text-sm font-medium">
                                 Kode Departemen

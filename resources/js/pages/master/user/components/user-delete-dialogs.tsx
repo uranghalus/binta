@@ -30,7 +30,7 @@ export default function UserDeleteDialog({ open, onOpenChange, currentRow }: Pro
             setErrorMessage('Email tidak sesuai');
             return;
         }
-        destroy(route('user.destroy', currentRow.id), {
+        destroy(route('pengguna.destroy', currentRow.id), {
             preserveScroll: true,
             onSuccess: () => {
                 handleClose();
