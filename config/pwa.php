@@ -9,7 +9,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'install-button' => false,
+    'install-button' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -20,11 +20,11 @@ return [
 
     'manifest' => [
         'name' => 'VeriFire',
-        'short_name' => 'VF',
-        'background_color' => '#6777ef',
+        'short_name' => 'VeriFire',
+        'background_color' => '#ffffff',
         'display' => 'fullscreen',
         'description' => 'A Progressive Web Application setup for Laravel projects.',
-        'theme_color' => '#6777ef',
+        'theme_color' => '#ffffff',
         'icons' => [
             [
                 'src' => 'icon-512x512.png',

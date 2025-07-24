@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\AparImport;
 use App\Models\Apar;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -9,6 +10,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image;
+use Maatwebsite\Excel\Facades\Excel;
 // third party
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -164,6 +166,16 @@ class AparController extends Controller implements HasMiddleware
         return redirect()->route('apar.index')->with('success', 'APAR berhasil diperbarui.');
     }
 
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        Excel::import(new AparImport, $request->file('file'));
+
+        return redirect()->back()->with('success', 'Data APAR berhasil diimpor!');
+    }
     /**
      * Remove the specified resource from storage.
      */
