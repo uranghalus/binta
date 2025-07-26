@@ -78,6 +78,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('departemen/bulk-delete', [DepartmentController::class, 'bulkDelete'])->name('departemen.bulk-delete');
         Route::post('unit-bisnis/bulk-delete', [OfficesController::class, 'bulkDelete'])->name('unit-bisnis.bulk-delete');
         Route::post('jabatan/bulk-delete', [JabatanController::class, 'bulkDelete'])->name('jabatan.bulk-delete');
+        //ANCHOR Import Data
+        Route::get('/upload-apar', [AparController::class, 'showUploadForm'])->name('apar.upload');
+        Route::post('/upload-apar-preview', [AparController::class, 'previewImport'])->name('apar.preview');
+        Route::post('/upload-apar-import', [AparController::class, 'import'])->name('apar.import');
     });
 });
 Route::prefix('reports')->group(function () {

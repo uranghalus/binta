@@ -12,19 +12,22 @@
         body {
             font-family: sans-serif;
             margin: 0;
-            /* padding: 0; */
         }
 
-        .label-wrapper {
-            width: 20%;
-            display: inline-block;
-            box-sizing: border-box;
-            padding: 6mm 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
             text-align: center;
+            padding: 8mm 4mm;
+            vertical-align: top;
         }
 
         .qr {
-            width: 80%;
+            width: 100px;
+            height: 100px;
             border: 4px solid #000;
             border-radius: 8px;
         }
@@ -33,24 +36,42 @@
             margin-top: 4mm;
             font-size: 11pt;
             font-weight: bold;
-            word-wrap: break-word;
         }
 
         .page-break {
             page-break-after: always;
-            clear: both;
         }
     </style>
 </head>
 
 <body>
-    @foreach ($qrList as $index => $qr)
-    <div class="label-wrapper">
-        <img src="{{ $qr['qr_base64'] }}" alt="QR" class="qr">
-        <div class="label">{{ $qr['kode_apar'] }}</div>
-    </div>
+    @php
+    $columns = 4;
+    $perPage = 30;
+    $chunks = $qrList->chunk($perPage);
+    @endphp
 
-    @if (($index + 1) % 30 === 0)
+    @foreach ($chunks as $page)
+    <table>
+        @foreach ($page->chunk($columns) as $row)
+        <tr>
+            @foreach ($row as $qr)
+            <td>
+                <img src="{{ $qr['qr_base64'] }}" alt="QR" class="qr"><br>
+                <div class="label">{{ $qr['kode_apar'] }}</div>
+                <small style="font-weight: bold;">{{ $qr['lokasi'] }}</small>
+            </td>
+            @endforeach
+
+            {{-- Isi kolom kosong jika kurang dari $columns --}}
+            @for ($i = 0; $i < $columns - $row->count(); $i++)
+                <td></td>
+                @endfor
+        </tr>
+        @endforeach
+    </table>
+
+    @if (!$loop->last)
     <div class="page-break"></div>
     @endif
     @endforeach

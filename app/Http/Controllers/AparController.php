@@ -13,7 +13,7 @@ use Intervention\Image\Laravel\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
 // third party
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AparController extends Controller implements HasMiddleware
 {
@@ -107,41 +107,51 @@ class AparController extends Controller implements HasMiddleware
         return $pdf->download("qr_apar_{$apar->kode_apar}.pdf");
     }
     // generate Mass QR Code
-    public function generateMassQRCode()
+    public function generateMassQRCode(Request $request)
     {
-        $apar = Apar::all();
+        set_time_limit(0);
+        ini_set('memory_limit', '512M');
+
+        $batch = $request->get('batch', 1); // default batch ke-1
+        $perPage = 50;
+
+        $apar = Apar::skip(($batch - 1) * $perPage)
+            ->take($perPage)
+            ->get();
+
         $qrDataList = [];
+
         foreach ($apar as $item) {
             $url = url('/inspection/apar-inspeksi/' . $item->id);
-
-            // Generate QR code binary PNG
             $qrCode = QrCode::format('png')
                 ->size(300)
                 ->generate($url);
 
-            // Convert to stream
             $tempStream = fopen('php://memory', 'r+');
             fwrite($tempStream, $qrCode);
             rewind($tempStream);
-
-            // Intervention Image V3
 
             $canvas = Image::create(300, 300)->fill('#ffffff');
             $qr = Image::read($tempStream)->resize(275, 275);
             $canvas->place($qr, 'center', 0, 0);
 
-            // Convert to base64
             $encoded = (string) $canvas->toJpeg(); // or toPng()
             $base64 = 'data:image/jpeg;base64,' . base64_encode($encoded);
+
             $qrDataList[] = [
                 'kode_apar' => $item->kode_apar,
+                'lokasi' => $item->lokasi,
                 'qr_base64' => $base64,
             ];
         }
+        $qrDataList = collect($qrDataList); // chunk 10 per halaman
+
         $pdf = Pdf::loadView('apar.qrexports_pdf', [
             'qrList' => $qrDataList,
+            'batch' => $batch,
         ])->setPaper('A4', 'portrait');
-        return $pdf->download("qr_apar_semua.pdf");
+
+        return $pdf->download("qr_apar_batch{$batch}.pdf");
     }
     /**
      * Update the specified resource in storage.
@@ -165,16 +175,75 @@ class AparController extends Controller implements HasMiddleware
 
         return redirect()->route('apar.index')->with('success', 'APAR berhasil diperbarui.');
     }
-
-    public function import(Request $request)
+    public function showUploadForm()
+    {
+        return Inertia::render('fire-safety/apar/UploadExcel');
+    }
+    public function previewImport(Request $request)
     {
         $request->validate([
             'file' => 'required|file|mimes:xlsx,xls,csv',
         ]);
+        $collection = Excel::toCollection(null, $request->file('file'))->first();
 
-        Excel::import(new AparImport, $request->file('file'));
+        $data = $collection->skip(1)->map(function ($row, $index) {
+            return [
+                'no'         => $index + 1,
+                'kode_apar'  => $row[0],
+                'lokasi'     => $row[1],
+                'jenis'      => $row[2],
+                'size'       => $row[3],
+                'errors'     => $this->validateRow($row),
+            ];
+        });
 
-        return redirect()->back()->with('success', 'Data APAR berhasil diimpor!');
+        return Inertia::render('fire-safety/apar/PreviewExcel', [
+            'items' =>  $data->values()->toArray(),
+        ]);
+    }
+    public function import(Request $request)
+    {
+        $items = $request->validate([
+            'items' => 'required|array',
+        ])['items'];
+
+        foreach ($items as $item) {
+            if (!empty($item['errors'])) continue;
+
+            Apar::create([
+                'kode_apar' => $item['kode_apar'],
+                'lokasi'    => $item['lokasi'],
+                'jenis'     => $item['jenis'],
+                'size'      => $item['size'],
+                'user_id'   => auth()->id(),
+            ]);
+        }
+
+        return redirect()->route('apar.index')->with('success', 'Data berhasil diimpor!');
+    }
+    public function downloadTemplate(): StreamedResponse
+    {
+        $headers = ['Content-Type' => 'text/csv'];
+        $content = "kode_apar,lokasi,jenis,size\nAPAR001,Lantai 1 - Server,CO2,6\n";
+        return response()->streamDownload(fn() => print($content), 'template_apar.csv', $headers);
+    }
+
+    private function validateRow($row)
+    {
+        $validJenis = ['CO2', 'Powder', 'Foam', 'Air'];
+        $errors = [];
+
+        if (!$row[0]) $errors[] = 'Kode kosong';
+        if (!$row[1]) $errors[] = 'Lokasi kosong';
+        if (!in_array($row[2], $validJenis)) $errors[] = 'Jenis tidak valid';
+        if (!is_numeric($row[3])) $errors[] = 'Size harus angka';
+
+        // Cek kode_apar unik di DB
+        if (Apar::where('kode_apar', $row[0])->exists()) {
+            $errors[] = 'Kode sudah terdaftar';
+        }
+
+        return $errors;
     }
     /**
      * Remove the specified resource from storage.

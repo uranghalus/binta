@@ -1,9 +1,11 @@
 import { DataTableFacetedFilter } from '@/components/datatable-faceted-filter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from '@inertiajs/react';
 import { Table } from '@tanstack/react-table';
 import { Printer, X } from 'lucide-react';
+import { useState } from 'react';
 // import { Apar } from '../data/aparSchema';
 
 interface Props<TData> {
@@ -12,6 +14,9 @@ interface Props<TData> {
 }
 function AparToolbar<TData>({ table }: Props<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
+    // Simulasi jumlah batch, nanti bisa diganti prop atau perhitungan otomatis
+    const totalBatch = 4;
+    const [selectedBatch, setSelectedBatch] = useState<string>('1');
     return (
         <div className="-items-center flex justify-between">
             <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
@@ -54,9 +59,25 @@ function AparToolbar<TData>({ table }: Props<TData>) {
                     </Button>
                 )}
             </div>
+
             <div className="flex items-center space-x-2">
+                {/* Dropdown Pilih Batch */}
+                <Select value={selectedBatch} onValueChange={setSelectedBatch}>
+                    <SelectTrigger className="h-8 w-[100px]">
+                        <SelectValue placeholder="Batch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {[...Array(totalBatch)].map((_, index) => (
+                            <SelectItem key={index} value={(index + 1).toString()}>
+                                Batch {index + 1}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                {/* Tombol Cetak PDF QR Code Batch */}
                 <Button asChild size={'sm'} className="h-8" variant={'secondary'}>
-                    <Link href={route('apar.print-qrcode')} className="space-x-1">
+                    <Link href={route('apar.print-qrcode', { batch: selectedBatch })} className="space-x-1">
                         <span>Cetak QR Code</span>
                         <Printer className="h-4 w-4" />
                     </Link>
