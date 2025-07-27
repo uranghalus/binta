@@ -15,7 +15,8 @@ class Hydrant extends Model
     protected $fillable = [
         'kode_unik',
         'kode_hydrant',
-        'tipe',
+        'ukuran',
+        'lantai',
         'lokasi',
         'user_id',
     ];

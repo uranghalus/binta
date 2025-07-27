@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('apar', function (Blueprint $table) {
             $table->id();
             $table->string('kode_apar', 25)->unique(); // Contoh: "APAR Utama"
+            $table->string('lantai')->nullable(); // Contoh: "Lantai 1"
             $table->string('lokasi'); // Contoh: "Lantai 1, Ruang Server"
             $table->enum('jenis', ['CO2', 'Powder', 'Foam', 'Air']);
-            $table->unsignedTinyInteger('size'); // Misalnya: 2, 4, 6, 9 (dalam kg)
+            $table->decimal('size', 3, 1); // Misalnya: 2, 4, 6, 9 (dalam kg)
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
@@ -25,7 +26,8 @@ return new class extends Migration
             $table->id();
             $table->string('kode_unik')->unique();  // Contoh: "HYD-001"
             $table->string('kode_hydrant', 25)->unique(); // Contoh: "HYD Utama"
-            $table->enum('tipe', ['Indoor', 'Outdoor']);
+            $table->string('ukuran');
+            $table->string('lantai')->nullable(); // Contoh: "Lantai 1"
             $table->string('lokasi');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
@@ -51,9 +53,15 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
             $table->enum('regu', ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])->default('Regu A');
             // Kolom fleksibel untuk input bebas (tanpa enum)
+
+            $table->string('valve_machino_coupling', 150)->nullable();
+            $table->string('fire_hose_machino_coupling', 150)->nullable();
             $table->string('selang_hydrant', 150)->nullable();
             $table->string('noozle_hydrant', 150)->nullable();
             $table->string('kaca_box_hydrant', 150)->nullable();
+            $table->string('kunci_box_hydrant', 150)->nullable();
+            $table->string('box_hydrant', 150)->nullable();
+            $table->string('alarm', 150)->nullable();
             $table->timestamp('tanggal_inspeksi')->default(now());
             $table->timestamps();
         });

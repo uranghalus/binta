@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Imports\AparImport;
 use App\Models\Apar;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
@@ -109,49 +111,39 @@ class AparController extends Controller implements HasMiddleware
     // generate Mass QR Code
     public function generateMassQRCode(Request $request)
     {
-        set_time_limit(0);
-        ini_set('memory_limit', '512M');
-
-        $batch = $request->get('batch', 1); // default batch ke-1
         $perPage = 50;
+        $batch = $request->get('batch', 1);
+        $offset = ($batch - 1) * $perPage;
 
-        $apar = Apar::skip(($batch - 1) * $perPage)
-            ->take($perPage)
-            ->get();
-
+        $items = Apar::orderBy('id')->skip($offset)->take($perPage)->get();
         $qrDataList = [];
 
-        foreach ($apar as $item) {
-            $url = url('/inspection/apar-inspeksi/' . $item->id);
-            $qrCode = QrCode::format('png')
-                ->size(300)
-                ->generate($url);
+        foreach ($items as $item) {
+            // Generate QR code PNG ke dalam variable (tanpa simpan file)
+            $qrPng = QrCode::format('png')
+                ->size(150)
+                ->generate(url('/inspection/apar-inspeksi/' . $item->id));
 
-            $tempStream = fopen('php://memory', 'r+');
-            fwrite($tempStream, $qrCode);
-            rewind($tempStream);
-
-            $canvas = Image::create(300, 300)->fill('#ffffff');
-            $qr = Image::read($tempStream)->resize(275, 275);
-            $canvas->place($qr, 'center', 0, 0);
-
-            $encoded = (string) $canvas->toJpeg(); // or toPng()
-            $base64 = 'data:image/jpeg;base64,' . base64_encode($encoded);
+            // Encode ke base64
+            $base64 = 'data:image/png;base64,' . base64_encode($qrPng);
 
             $qrDataList[] = [
                 'kode_apar' => $item->kode_apar,
-                'lokasi' => $item->lokasi,
+                'lokasi' => $item->lokasi->nama_lokasi ?? '-',
+                'penempatan' => $item->penempatan->nama_penempatan ?? '-',
                 'qr_base64' => $base64,
             ];
         }
-        $qrDataList = collect($qrDataList); // chunk 10 per halaman
 
-        $pdf = Pdf::loadView('apar.qrexports_pdf', [
-            'qrList' => $qrDataList,
-            'batch' => $batch,
-        ])->setPaper('A4', 'portrait');
+        $pdf = SnappyPdf::loadView('apar.qrexports_pdf', ['qrDataList' => $qrDataList])
+            ->setPaper('a4')
+            ->setOption('enable-local-file-access', true) // Penting kalau pakai gambar lokal
+            ->setOption('margin-top', 0)
+            ->setOption('margin-bottom', 0)
+            ->setOption('margin-left', 0)
+            ->setOption('margin-right', 0);
 
-        return $pdf->download("qr_apar_batch{$batch}.pdf");
+        return $pdf->stream("qr_apar_batch_{$batch}.pdf");
     }
     /**
      * Update the specified resource in storage.

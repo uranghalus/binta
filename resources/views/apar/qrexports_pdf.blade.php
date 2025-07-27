@@ -23,12 +23,14 @@
             text-align: center;
             padding: 8mm 4mm;
             vertical-align: top;
+            border: 1px solid #000;
         }
 
         .qr {
             width: 100px;
             height: 100px;
             border: 4px solid #000;
+            padding: 1.5mm;
             border-radius: 8px;
         }
 
@@ -45,35 +47,16 @@
 </head>
 
 <body>
-    @php
-    $columns = 4;
-    $perPage = 30;
-    $chunks = $qrList->chunk($perPage);
-    @endphp
 
-    @foreach ($chunks as $page)
-    <table>
-        @foreach ($page->chunk($columns) as $row)
-        <tr>
-            @foreach ($row as $qr)
-            <td>
-                <img src="{{ $qr['qr_base64'] }}" alt="QR" class="qr"><br>
-                <div class="label">{{ $qr['kode_apar'] }}</div>
-                <small style="font-weight: bold;">{{ $qr['lokasi'] }}</small>
-            </td>
-            @endforeach
-
-            {{-- Isi kolom kosong jika kurang dari $columns --}}
-            @for ($i = 0; $i < $columns - $row->count(); $i++)
-                <td></td>
-                @endfor
-        </tr>
-        @endforeach
-    </table>
-
-    @if (!$loop->last)
-    <div class="page-break"></div>
-    @endif
+    @foreach ($qrDataList as $qr)
+    <div class="label">
+        <div class="info">
+            <strong>{{ $qr['kode_apar'] }}</strong><br>
+            {{ $qr['lokasi'] }}<br>
+            {{ $qr['penempatan'] }}
+        </div>
+        <img src="{{ $qr['qr_base64'] }}" alt="QR Code" class="qr">
+    </div>
     @endforeach
 </body>
 

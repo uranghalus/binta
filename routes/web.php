@@ -82,6 +82,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/upload-apar', [AparController::class, 'showUploadForm'])->name('apar.upload');
         Route::post('/upload-apar-preview', [AparController::class, 'previewImport'])->name('apar.preview');
         Route::post('/upload-apar-import', [AparController::class, 'import'])->name('apar.import');
+        Route::get('/upload-hydrant', [HydrantController::class, 'showUploadForm'])->name('hydrant.upload');
+        Route::get('/template-hydrant', [HydrantController::class, 'downloadTemplate'])->name('hydrant.template');
+        Route::post('/preview-hydrant', [HydrantController::class, 'preview'])->name('hydrant.preview');
+        Route::post('/import-hydrant', [HydrantController::class, 'import'])->name('hydrant.import');
     });
 });
 Route::prefix('reports')->group(function () {

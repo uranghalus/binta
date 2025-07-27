@@ -15,6 +15,7 @@ class Apar extends Model
 
     protected $fillable = [
         'kode_apar',
+        'lantai',
         'lokasi',
         'jenis',
         'size',
