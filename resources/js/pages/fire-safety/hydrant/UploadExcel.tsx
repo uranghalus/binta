@@ -6,15 +6,13 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
-import { Apar } from './data/aparSchema';
-
+import { Hydrant } from './data/hydrantSchema';
 export default function UploadExcel() {
-    const [items, setItems] = useState<Apar[]>([]);
+    const [items, setItems] = useState<Hydrant[]>([]);
     const [errors, setErrors] = useState<number[]>([]);
     const { processing } = useForm<any>({
         data: [],
     });
-
     const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -25,10 +23,10 @@ export default function UploadExcel() {
             const wb = XLSX.read(arrayBuffer, { type: 'array' });
             const wsname = wb.SheetNames[0];
             const ws = wb.Sheets[wsname];
-            const data: Apar[] = XLSX.utils.sheet_to_json(ws, { header: 0 });
+            const data: Hydrant[] = XLSX.utils.sheet_to_json(ws, { header: 0 });
 
             const newErrors = data.reduce((acc: number[], item, index) => {
-                if (!item.kode_apar || !item.lokasi || !item.jenis || !item.size) {
+                if (!item.kode_unik || !item.kode_hydrant || !item.ukuran || !item.lokasi) {
                     acc.push(index);
                 }
                 return acc;
@@ -44,20 +42,20 @@ export default function UploadExcel() {
         const formData = new FormData();
 
         items.forEach((item, index) => {
-            formData.append(`data[${index}][kode_apar]`, item.kode_apar);
-            formData.append(`data[${index}][lokasi]`, item.lokasi);
-            formData.append(`data[${index}][jenis]`, item.jenis);
-            formData.append(`data[${index}][size]`, String(item.size));
+            formData.append(`data[${index}][kode_unik]`, item.kode_unik);
+            formData.append(`data[${index}][kode_hydrant]`, item.kode_hydrant);
+            formData.append(`data[${index}][ukuran]`, item.ukuran);
             formData.append(`data[${index}][lantai]`, item.lantai ?? '');
+            formData.append(`data[${index}][lokasi]`, item.lokasi);
         });
 
-        router.post(route('apar.import'), formData, {
+        router.post(route('hydrant.import'), formData, {
             preserveScroll: true,
             onStart: () => {
-                toast.loading('Mengimpor data APAR...');
+                toast.loading('Mengimpor data hydrant...');
             },
             onSuccess: () => {
-                toast.dismiss();
+                toast.dismiss(); // tutup loading
                 toast.success('Import berhasil!');
             },
             onError: (errors) => {
@@ -69,8 +67,8 @@ export default function UploadExcel() {
     };
 
     return (
-        <AppLayout title="Upload APAR Data">
-            <Head title="Upload APAR Data" />
+        <AppLayout title="Upload Hydrant Data">
+            <Head title="Upload Hydrant Data" />
             <Card>
                 <CardHeader>
                     <CardTitle>Upload Excel APAR</CardTitle>
@@ -83,11 +81,11 @@ export default function UploadExcel() {
                                 <thead>
                                     <tr className="bg-gray-100 text-left">
                                         <th className="border p-2">#</th>
-                                        <th className="border p-2">Kode APAR</th>
-                                        <th className="border p-2">Lokasi</th>
-                                        <th className="border p-2">Jenis</th>
-                                        <th className="border p-2">Size</th>
+                                        <th className="border p-2">Kode Unik</th>
+                                        <th className="border p-2">Kode Hydrant</th>
+                                        <th className="border p-2">Ukuran</th>
                                         <th className="border p-2">Lantai</th>
+                                        <th className="border p-2">Lokasi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -96,11 +94,11 @@ export default function UploadExcel() {
                                         return (
                                             <tr key={idx} className={invalid ? 'bg-red-100' : ''}>
                                                 <td className="border p-2">{idx + 1}</td>
-                                                <td className="border p-2">{item.kode_apar}</td>
-                                                <td className="border p-2">{item.lokasi}</td>
-                                                <td className="border p-2">{item.jenis}</td>
-                                                <td className="border p-2">{item.size}</td>
+                                                <td className="border p-2">{item.kode_unik}</td>
+                                                <td className="border p-2">{item.kode_hydrant}</td>
+                                                <td className="border p-2">{item.ukuran}</td>
                                                 <td className="border p-2">{item.lantai}</td>
+                                                <td className="border p-2">{item.lokasi}</td>
                                             </tr>
                                         );
                                     })}

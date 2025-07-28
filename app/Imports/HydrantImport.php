@@ -22,6 +22,7 @@ class HydrantImport implements ToModel, WithHeadingRow
             'kode_hydrant'  => $row['kode_hydrant'],
             'ukuran'        => $row['ukuran'],
             'lantai'        => $row['lantai'] ?? null,
+            'lokasi'        => $row['lokasi'] ?? null,
             'user_id'       => optional(Auth::user())->id, // atau null jika tidak ingin menyimpan user
         ]);
     }

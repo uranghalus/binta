@@ -4,7 +4,8 @@ export interface Hydrant {
     id: number;
     kode_unik: string;
     kode_hydrant: string;
-    tipe: 'Indoor' | 'Outdoor';
+    ukuran: string;
+    lantai: string;
     lokasi: string;
     user?: User;
     created_at: string; // ISO date string

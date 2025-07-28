@@ -57,8 +57,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // LINK Scan
     Route::get('/hydrant/qrcode/{id}', [HydrantController::class, 'HydrantQRCode'])->name('hydrant.qrcode');
     Route::get('/hydrant/print-qrcode', [HydrantController::class, 'MassHydrantQRCode'])->name('hydrant.print-qrcode');
+    Route::get('/hydrant/qr/options', [HydrantController::class, 'getFilterOptions'])->name('hydrant.filter.options');
     Route::get('/apar/qrcode/{id}', [AparController::class, 'generateQRCode'])->name('apar.qrcode');
     Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');
+    Route::get('/apar/qr/options', [AparController::class, 'getFilterOptions'])->name('apar.filter.options');
     // LINK Master Data
     Route::prefix('master-data')->group(function () {
         Route::resource('pengguna', UserController::class)->parameters(['user' => 'id'])->names('pengguna');
@@ -80,11 +82,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('jabatan/bulk-delete', [JabatanController::class, 'bulkDelete'])->name('jabatan.bulk-delete');
         //ANCHOR Import Data
         Route::get('/upload-apar', [AparController::class, 'showUploadForm'])->name('apar.upload');
-        Route::post('/upload-apar-preview', [AparController::class, 'previewImport'])->name('apar.preview');
         Route::post('/upload-apar-import', [AparController::class, 'import'])->name('apar.import');
         Route::get('/upload-hydrant', [HydrantController::class, 'showUploadForm'])->name('hydrant.upload');
-        Route::get('/template-hydrant', [HydrantController::class, 'downloadTemplate'])->name('hydrant.template');
-        Route::post('/preview-hydrant', [HydrantController::class, 'preview'])->name('hydrant.preview');
         Route::post('/import-hydrant', [HydrantController::class, 'import'])->name('hydrant.import');
     });
 });

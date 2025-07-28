@@ -44,19 +44,19 @@ export const HydrantColumn: ColumnDef<Hydrant>[] = [
         cell: ({ row }) => <div>{row.getValue('kode_hydrant')}</div>,
     },
     {
-        accessorKey: 'tipe',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Tipe" />,
-        cell: ({ row }) => <div>{row.getValue('tipe')}</div>,
+        accessorKey: 'ukuran',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Ukuran" />,
+        cell: ({ row }) => <div>{row.getValue('ukuran')}</div>,
+    },
+    {
+        accessorKey: 'lantai',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Lantai" />,
+        cell: ({ row }) => <div>{row.getValue('lantai')}</div>,
     },
     {
         accessorKey: 'lokasi',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Lokasi" />,
         cell: ({ row }) => <div>{row.getValue('lokasi')}</div>,
-    },
-    {
-        accessorKey: 'user_id.karyawan',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Penanggung Jawab" />,
-        cell: ({ row }) => <div>{row.original.user?.karyawan?.nama ? row.original.user.karyawan.nama : '-'}</div>,
     },
     {
         id: 'actions',

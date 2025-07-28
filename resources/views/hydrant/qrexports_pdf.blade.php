@@ -1,59 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>QR Labels</title>
+    <meta charset="utf-8">
+    <title>QR Code Hydrant</title>
     <style>
-        @page {
-            margin: 1cm;
-        }
-
         body {
             font-family: sans-serif;
-            margin: 0;
-            /* padding: 0; */
-        }
-
-        .label-wrapper {
-            width: 20%;
-            display: inline-block;
-            box-sizing: border-box;
-            padding: 6mm 0;
+            margin: 1cm;
             text-align: center;
         }
 
-        .qr {
-            width: 80%;
-            border: 4px solid #000;
-            border-radius: 8px;
+        h3,
+        p {
+            margin: 0.5em 0;
         }
 
-        .label {
-            margin-top: 4mm;
-            font-size: 11pt;
-            font-weight: bold;
-            word-wrap: break-word;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
         }
 
-        .page-break {
-            page-break-after: always;
-            clear: both;
+        td {
+            width: 25%;
+            height: 200px;
+            padding: 10px;
+            vertical-align: middle;
+            border: 1px solid black;
+        }
+
+        .qr-container {
+            padding: 10px;
+            border: 3px solid black;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .info {
+            font-size: 12px;
+            margin-top: 6px;
         }
     </style>
 </head>
 
 <body>
-    @foreach ($qrList as $index => $qr)
-    <div class="label-wrapper">
-        <img src="{{ $qr['qr_base64'] }}" alt="QR" class="qr">
-        <div class="label">{{ $qr['kode_hydrant'] }}</div>
-    </div>
 
-    @if (($index + 1) % 30 === 0)
-    <div class="page-break"></div>
+    <h3>QR Code Hydrant</h3>
+
+    @if ($lantai)
+    <p><strong>Lantai:</strong> {{ $lantai }}</p>
     @endif
-    @endforeach
+    <p><strong>Batch:</strong> {{ $batch }}</p>
+
+    <table>
+        @php
+        $rows = $hydrants->chunk(4); // 4 kolom per baris
+        $totalRows = 5; // 5 baris maksimal
+        @endphp
+
+        @foreach ($rows as $row)
+        <tr>
+            @foreach ($row as $item)
+            <td>
+                <div class="qr-container">
+                    <img src="{{ $item->qr_path }}" alt="QR">
+                </div>
+                <div class="info"><strong>{{ $item->kode_hydrant }}</strong></div>
+                <div class="info">{{ $item->lokasi ?? '-' }}</div>
+            </td>
+            @endforeach
+            @for ($i = $row->count(); $i < 4; $i++)
+                <td>
+                </td>
+                @endfor
+        </tr>
+        @endforeach
+
+        {{-- Tambahkan baris kosong jika kurang dari 5 --}}
+        @for ($i = $rows->count(); $i < $totalRows; $i++)
+            <tr>
+            @for ($j = 0; $j < 4; $j++)
+                <td>
+                </td>
+                @endfor
+                </tr>
+                @endfor
+    </table>
 </body>
 
 </html>

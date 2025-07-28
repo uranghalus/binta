@@ -19,10 +19,15 @@ class Apar extends Model
         'lokasi',
         'jenis',
         'size',
-        'user_id',
+        'user_id'
     ];
 
-    // Relasi ke user (yang bertanggung jawab atas APAR, jika ada)
+    protected $casts = [
+        'size' => 'decimal:1'
+    ];
+
+    public static $jenisApar = ['CO2', 'Powder', 'Foam', 'Air'];
+
     public function user()
     {
         return $this->belongsTo(User::class);

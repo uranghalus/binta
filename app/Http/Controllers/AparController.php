@@ -9,7 +9,10 @@ use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
@@ -111,39 +114,36 @@ class AparController extends Controller implements HasMiddleware
     // generate Mass QR Code
     public function generateMassQRCode(Request $request)
     {
-        $perPage = 50;
         $batch = $request->get('batch', 1);
-        $offset = ($batch - 1) * $perPage;
+        $perPage = 40; // Jumlah item per batch
 
-        $items = Apar::orderBy('id')->skip($offset)->take($perPage)->get();
-        $qrDataList = [];
+        $query = Apar::query();
+        $apars = $query->orderBy('id')
+            ->skip(($batch - 1) * $perPage)
+            ->take($perPage)
+            ->get();
 
-        foreach ($items as $item) {
-            // Generate QR code PNG ke dalam variable (tanpa simpan file)
-            $qrPng = QrCode::format('png')
-                ->size(150)
-                ->generate(url('/inspection/apar-inspeksi/' . $item->id));
+        // Generate QR untuk setiap APAR
+        $apars = $apars->map(function ($apar) {
+            $qrImage = base64_encode(
+                QrCode::format('png')
+                    ->size(150)
+                    ->generate(url('/inspection/apar-inspeksi/' . $apar->kode_apar))
+            );
 
-            // Encode ke base64
-            $base64 = 'data:image/png;base64,' . base64_encode($qrPng);
-
-            $qrDataList[] = [
-                'kode_apar' => $item->kode_apar,
-                'lokasi' => $item->lokasi->nama_lokasi ?? '-',
-                'penempatan' => $item->penempatan->nama_penempatan ?? '-',
-                'qr_base64' => $base64,
+            return [
+                'kode_apar' => $apar->kode_apar,
+                'lokasi' => $apar->lokasi,
+                'qr_base64' => 'data:image/png;base64,' . $qrImage,
             ];
-        }
+        });
 
-        $pdf = SnappyPdf::loadView('apar.qrexports_pdf', ['qrDataList' => $qrDataList])
-            ->setPaper('a4')
-            ->setOption('enable-local-file-access', true) // Penting kalau pakai gambar lokal
-            ->setOption('margin-top', 0)
-            ->setOption('margin-bottom', 0)
-            ->setOption('margin-left', 0)
-            ->setOption('margin-right', 0);
+        $pdf = Pdf::loadView('apar.qrexports_pdf', [
+            'apars' => $apars,
+            'batch' => $batch,
+        ])->setPaper('a4', 'portrait');
 
-        return $pdf->stream("qr_apar_batch_{$batch}.pdf");
+        return $pdf->download('qr-code-apar-batch-' . $batch . '.pdf');
     }
     /**
      * Update the specified resource in storage.
@@ -171,71 +171,82 @@ class AparController extends Controller implements HasMiddleware
     {
         return Inertia::render('fire-safety/apar/UploadExcel');
     }
-    public function previewImport(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv',
-        ]);
-        $collection = Excel::toCollection(null, $request->file('file'))->first();
-
-        $data = $collection->skip(1)->map(function ($row, $index) {
-            return [
-                'no'         => $index + 1,
-                'kode_apar'  => $row[0],
-                'lokasi'     => $row[1],
-                'jenis'      => $row[2],
-                'size'       => $row[3],
-                'errors'     => $this->validateRow($row),
-            ];
-        });
-
-        return Inertia::render('fire-safety/apar/PreviewExcel', [
-            'items' =>  $data->values()->toArray(),
-        ]);
-    }
     public function import(Request $request)
     {
-        $items = $request->validate([
-            'items' => 'required|array',
-        ])['items'];
+        $apars = $request->input('data', []);
 
-        foreach ($items as $item) {
-            if (!empty($item['errors'])) continue;
+        $validator = Validator::make(['data' => $apars], [
+            'data.*.kode_apar' => 'required|string|max:25|distinct|unique:apar,kode_apar',
+            'data.*.lantai' => 'nullable|string|max:50',
+            'data.*.lokasi' => 'required|string|max:100',
+            'data.*.jenis' => 'required|string|in:CO2,Powder,Foam,Air',
+            'data.*.size' => 'required|numeric|min:1|max:50',
+        ]);
 
-            Apar::create([
-                'kode_apar' => $item['kode_apar'],
-                'lokasi'    => $item['lokasi'],
-                'jenis'     => $item['jenis'],
-                'size'      => $item['size'],
-                'user_id'   => auth()->id(),
-            ]);
+        if ($validator->fails()) {
+            Log::error('APAR import validation failed', $validator->errors()->toArray());
+            return back()->withErrors($validator)->withInput();
         }
 
-        return redirect()->route('apar.index')->with('success', 'Data berhasil diimpor!');
-    }
-    public function downloadTemplate(): StreamedResponse
-    {
-        $headers = ['Content-Type' => 'text/csv'];
-        $content = "kode_apar,lokasi,jenis,size\nAPAR001,Lantai 1 - Server,CO2,6\n";
-        return response()->streamDownload(fn() => print($content), 'template_apar.csv', $headers);
-    }
+        try {
+            $importedCount = 0;
+            $updatedCount = 0;
 
-    private function validateRow($row)
-    {
-        $validJenis = ['CO2', 'Powder', 'Foam', 'Air'];
-        $errors = [];
+            foreach ($apars as $row) {
+                $result = Apar::updateOrCreate(
+                    ['kode_apar' => $row['kode_apar']],
+                    [
+                        'lantai' => $row['lantai'] ?? null,
+                        'lokasi' => $row['lokasi'],
+                        'jenis' => $row['jenis'],
+                        'size' => $row['size'],
+                        'user_id' => Auth::id(),
+                    ]
+                );
 
-        if (!$row[0]) $errors[] = 'Kode kosong';
-        if (!$row[1]) $errors[] = 'Lokasi kosong';
-        if (!in_array($row[2], $validJenis)) $errors[] = 'Jenis tidak valid';
-        if (!is_numeric($row[3])) $errors[] = 'Size harus angka';
+                $result->wasRecentlyCreated ? $importedCount++ : $updatedCount++;
+            }
 
-        // Cek kode_apar unik di DB
-        if (Apar::where('kode_apar', $row[0])->exists()) {
-            $errors[] = 'Kode sudah terdaftar';
+            $message = sprintf(
+                'Import APAR berhasil! %d data baru ditambahkan, %d data diperbarui.',
+                $importedCount,
+                $updatedCount
+            );
+
+            return redirect()->route('apar.index')->with('success', $message);
+        } catch (\Exception $e) {
+            Log::error('APAR import failed: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat mengimpor data APAR: ' . $e->getMessage());
         }
+    }
 
-        return $errors;
+    public function getFilterOptions()
+    {
+        $lantai = Apar::select('lantai')
+            ->distinct()
+            ->whereNotNull('lantai')
+            ->where('lantai', '!=', '')
+            ->pluck('lantai');
+        $size = Apar::select('size')
+            ->distinct()
+            ->whereNotNull('size')
+            ->where('size', '!=', '')
+            ->pluck('size');
+        $jenis = Apar::select('jenis')
+            ->distinct()
+            ->whereNotNull('jenis')
+            ->where('jenis', '!=', '')
+            ->pluck('jenis');
+        $total = Apar::count();
+        $perPage = 40;
+        $totalBatch = ceil($total / $perPage);
+
+        return response()->json([
+            'size' => $size,
+            'jenis' => $jenis,
+            'lantai' => $lantai,
+            'totalBatch' => $totalBatch,
+        ]);
     }
     /**
      * Remove the specified resource from storage.

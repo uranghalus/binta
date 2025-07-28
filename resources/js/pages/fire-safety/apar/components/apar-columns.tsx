@@ -39,6 +39,11 @@ export const AparColumn: ColumnDef<Apar>[] = [
         cell: ({ row }) => <div className="font-bold">{row.getValue('kode_apar')}</div>,
     },
     {
+        accessorKey: 'lantai',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Lantai" />,
+        cell: ({ row }) => <div>{row.getValue('lantai')}</div>,
+    },
+    {
         accessorKey: 'lokasi',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Lokasi" />,
         cell: ({ row }) => <div>{row.getValue('lokasi')}</div>,

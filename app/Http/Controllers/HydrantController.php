@@ -7,10 +7,18 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Laravel\Facades\Image;
+use Maatwebsite\Excel\Excel as ExcelExcel;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\HeadingRowImport;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
 
 class HydrantController extends Controller implements HasMiddleware
 {
@@ -68,41 +76,37 @@ class HydrantController extends Controller implements HasMiddleware
 
         return $pdf->download("qr_apar_{$apar->kode_apar}.pdf");
     }
-    public function MassHydrantQRCode()
+    public function MassHydrantQRCode(Request $request)
     {
-        $hydrant = Hydrant::all();
-        $qrDataList = [];
-        foreach ($hydrant as $item) {
-            $url = url('/inspection/hydrant-inspeksi/' . $item->id);
+        $batch = $request->get('batch', 1);
+        $lantai = $request->get('lantai');
+        $perPage = 40; // ≤20 agar ringan di storage/RAM
 
-            // Generate QR code binary PNG
-            $qrCode = QrCode::format('png')
-                ->size(300)
-                ->generate($url);
+        $query = Hydrant::query();
+        if ($lantai) $query->where('lantai', $lantai);
 
-            // Convert to stream
-            $tempStream = fopen('php://memory', 'r+');
-            fwrite($tempStream, $qrCode);
-            rewind($tempStream);
+        $hydrants = $query
+            ->orderBy('id')
+            ->skip(($batch - 1) * $perPage)
+            ->take($perPage)
+            ->get();
 
-            // Intervention Image V3
+        // Generate QR tanpa simpan ke disk
+        $hydrants = $hydrants->map(function ($item) {
+            $qrImage = base64_encode(QrCode::format('png')->size(200)->generate(
+                url('/inspection/hydrant-inspeksi/' . $item->kode_unik)
+            ));
+            $item->qr_path = 'data:image/png;base64,' . $qrImage;
+            return $item;
+        });
 
-            $canvas = Image::create(300, 300)->fill('#ffffff');
-            $qr = Image::read($tempStream)->resize(275, 275);
-            $canvas->place($qr, 'center', 0, 0);
-
-            // Convert to base64
-            $encoded = (string) $canvas->toJpeg(); // or toPng()
-            $base64 = 'data:image/jpeg;base64,' . base64_encode($encoded);
-            $qrDataList[] = [
-                'kode_hydrant' => $item->kode_hydrant,
-                'qr_base64' => $base64,
-            ];
-        }
         $pdf = Pdf::loadView('hydrant.qrexports_pdf', [
-            'qrList' => $qrDataList,
-        ])->setPaper('A4', 'portrait');
-        return $pdf->download("data-qr-hydrant.pdf");
+            'hydrants' => $hydrants,
+            'batch' => $batch,
+            'lantai' => $lantai,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download('qr-code-hydrant-batch-' . $batch . '.pdf');
     }
     /**
      * Store a newly created resource in storage.
@@ -144,7 +148,61 @@ class HydrantController extends Controller implements HasMiddleware
 
         return redirect()->route('hydrant.index')->with('success', 'Hydrant berhasil diupdate.');
     }
+    public function showUploadForm()
+    {
+        return Inertia::render('fire-safety/hydrant/UploadExcel');
+    }
 
+
+    public function import(Request $request)
+    {
+        $hydrants = $request->input('data', []);
+
+        $validator = Validator::make(['data' => $hydrants], [
+            'data.*.kode_unik' => 'required|string|distinct',
+            'data.*.kode_hydrant' => 'required|string|distinct',
+            'data.*.ukuran' => 'required|string',
+            'data.*.lantai' => 'nullable|string',
+            'data.*.lokasi' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            Log::error('Import validation failed', $validator->errors()->toArray());
+            return back()->withErrors($validator);
+        }
+
+        foreach ($hydrants as $row) {
+            Hydrant::updateOrCreate(
+                ['kode_unik' => $row['kode_unik']],
+                [
+                    'kode_hydrant' => $row['kode_hydrant'],
+                    'ukuran' => $row['ukuran'],
+                    'lantai' => $row['lantai'] ?? null,
+                    'lokasi' => $row['lokasi'],
+                    'user_id' => Auth::user()->id,
+                ]
+            );
+        }
+
+        return redirect()->route('hydrant.index')->with('success', 'Import berhasil!');
+    }
+    public function getFilterOptions()
+    {
+        $lantai = Hydrant::select('lantai')
+            ->distinct()
+            ->whereNotNull('lantai')
+            ->where('lantai', '!=', '')
+            ->pluck('lantai');
+
+        $total = Hydrant::count();
+        $perPage = 40;
+        $totalBatch = ceil($total / $perPage);
+
+        return response()->json([
+            'lantai' => $lantai,
+            'totalBatch' => $totalBatch,
+        ]);
+    }
     /**
      * Remove the specified resource from storage.
      */
