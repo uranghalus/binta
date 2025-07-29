@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
@@ -114,34 +115,44 @@ class AparController extends Controller implements HasMiddleware
     // generate Mass QR Code
     public function generateMassQRCode(Request $request)
     {
-        $batch = $request->get('batch', 1);
-        $perPage = 40; // Jumlah item per batch
+        ini_set('max_execution_time', 60);
+        ini_set('memory_limit', '256M');
 
-        $query = Apar::query();
-        $apars = $query->orderBy('id')
+        $batch = $request->get('batch', 1);
+        $perPage = 30;
+
+        $apars = Apar::orderBy('id')
             ->skip(($batch - 1) * $perPage)
             ->take($perPage)
             ->get();
 
-        // Generate QR untuk setiap APAR
         $apars = $apars->map(function ($apar) {
-            $qrImage = base64_encode(
-                QrCode::format('png')
+            $filename = 'qrcodes/qr-' . $apar->kode_apar . '.png';
+            $storagePath = storage_path('app/public/' . $filename);
+
+            // Generate hanya jika belum ada
+            if (!file_exists($storagePath)) {
+                $qr = QrCode::format('png')
                     ->size(150)
-                    ->generate(url('/inspection/apar-inspeksi/' . $apar->kode_apar))
-            );
+                    ->generate(url('/inspection/apar-inspeksi/' . $apar->kode_apar));
+                Storage::disk('public')->put($filename, $qr);
+            }
 
             return [
                 'kode_apar' => $apar->kode_apar,
+                'lantai' => $apar->lantai,
                 'lokasi' => $apar->lokasi,
-                'qr_base64' => 'data:image/png;base64,' . $qrImage,
+                'qr_base64' => 'data:image/png;base64,' . base64_encode(file_get_contents($storagePath)),
             ];
         });
 
-        $pdf = Pdf::loadView('apar.qrexports_pdf', [
+        $html = View::make('apar.qrexports_pdf', [
             'apars' => $apars,
             'batch' => $batch,
-        ])->setPaper('a4', 'portrait');
+            'lantai' => $request->get('lantai') // Tambahkan ini
+        ])->render();
+
+        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
 
         return $pdf->download('qr-code-apar-batch-' . $batch . '.pdf');
     }
@@ -238,7 +249,7 @@ class AparController extends Controller implements HasMiddleware
             ->where('jenis', '!=', '')
             ->pluck('jenis');
         $total = Apar::count();
-        $perPage = 40;
+        $perPage = 30;
         $totalBatch = ceil($total / $perPage);
 
         return response()->json([

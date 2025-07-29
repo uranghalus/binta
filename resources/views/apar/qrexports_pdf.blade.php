@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: sans-serif;
-            margin: 1cm;
+            margin: 0cm;
             text-align: center;
         }
 
@@ -27,18 +27,29 @@
             height: 200px;
             padding: 10px;
             vertical-align: middle;
+            text-align: center;
+            border: 2px solid black
         }
 
-        .qr-container {
-            padding: 10px;
-            border: 3px solid black;
-            border-radius: 12px;
-            display: inline-block;
-        }
-
-        img {
+        /* .qr-container {
             width: 100px;
             height: 100px;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-sizing: border-box;
+        } */
+
+        .qr-container img {
+            width: 100px;
+            height: 100px;
+            padding: 8px;
+            text-align: center;
+            border-radius: 6px;
+            margin: 0 auto;
+            border: 1px solid #000;
         }
 
         .info {
@@ -63,7 +74,12 @@
         $totalRows = 5; // 5 baris maksimal
         @endphp
 
-        @foreach ($rows as $row)
+        @php
+        $chunks = $apars->chunk(4);
+        $emptyRows = 5 - $chunks->count();
+        @endphp
+
+        @foreach ($chunks as $row)
         <tr>
             @foreach ($row as $item)
             <td>
@@ -71,9 +87,11 @@
                     <img src="{{ $item['qr_base64'] }}" alt="QR">
                 </div>
                 <div class="info"><strong>{{ $item['kode_apar'] }}</strong></div>
-                <div class="info">{{ $item['lokasi'] ?? '-' }}</div>
+                <div class="info">{{ $item['lokasi'] }}</div>
             </td>
             @endforeach
+
+            {{-- Isi kolom kosong jika kurang dari 4 --}}
             @for ($i = $row->count(); $i < 4; $i++)
                 <td>
                 </td>
@@ -81,8 +99,8 @@
         </tr>
         @endforeach
 
-        {{-- Tambahkan baris kosong jika kurang dari 5 --}}
-        @for ($i = $rows->count(); $i < $totalRows; $i++)
+        {{-- Tambah baris kosong jika kurang dari 5 --}}
+        @for ($i = 0; $i < $emptyRows; $i++)
             <tr>
             @for ($j = 0; $j < 4; $j++)
                 <td>

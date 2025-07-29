@@ -56,7 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     // LINK Scan
     Route::get('/hydrant/qrcode/{id}', [HydrantController::class, 'HydrantQRCode'])->name('hydrant.qrcode');
-    Route::get('/hydrant/print-qrcode', [HydrantController::class, 'MassHydrantQRCode'])->name('hydrant.print-qrcode');
+    Route::get('/hydrant/print-qrcode', [HydrantController::class, 'generateMassHydrantQRCode'])->name('hydrant.print-qrcode');
     Route::get('/hydrant/qr/options', [HydrantController::class, 'getFilterOptions'])->name('hydrant.filter.options');
     Route::get('/apar/qrcode/{id}', [AparController::class, 'generateQRCode'])->name('apar.qrcode');
     Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');

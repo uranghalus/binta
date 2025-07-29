@@ -7,16 +7,13 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 use Intervention\Image\Laravel\Facades\Image;
-use Maatwebsite\Excel\Excel as ExcelExcel;
-use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\HeadingRowImport;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 
@@ -76,11 +73,14 @@ class HydrantController extends Controller implements HasMiddleware
 
         return $pdf->download("qr_apar_{$apar->kode_apar}.pdf");
     }
-    public function MassHydrantQRCode(Request $request)
+    public function generateMassHydrantQRCode(Request $request)
     {
+        ini_set('max_execution_time', 60);
+        ini_set('memory_limit', '256M');
+
         $batch = $request->get('batch', 1);
         $lantai = $request->get('lantai');
-        $perPage = 40; // ≤20 agar ringan di storage/RAM
+        $perPage = 30;
 
         $query = Hydrant::query();
         if ($lantai) $query->where('lantai', $lantai);
@@ -91,20 +91,34 @@ class HydrantController extends Controller implements HasMiddleware
             ->take($perPage)
             ->get();
 
-        // Generate QR tanpa simpan ke disk
-        $hydrants = $hydrants->map(function ($item) {
-            $qrImage = base64_encode(QrCode::format('png')->size(200)->generate(
-                url('/inspection/hydrant-inspeksi/' . $item->kode_unik)
-            ));
-            $item->qr_path = 'data:image/png;base64,' . $qrImage;
-            return $item;
+        $hydrants = $hydrants->map(function ($hydrant) {
+            $filename = 'qrcodes/hydrant-qr-' . $hydrant->kode_unik . '.png';
+            $storagePath = storage_path('app/public/' . $filename);
+
+            // Generate hanya jika belum ada
+            if (!file_exists($storagePath)) {
+                $qr = QrCode::format('png')
+                    ->size(150)
+                    ->generate(url('/inspection/hydrant-inspeksi/' . $hydrant->kode_unik));
+                Storage::disk('public')->put($filename, $qr);
+            }
+
+            return [
+                'kode_unik' => $hydrant->kode_unik,
+                'kode_hydrant' => $hydrant->kode_hydrant,
+                'lantai' => $hydrant->lantai,
+                'lokasi' => $hydrant->lokasi,
+                'qr_base64' => 'data:image/png;base64,' . base64_encode(file_get_contents($storagePath)),
+            ];
         });
 
-        $pdf = Pdf::loadView('hydrant.qrexports_pdf', [
+        $html = View::make('hydrant.qrexports_pdf', [
             'hydrants' => $hydrants,
             'batch' => $batch,
-            'lantai' => $lantai,
-        ])->setPaper('a4', 'portrait');
+            'lantai' => $lantai
+        ])->render();
+
+        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
 
         return $pdf->download('qr-code-hydrant-batch-' . $batch . '.pdf');
     }
