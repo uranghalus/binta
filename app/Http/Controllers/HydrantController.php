@@ -91,17 +91,26 @@ class HydrantController extends Controller implements HasMiddleware
             ->take($perPage)
             ->get();
 
+        // Hapus file QR lama dari hydrant dalam batch ini
+        foreach ($hydrants as $hydrant) {
+            $filename = 'qrcodes/hydrant-qr-' . $hydrant->kode_unik . '.png';
+            $storagePath = storage_path('app/public/' . $filename);
+
+            if (file_exists($storagePath)) {
+                unlink($storagePath);
+            }
+        }
+
+        // Generate ulang semua QR code
         $hydrants = $hydrants->map(function ($hydrant) {
             $filename = 'qrcodes/hydrant-qr-' . $hydrant->kode_unik . '.png';
             $storagePath = storage_path('app/public/' . $filename);
 
-            // Generate hanya jika belum ada
-            if (!file_exists($storagePath)) {
-                $qr = QrCode::format('png')
-                    ->size(150)
-                    ->generate(url('/inspection/hydrant-inspeksi/' . $hydrant->kode_unik));
-                Storage::disk('public')->put($filename, $qr);
-            }
+            $qr = QrCode::format('png')
+                ->size(150)
+                ->generate(url('/inspection/hydrant-inspeksi/' . $hydrant->kode_unik));
+
+            Storage::disk('public')->put($filename, $qr);
 
             return [
                 'kode_unik' => $hydrant->kode_unik,

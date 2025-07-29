@@ -31,7 +31,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     });
 
     const refreshCaptcha = () => {
-        setCaptchaImg('/captcha?' + Math.random());
+        setCaptchaImg('/captcha/minimal?' + Date.now());
     };
 
     useEffect(() => {
@@ -91,7 +91,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                     <div className="grid gap-2">
                         <div className="gap- flex items-center">
-                            <img src={captchaImg} alt="CAPTCHA code" className="h-9 w-auto" />
+                            <img src={captchaImg} alt="CAPTCHA code" className="h-9 w-auto rounded border" />
                             <Button type="button" variant="ghost" onClick={refreshCaptcha} className="h-10 w-10 p-0">
                                 <RotateCcw className="h-4 w-4" />
                             </Button>
@@ -118,9 +118,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 </div>
 
                 <div className="text-muted-foreground text-center text-sm">
-                    Don't have an account?{' '}
-                    <Link href={route('register')} tabIndex={6}>
-                        Sign up
+                    Belum Punya Akun ?{' '}
+                    <Link href={route('register')} tabIndex={6} className="text-primary font-bold">
+                        Daftar Disini
                     </Link>
                 </div>
             </form>

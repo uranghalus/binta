@@ -90,7 +90,7 @@ export default function Register() {
                 </div>
                 <div className="text-muted-foreground text-center text-sm">
                     Sudah punya akun?{' '}
-                    <Link href={route('login')} tabIndex={6} className="font-bold">
+                    <Link href={route('login')} tabIndex={6} className="text-primary font-bold">
                         Masuk Disini
                     </Link>
                 </div>

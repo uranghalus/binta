@@ -96,7 +96,7 @@ Route::prefix('reports')->group(function () {
 });
 Route::get('/captcha', function () {
     return response()->json([
-        'captcha' => captcha_src('default'),
+        'captcha' => captcha_src('white'),
     ]);
 });
 require __DIR__ . '/settings.php';
