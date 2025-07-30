@@ -62,6 +62,7 @@ return new class extends Migration
             $table->string('kunci_box_hydrant', 150)->nullable();
             $table->string('box_hydrant', 150)->nullable();
             $table->string('alarm', 150)->nullable();
+            $table->string('foto_hydrant')->nullable(); // Lebih spesifik
             $table->timestamp('tanggal_inspeksi')->default(now());
             $table->timestamps();
         });

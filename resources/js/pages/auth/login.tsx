@@ -53,6 +53,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 <div className="grid gap-6">
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>
+                        1{' '}
                         <Input
                             id="email"
                             type="email"
@@ -115,13 +116,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Log in
                     </Button>
-                </div>
-
-                <div className="text-muted-foreground text-center text-sm">
-                    Belum Punya Akun ?{' '}
-                    <Link href={route('register')} tabIndex={6} className="text-primary font-bold">
-                        Daftar Disini
-                    </Link>
                 </div>
             </form>
 

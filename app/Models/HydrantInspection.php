@@ -14,10 +14,20 @@ class HydrantInspection extends Model
         'hydrant_id',
         'user_id',
         'regu',
+        'valve_machino_coupling',
+        'fire_hose_machino_coupling',
         'selang_hydrant',
         'noozle_hydrant',
         'kaca_box_hydrant',
+        'kunci_box_hydrant',
+        'box_hydrant',
+        'alarm',
+        'foto_hydrant',
         'tanggal_inspeksi',
+    ];
+
+    protected $casts = [
+        'tanggal_inspeksi' => 'datetime',
     ];
 
     public function hydrant(): BelongsTo
