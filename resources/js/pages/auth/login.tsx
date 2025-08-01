@@ -53,7 +53,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 <div className="grid gap-6">
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>
-                        1{' '}
                         <Input
                             id="email"
                             type="email"

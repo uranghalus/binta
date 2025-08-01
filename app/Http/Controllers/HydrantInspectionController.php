@@ -8,8 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class HydrantInspectionController extends Controller implements HasMiddleware
 {
@@ -52,15 +55,33 @@ class HydrantInspectionController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         //
+        $fileName = 'photo_' . time() . '.jpg';
         $validated = $request->validate([
-            'hydrant_id' => 'required|exists:hydrant,id',
-            'regu' => 'required|string|max:50',
-            'selang_hydrant' => 'required|string|max:255',
-            'noozle_hydrant' => 'required|string|max:255',
-            'kaca_box_hydrant' => 'required|string|max:255',
+            'hydrant_id' => ['nullable', 'exists:hydrant,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
+            'regu' => ['required', Rule::in(['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])],
+            'valve_machino_coupling' => ['nullable', 'string', 'max:150'],
+            'fire_hose_machino_coupling' => ['nullable', 'string', 'max:150'],
+            'selang_hydrant' => ['nullable', 'string', 'max:150'],
+            'noozle_hydrant' => ['nullable', 'string', 'max:150'],
+            'kaca_box_hydrant' => ['nullable', 'string', 'max:150'],
+            'kunci_box_hydrant' => ['nullable', 'string', 'max:150'],
+            'box_hydrant' => ['nullable', 'string', 'max:150'],
+            'alarm' => ['nullable', 'string', 'max:150'],
+            'foto_hydrant' => ['nullable', function ($attribute, $value, $fail) {
+                if (!Str::startsWith($value, 'data:image')) {
+                    $fail('The ' . $attribute . ' must be a valid base64 image.');
+                }
+            },],
+            'tanggal_inspeksi' => ['nullable', 'date'],
         ]);
         $user = Auth::user();
-
+        $imageData = $request->foto_hydrant;
+        if (Str::startsWith($imageData, 'data:image/')) {
+            $imageData = explode(',', $imageData)[1]; // buang header base64
+        };
+        Storage::put("public/inspection/hydrant{$fileName}", base64_decode($imageData));
+        $validated['foto_hydrant'] = "inspection/hydrant{$fileName}";
         $validated['user_id'] = $user->id;
         HydrantInspection::create($validated);
 
@@ -70,9 +91,13 @@ class HydrantInspectionController extends Controller implements HasMiddleware
     /**
      * Display the specified resource.
      */
-    public function show(HydrantInspection $hydrantInspection)
+    public function show($id)
     {
         //
+        $inspection = HydrantInspection::with(['hydrant', 'user.karyawan'])->findOrFail($id);
+        return Inertia::render('fire-safety/inspection/hydrant/Show', [
+            'inspection' => $inspection,
+        ]);
     }
 
     /**
@@ -95,14 +120,29 @@ class HydrantInspectionController extends Controller implements HasMiddleware
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'hydrant_id' => 'required|exists:hydrant,id',
-            'regu' => 'required|string|max:50',
-            'selang_hydrant' => 'required|string|max:255',
-            'noozle_hydrant' => 'required|string|max:255',
-            'kaca_box_hydrant' => 'required|string|max:255',
+            'hydrant_id' => ['nullable', 'exists:hydrant,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
+            'regu' => ['required', Rule::in(['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])],
+            'valve_machino_coupling' => ['nullable', 'string', 'max:150'],
+            'fire_hose_machino_coupling' => ['nullable', 'string', 'max:150'],
+            'selang_hydrant' => ['nullable', 'string', 'max:150'],
+            'noozle_hydrant' => ['nullable', 'string', 'max:150'],
+            'kaca_box_hydrant' => ['nullable', 'string', 'max:150'],
+            'kunci_box_hydrant' => ['nullable', 'string', 'max:150'],
+            'box_hydrant' => ['nullable', 'string', 'max:150'],
+            'alarm' => ['nullable', 'string', 'max:150'],
+            'foto_hydrant' => ['nullable', 'image', 'max:500'],
+            'tanggal_inspeksi' => ['nullable', 'date'],
         ]);
 
         $inspection = HydrantInspection::findOrFail($id);
+        if ($request->hasFile('foto_hydrant')) {
+            // Hapus foto lama jika ada
+            if ($inspection->foto_hydrant) {
+                Storage::disk('public')->delete($inspection->foto_hydrant);
+            }
+            $validated['foto_hydrant'] = $request->file('foto_hydrant')->store('hydrant_fotos', 'public');
+        }
         $inspection->update($validated);
 
         return redirect()->route('inspection.hydrant.index')->with('success', 'Inspeksi Hydrant berhasil diperbarui.');
@@ -115,7 +155,11 @@ class HydrantInspectionController extends Controller implements HasMiddleware
     {
         //
         $inspection = HydrantInspection::findOrFail($id);
+        if ($inspection->foto_hydrant) {
+            Storage::disk('public')->delete($inspection->foto_hydrant);
+        }
         $inspection->delete();
+
         return redirect()->route('inspection.hydrant.index')->with('success', 'Data berhasil dihapus!');
     }
     public function rekap(Request $request)
