@@ -75,7 +75,7 @@ class HydrantController extends Controller implements HasMiddleware
     }
     public function generateMassHydrantQRCode(Request $request)
     {
-        ini_set('max_execution_time', 60);
+        ini_set('max_execution_time', 120);
         ini_set('memory_limit', '256M');
 
         $batch = $request->get('batch', 1);
@@ -90,16 +90,11 @@ class HydrantController extends Controller implements HasMiddleware
             ->skip(($batch - 1) * $perPage)
             ->take($perPage)
             ->get();
-
-        // Hapus file QR lama dari hydrant dalam batch ini
-        foreach ($hydrants as $hydrant) {
-            $filename = 'qrcodes/hydrant-qr-' . $hydrant->kode_unik . '.png';
-            $storagePath = storage_path('app/public/' . $filename);
-
-            if (file_exists($storagePath)) {
-                unlink($storagePath);
-            }
+        if (!$batch || !is_numeric($batch) || $batch < 1 || $hydrants->isEmpty()) {
+            abort(404, 'Data tidak valid untuk dicetak.');
         }
+        // Hapus file QR lama dari hydrant dalam batch ini
+
 
         // Generate ulang semua QR code
         $hydrants = $hydrants->map(function ($hydrant) {
@@ -108,7 +103,7 @@ class HydrantController extends Controller implements HasMiddleware
 
             $qr = QrCode::format('png')
                 ->size(150)
-                ->generate(url('/inspection/hydrant-inspeksi/' . $hydrant->kode_unik));
+                ->generate(url('/inspection/hydrant-inspeksi/' . $hydrant->id));
 
             Storage::disk('public')->put($filename, $qr);
 
@@ -130,6 +125,14 @@ class HydrantController extends Controller implements HasMiddleware
         $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
 
         return $pdf->download('qr-code-hydrant-batch-' . $batch . '.pdf');
+        foreach ($hydrants as $hydrant) {
+            $filename = 'qrcodes/hydrant-qr-' . $hydrant->kode_unik . '.png';
+            $storagePath = storage_path('app/public/' . $filename);
+
+            if (file_exists($storagePath)) {
+                unlink($storagePath);
+            }
+        }
     }
     /**
      * Store a newly created resource in storage.

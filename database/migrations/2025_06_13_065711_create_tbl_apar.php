@@ -37,7 +37,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('apar_id')->nullable()->constrained('apar')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
-            $table->enum('regu', ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])->default('Regu A');
+            $table->enum('regu', ['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])->default('PAGI');
             $table->date('tanggal_kadaluarsa')->nullable(); // Bisa kosong jika tidak ada
             $table->date('tanggal_refill')->nullable(); // Bisa kosong jika tidak ada
             $table->string('kondisi', 150)->nullable(); // Bisa input bebas
@@ -51,7 +51,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('hydrant_id')->nullable()->constrained('hydrant')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
-            $table->enum('regu', ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'])->default('Regu A');
+            $table->enum('regu', ['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])->default('PAGI');
             // Kolom fleksibel untuk input bebas (tanpa enum)
 
             $table->string('valve_machino_coupling', 150)->nullable();

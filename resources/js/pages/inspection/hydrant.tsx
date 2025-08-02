@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import CameraInput from '@/components/camera-capture';
+import RadioInputWithOther from '@/components/radio-input-with-other';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -11,25 +13,36 @@ import { LoaderIcon, MapPin } from 'lucide-react';
 import { FormEvent, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Hydrant } from '../fire-safety/hydrant/data/hydrantSchema';
-
 interface Props {
     hydrantData: Hydrant;
 }
 export default function hydrant({ hydrantData }: Props) {
     const { post, processing, reset, data, setData, errors } = useForm<{
         hydrant_id: string;
-        regu: string;
+        regu: 'PAGI' | 'MIDDLE' | 'SIANG' | 'MALAM';
         tanggal_inspeksi: string;
+        valve_machino_coupling: string;
+        fire_hose_machino_coupling: string;
         selang_hydrant: string;
         noozle_hydrant: string;
         kaca_box_hydrant: string;
+        kunci_box_hydrant: string;
+        box_hydrant: string;
+        alarm: string;
+        foto_hydrant: File | null;
     }>({
         hydrant_id: '',
-        regu: ['Regu A', 'Regu B', 'Regu C', 'MIDDLE'][0],
+        regu: 'PAGI',
         tanggal_inspeksi: '',
+        valve_machino_coupling: '',
+        fire_hose_machino_coupling: '',
         selang_hydrant: '',
         noozle_hydrant: '',
         kaca_box_hydrant: '',
+        kunci_box_hydrant: '',
+        box_hydrant: '',
+        alarm: '',
+        foto_hydrant: null,
     });
     useEffect(() => {
         if (hydrantData?.id) {
@@ -37,9 +50,13 @@ export default function hydrant({ hydrantData }: Props) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hydrantData]);
+    const handleCapture = (image: string) => {
+        setData('foto_hydrant', image); // base64 image
+    };
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         post(route('inspection.hydrant.store'), {
+            forceFormData: true, // WAJIB agar file dikirim sebagai FormData
             onSuccess: () => {
                 toast.success('Data berhasil ditambahkan!', { description: 'Data Hydrant berhasil ditambah.' });
                 reset();
@@ -77,127 +94,96 @@ export default function hydrant({ hydrantData }: Props) {
                                 </div>
                             </div>
                             <div className="grid gap-1">
-                                <Label className="text-sm font-bold">Jenis Hydrant</Label>
-                                <div className="text-muted-foreground">{hydrantData.tipe}</div>
+                                <Label className="text-sm font-bold">Ukuran</Label>
+                                <div className="text-muted-foreground">{hydrantData.ukuran}</div>
                             </div>
                             <Input type="hidden" value={String(hydrantData.id)} onChange={(e) => setData('hydrant_id', e.target.value)} />
                         </div>
                         <div className="grid gap-2">
-                            <Label>Selang Hydrant</Label>
-                            <RadioGroup
-                                value={['Ada', 'Tidak Ada'].includes(data.selang_hydrant) ? data.selang_hydrant : 'Yang Lain'}
-                                onValueChange={(value) => {
-                                    if (value === 'Yang Lain') {
-                                        setData('selang_hydrant', ''); // kosongkan agar user isi manual
-                                    } else {
-                                        setData('selang_hydrant', value);
-                                    }
-                                }}
-                                className="flex gap-2 p-2"
+                            <Label htmlFor="regu">Regu</Label>
+                            <Select
+                                value={data.regu}
+                                onValueChange={(value) => setData('regu', value as 'PAGI' | 'MIDDLE' | 'SIANG' | 'MALAM')}
+                                defaultValue={data.regu[0] as 'PAGI' | 'MIDDLE' | 'SIANG' | 'MALAM' | undefined}
                             >
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Ada" id="ada" />
-                                    <Label htmlFor="ada">Ada</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Tidak Ada" id="tidak-ada" />
-                                    <Label htmlFor="tidak-ada">Tidak Ada</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Yang Lain" id="kondisi-lain" />
-                                    <Label htmlFor="kondisi-lain">Yang Lain</Label>
-                                </div>
-                            </RadioGroup>
-
-                            {['Ada', 'Tidak Ada'].includes(data.selang_hydrant) === false && (
-                                <Input
-                                    type="text"
-                                    name="selang_hydrant"
-                                    placeholder="Masukkan kondisi lain..."
-                                    value={data.selang_hydrant}
-                                    onChange={(e) => setData('selang_hydrant', e.target.value)}
-                                />
-                            )}
-
-                            {errors.selang_hydrant && <p className="text-xs text-red-500">{errors.selang_hydrant}</p>}
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Pilih Regu" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="PAGI">PAGI</SelectItem>
+                                    <SelectItem value="MIDDLE">MIDDLE</SelectItem>
+                                    <SelectItem value="SIANG">SIANG</SelectItem>
+                                    <SelectItem value="MALAM">MALAM</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
+                        <RadioInputWithOther
+                            label="Selang Hydrant"
+                            name="selang_hydrant"
+                            value={data.selang_hydrant}
+                            onChange={(val) => setData('selang_hydrant', val)}
+                            error={errors.selang_hydrant}
+                        />
+                        <RadioInputWithOther
+                            label="Noozle Hydrant"
+                            name="noozle_hydrant"
+                            value={data.noozle_hydrant}
+                            onChange={(val) => setData('noozle_hydrant', val)}
+                            error={errors.noozle_hydrant}
+                        />
+                        <RadioInputWithOther
+                            label="Valve Machino Coupling"
+                            name="valve_machino_coupling"
+                            value={data.valve_machino_coupling}
+                            onChange={(val) => setData('valve_machino_coupling', val)}
+                            error={errors.valve_machino_coupling}
+                        />
+
+                        <RadioInputWithOther
+                            label="Fire Hose Machino Coupling"
+                            name="fire_hose_machino_coupling"
+                            value={data.fire_hose_machino_coupling}
+                            onChange={(val) => setData('fire_hose_machino_coupling', val)}
+                            error={errors.fire_hose_machino_coupling}
+                        />
+
+                        <RadioInputWithOther
+                            label="Kunci Box Hydrant"
+                            name="kunci_box_hydrant"
+                            value={data.kunci_box_hydrant}
+                            onChange={(val) => setData('kunci_box_hydrant', val)}
+                            error={errors.kunci_box_hydrant}
+                        />
+
+                        <RadioInputWithOther
+                            label="Kaca Box Hydrant"
+                            name="kaca_box_hydrant"
+                            value={data.kaca_box_hydrant}
+                            onChange={(val) => setData('kaca_box_hydrant', val)}
+                            error={errors.kaca_box_hydrant}
+                        />
+                        <RadioInputWithOther
+                            label="Box Hydrant"
+                            name="box_hydrant"
+                            value={data.box_hydrant}
+                            onChange={(val) => setData('box_hydrant', val)}
+                            error={errors.box_hydrant}
+                        />
+
+                        <RadioInputWithOther
+                            label="Alarm"
+                            name="alarm"
+                            value={data.alarm}
+                            onChange={(val) => setData('alarm', val)}
+                            error={errors.alarm}
+                        />
+
                         <div className="grid gap-2">
-                            <Label>Noozle Hydrant</Label>
-                            <RadioGroup
-                                value={['Ada', 'Tidak Ada'].includes(data.noozle_hydrant) ? data.noozle_hydrant : 'Yang Lain'}
-                                onValueChange={(value) => {
-                                    if (value === 'Yang Lain') {
-                                        setData('noozle_hydrant', ''); // kosongkan agar user isi manual
-                                    } else {
-                                        setData('noozle_hydrant', value);
-                                    }
-                                }}
-                                className="flex gap-2 p-2"
-                            >
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Ada" id="ada" />
-                                    <Label htmlFor="ada">Ada</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Tidak Ada" id="tidak-ada" />
-                                    <Label htmlFor="tidak-ada">Tidak Ada</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Yang Lain" id="kondisi-lain" />
-                                    <Label htmlFor="kondisi-lain">Yang Lain</Label>
-                                </div>
-                            </RadioGroup>
+                            <Label>Foto Hydrant</Label>
+                            {/* Komponen Kamera */}
+                            <CameraInput onCapture={handleCapture} />
 
-                            {['Ada', 'Tidak Ada'].includes(data.noozle_hydrant) === false && (
-                                <Input
-                                    type="text"
-                                    name="kondisi"
-                                    placeholder="Masukkan kondisi lain..."
-                                    value={data.noozle_hydrant}
-                                    onChange={(e) => setData('noozle_hydrant', e.target.value)}
-                                />
-                            )}
-
-                            {errors.noozle_hydrant && <p className="text-xs text-red-500">{errors.noozle_hydrant}</p>}
-                        </div>
-                        <div className="grid gap-2">
-                            <Label>Kondisi</Label>
-                            <RadioGroup
-                                value={['Bagus', 'Rusak'].includes(data.kaca_box_hydrant) ? data.kaca_box_hydrant : 'Yang Lain'}
-                                onValueChange={(value) => {
-                                    if (value === 'Yang Lain') {
-                                        setData('kaca_box_hydrant', ''); // kosongkan agar user isi manual
-                                    } else {
-                                        setData('kaca_box_hydrant', value);
-                                    }
-                                }}
-                                className="flex gap-2 p-2"
-                            >
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Bagus" id="bagus" />
-                                    <Label htmlFor="bagus">Bagus</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Rusak" id="kondisi-rusak" />
-                                    <Label htmlFor="kondisi-rusak">Rusak</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Yang Lain" id="kondisi-lain" />
-                                    <Label htmlFor="kondisi-lain">Yang Lain</Label>
-                                </div>
-                            </RadioGroup>
-
-                            {['Bagus', 'Rusak'].includes(data.kaca_box_hydrant) === false && (
-                                <Input
-                                    type="text"
-                                    name="kondisi"
-                                    placeholder="Masukkan kondisi lain..."
-                                    value={data.kaca_box_hydrant}
-                                    onChange={(e) => setData('kaca_box_hydrant', e.target.value)}
-                                />
-                            )}
-
-                            {errors.kaca_box_hydrant && <p className="text-xs text-red-500">{errors.kaca_box_hydrant}</p>}
+                            {errors.foto_hydrant && <p className="text-xs text-red-500">{errors.foto_hydrant}</p>}
                         </div>
                     </form>
                 </CardContent>
