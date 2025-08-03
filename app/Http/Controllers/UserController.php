@@ -39,22 +39,33 @@ class UserController extends Controller
     public function store(Request $request)
     {
         //
+        // Validasi input
         $validated = $request->validate([
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'karyawan_id' => 'required|exists:tbl_karyawans,id_karyawan',
-            // tambahkan validasi lain sesuai kebutuhan
+            'karyawan_id' => 'required|exists:tbl_karyawans,id_karyawan|unique:users,karyawan_id',
         ]);
 
+        // Ambil data karyawan
+        $karyawan = Karyawan::where('id_karyawan', $validated['karyawan_id'])->firstOrFail();
+
+        // Validasi tambahan jika no_ktp kosong
+        if (!$karyawan->no_ktp) {
+            return back()->withErrors(['karyawan_id' => 'Karyawan belum memiliki nomor KTP.']);
+        }
+
+        // Buat user baru
         $user = User::create([
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-            'karyawan_id' => $validated['karyawan_id'],
-            // field lain jika ada
+            'karyawan_id' => $karyawan->id_karyawan,
+            'email' => $this->generateEmailFromKaryawan($karyawan), // bisa custom sesuai kebutuhan
+            'password' => $karyawan->no_ktp,
         ]);
-        return redirect()->route('pengguna.index')->with('success', 'User berhasil ditambahkan.');
-    }
 
+        return redirect()->route('pengguna.index')->with('success', 'User berhasil dibuat.');
+    }
+    private function generateEmailFromKaryawan($karyawan): string
+    {
+        // Bisa ubah jadi lebih kompleks sesuai aturan email perusahaan
+        return strtolower(str_replace(' ', '_', $karyawan->nama)) . '@appdutamall.com';
+    }
     /**
      * Display the specified resource.
      */

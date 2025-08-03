@@ -14,7 +14,9 @@ use App\Http\Controllers\OfficesController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 
@@ -99,5 +101,10 @@ Route::get('/captcha', function () {
         'captcha' => captcha_src('white'),
     ]);
 });
+Route::get('/test-s3', function () {
+    Storage::disk('s3')->put('test-folder/test.txt', 'Hello from Laravel!');
+    return 'Uploaded!';
+});
+
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

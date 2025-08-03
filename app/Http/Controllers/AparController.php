@@ -134,7 +134,7 @@ class AparController extends Controller implements HasMiddleware
             if (!file_exists($storagePath)) {
                 $qr = QrCode::format('png')
                     ->size(150)
-                    ->generate(url('/inspection/apar-inspeksi/' . $apar->kode_apar));
+                    ->generate(url('/inspection/apar-inspeksi/' . $apar->id));
                 Storage::disk('public')->put($filename, $qr);
             }
 

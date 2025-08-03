@@ -7,9 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+import CameraCapture from '@/components/camera-capture';
+import RadioInputWithOther from '@/components/radio-input-with-other';
 import { Calendar } from '@/components/ui/calendar';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
 import { toDisplayDate } from '@/lib/utils';
 import { format } from 'date-fns';
 import { CalendarIcon, ChevronsUpDownIcon, LoaderIcon } from 'lucide-react';
@@ -25,24 +26,29 @@ export default function Create({ aparData }: Props) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const { post, processing, reset, data, setData, errors } = useForm<{
         apar_id: string;
-        regu: string;
+        regu: 'PAGI' | 'MIDDLE' | 'SIANG' | 'MALAM';
         tanggal_kadaluarsa: string;
         tanggal_refill: string;
         kondisi: string;
         catatan: string;
-        foto_apar: File | null;
+        foto_apar: string | File | null;
     }>({
         apar_id: '',
-        regu: ['REGU A', 'REGU B', 'REGU C', 'MIDDLE'][0],
+        regu: 'PAGI',
         tanggal_kadaluarsa: '',
         tanggal_refill: '',
         kondisi: '',
         catatan: '',
         foto_apar: null,
     });
+    const handleCapture = (image: string) => {
+        setData('foto_apar', image); // base64 image
+        setPreviewUrl(image);
+    };
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         post(route('inspection.apar.store'), {
+            forceFormData: true, // WAJIB agar file dikirim sebagai FormData
             onSuccess: () => {
                 toast.success('Data berhasil ditambahkan!', { description: 'Data APAR berhasil ditambah.' });
                 reset();
@@ -99,18 +105,23 @@ export default function Create({ aparData }: Props) {
                                 {errors.apar_id && <p className="text-xs text-red-500">{errors.apar_id}</p>}
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="regu">Regu</Label>
-                                <Select value={data.regu} onValueChange={(value) => setData('regu', value)} defaultValue={data.regu}>
+                                <Label htmlFor="regu">Shift</Label>
+                                <Select
+                                    value={data.regu}
+                                    onValueChange={(value) => setData('regu', value as 'PAGI' | 'MIDDLE' | 'SIANG' | 'MALAM')}
+                                    defaultValue={data.regu}
+                                >
                                     <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Pilih Regu" />
-                                        <SelectContent>
-                                            <SelectItem value="REGU A">REGU A</SelectItem>
-                                            <SelectItem value="REGU B">REGU B</SelectItem>
-                                            <SelectItem value="REGU C">REGU C</SelectItem>
-                                            <SelectItem value="MIDDLE">MIDDLE</SelectItem>
-                                        </SelectContent>
+                                        <SelectValue placeholder="Pilih Shift" />
                                     </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="PAGI">PAGI</SelectItem>
+                                        <SelectItem value="MIDDLE">MIDDLE</SelectItem>
+                                        <SelectItem value="SIANG">SIANG</SelectItem>
+                                        <SelectItem value="MALAM">MALAM</SelectItem>
+                                    </SelectContent>
                                 </Select>
+                                {errors.regu && <p className="text-xs text-red-500">{errors.regu}</p>}
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="tanggal_kadaluarsa">Tanggal Kadaluarsa</Label>
@@ -133,6 +144,7 @@ export default function Create({ aparData }: Props) {
                                         />
                                     </PopoverContent>
                                 </Popover>
+                                {errors.tanggal_kadaluarsa && <p className="text-xs text-red-500">{errors.tanggal_kadaluarsa}</p>}
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="tanggal_kadaluarsa">Tanggal Refill</Label>
@@ -155,62 +167,30 @@ export default function Create({ aparData }: Props) {
                                         />
                                     </PopoverContent>
                                 </Popover>
+                                {errors.tanggal_refill && <p className="text-xs text-red-500">{errors.tanggal_refill}</p>}
                             </div>
-                            <div className="grid gap-2">
-                                <Label>Kondisi</Label>
-                                <RadioGroup
-                                    value={['Baik', 'Rusak'].includes(data.kondisi) ? data.kondisi : 'Yang Lain'}
-                                    onValueChange={(value) => {
-                                        if (value === 'Yang Lain') {
-                                            setData('kondisi', ''); // kosongkan agar user isi manual
-                                        } else {
-                                            setData('kondisi', value);
-                                        }
-                                    }}
-                                    className="flex gap-2 p-2"
-                                >
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="Baik" id="kondisi-baik" />
-                                        <Label htmlFor="kondisi-baik">Baik</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="Rusak" id="kondisi-rusak" />
-                                        <Label htmlFor="kondisi-rusak">Rusak</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="Yang Lain" id="kondisi-lain" />
-                                        <Label htmlFor="kondisi-lain">Yang Lain</Label>
-                                    </div>
-                                </RadioGroup>
-
-                                {['Baik', 'Rusak'].includes(data.kondisi) === false && (
-                                    <Input
-                                        type="text"
-                                        name="kondisi"
-                                        placeholder="Masukkan kondisi lain..."
-                                        value={data.kondisi}
-                                        onChange={(e) => setData('kondisi', e.target.value)}
-                                    />
-                                )}
-
-                                {errors.kondisi && <p className="text-xs text-red-500">{errors.kondisi}</p>}
-                            </div>
+                            <RadioInputWithOther
+                                label="Kondisi Apar"
+                                name="kondisi_apar"
+                                value={data.kondisi}
+                                onChange={(val) => setData('kondisi', val)}
+                                error={errors.kondisi}
+                            />
                             <div className="grid gap-2">
                                 <Label htmlFor="foto">Foto Kondisi</Label>
-                                <Input
-                                    type="file"
-                                    id="foto"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                            setData('foto_apar', file);
-                                            const url = URL.createObjectURL(file);
-                                            setPreviewUrl(url);
-                                        }
-                                    }}
-                                />
+                                <CameraCapture onCapture={handleCapture} />
                                 {errors.foto_apar && <p className="text-xs text-red-500">{errors.foto_apar}</p>}
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="catatan">Catatan</Label>
+                                <Textarea
+                                    placeholder="Masukkan catatan inspeksi di sini..."
+                                    value={data.catatan}
+                                    onChange={(e) => setData('catatan', e.target.value)}
+                                    name="catatan"
+                                    className="resize-none"
+                                    rows={3}
+                                />
                             </div>
                         </div>
                         <div className="bg-muted flex h-full w-full items-center justify-center overflow-hidden rounded">

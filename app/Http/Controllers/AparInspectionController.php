@@ -9,8 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Intervention\Image\Laravel\Facades\Image;
 
 class AparInspectionController extends Controller implements HasMiddleware
 {
@@ -52,29 +55,46 @@ class AparInspectionController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        //
+        $fileName = 'inspeksi_' . time() . '.jpg';
+
         $validated = $request->validate([
             'apar_id'            => ['required', 'exists:apar,id'],
-            'regu'               => ['required', 'in:REGU A,REGU B,REGU C,MIDDLE'],
-            'tanggal_kadaluarsa' => ['nullable', 'date'],
-            'tanggal_refill'     => ['nullable', 'date'],
-            'kondisi'            => ['nullable', 'string', 'max:150'],
-            'catatan'            => ['nullable', 'string'],
-            'foto_apar'          => ['nullable', 'image', 'max:2048'],
+            'regu'               => ['required', 'in:PAGI, MIDDLE, SIANG, MALAM'],
+            'tanggal_kadaluarsa' => ['required', 'date'],
+            'tanggal_refill'     => ['required', 'date'],
+            'kondisi'            => ['required', 'string', 'max:150'],
+            'catatan'            => ['required', 'string'],
+            'foto_apar'          => ['required', function ($attribute, $value, $fail) {
+                if (!Str::startsWith($value, 'data:image')) {
+                    $fail('The ' . $attribute . ' must be a valid base64 image.');
+                }
+            }],
         ]);
 
-        // Ubah regu ke format DB (Regu A, Regu B, dst)
+        // Format regu
         $validated['regu'] = str_replace('REGU ', 'Regu ', $validated['regu']);
+        $validated['user_id'] = Auth::id();
 
-        if ($request->hasFile('foto_apar')) {
-            $validated['foto_apar'] = $request->file('foto_apar')->store('apar-inspections', 'public');
+        // === Handle base64 image ===
+        if ($request->filled('foto_apar') && Str::startsWith($request->foto_apar, 'data:image/')) {
+            $imageData = explode(',', $request->foto_apar)[1]; // Remove base64 header
+            $decodedImage = base64_decode($imageData);
+
+            // Kompres dengan Intervention Image
+            $image = Image::read($decodedImage);
+
+            if ($image->width() > 1200) {
+                $image->resize(1200, null);
+            }
+
+            $compressed = $image->toJpeg(75);
+
+            $path = "inspection/apar/{$fileName}";
+            Storage::disk('s3')->put($path, (string) $compressed);
+
+            $validated['foto_apar'] = $path;
         }
-        $user = Auth::user();
-
-        $validated['user_id'] = $user->id;
-
-        $inspection = AparInspection::create($validated);
-
+        AparInspection::create($validated);
         return redirect()->route('inspection.apar.index')->with('success', 'Data berhasil ditambahkan!');
     }
 
@@ -88,8 +108,9 @@ class AparInspectionController extends Controller implements HasMiddleware
         if (!$inspection) {
             return redirect()->back()->with('error', 'Data not found.');
         }
+
         return Inertia::render('fire-safety/inspection/apar/Show', [
-            'aparData' => $inspection
+            'aparData' => $inspection->append('foto_apar_url')
         ]);
     }
 
@@ -103,7 +124,7 @@ class AparInspectionController extends Controller implements HasMiddleware
         $aparData = Apar::all(['id', 'kode_apar', 'lokasi']);
 
         return Inertia::render('fire-safety/inspection/apar/Edit', [
-            'aparInspection' => $inspection,
+            'aparInspection' => $inspection->append('foto_apar_url'),
             'aparData' => $aparData,
         ]);
     }
@@ -113,31 +134,52 @@ class AparInspectionController extends Controller implements HasMiddleware
      */
     public function update(Request $request, $id)
     {
-        //
-        $aparInspection = AparInspection::with(['apar', 'user.karyawan'])->findOrFail($id);
+        $inspection = AparInspection::findOrFail($id);
+        $fileName = 'inspeksi_' . time() . '.jpg';
+
         $validated = $request->validate([
             'apar_id'            => ['required', 'exists:apar,id'],
-            'regu'               => ['required', 'in:REGU A,REGU B,REGU C,MIDDLE'],
-            'tanggal_kadaluarsa' => ['nullable', 'date'],
-            'tanggal_refill'     => ['nullable', 'date'],
-            'kondisi'            => ['nullable', 'string', 'max:150'],
-            'catatan'            => ['nullable', 'string'],
-            'foto_apar'          => ['nullable', 'image', 'max:2048'],
+            'regu'               => ['required', 'in:PAGI, MIDDLE, SIANG, MALAM'],
+            'tanggal_kadaluarsa' => ['required', 'date'],
+            'tanggal_refill'     => ['required', 'date'],
+            'kondisi'            => ['required', 'string', 'max:150'],
+            'catatan'            => ['required', 'string'],
+            'foto_apar'          => ['nullable', function ($attribute, $value, $fail) {
+                if ($value && !Str::startsWith($value, 'data:image')) {
+                    $fail('The ' . $attribute . ' must be a valid base64 image.');
+                }
+            }],
         ]);
 
+        // Format regu
         $validated['regu'] = str_replace('REGU ', 'Regu ', $validated['regu']);
+        $validated['user_id'] = Auth::id();
 
-        // Jika user ganti foto, hapus yang lama dan simpan yang baru
-        if ($request->hasFile('foto_apar')) {
-            if ($aparInspection->foto_apar && Storage::disk('public')->exists("apar-inspections/{$aparInspection->foto_apar}")) {
-                Storage::disk('public')->delete("apar-inspections/{$aparInspection->foto_apar}");
+        // === Jika ada foto baru ===
+        if ($request->filled('foto_apar') && Str::startsWith($request->foto_apar, 'data:image/')) {
+            $imageData = explode(',', $request->foto_apar)[1];
+            $decodedImage = base64_decode($imageData);
+
+            // Kompres dengan Intervention
+            $image = Image::read($decodedImage);
+
+            if ($image->width() > 1200) {
+                $image->resize(1200, null);
             }
 
+            $compressed = $image->toJpeg(75);
+            $path = "inspection/apar/{$fileName}";
+            Storage::disk('s3')->put($path, (string) $compressed);
 
-            $validated['foto_apar'] = $request->file('foto_apar')->store('apar-inspections', 'public');
+            // Hapus foto lama
+            if ($inspection->foto_apar && Storage::disk('s3')->exists($inspection->foto_apar)) {
+                Storage::disk('s3')->delete($inspection->foto_apar);
+            }
+
+            $validated['foto_apar'] = $path;
         }
 
-        $aparInspection->update($validated);
+        $inspection->update($validated);
 
         return redirect()->route('inspection.apar.index')->with('success', 'Data berhasil diperbarui!');
     }
@@ -147,15 +189,15 @@ class AparInspectionController extends Controller implements HasMiddleware
      */
     public function destroy($id)
     {
-        $aparInspection = AparInspection::findOrFail($id);
+        $inspection = AparInspection::findOrFail($id);
 
-        // Hapus file foto jika ada
-        if ($aparInspection->foto_apar && Storage::disk('public')->exists($aparInspection->foto_apar)) {
-            Storage::disk('public')->delete($aparInspection->foto_apar);
+        // Hapus foto dari S3 jika ada
+        if ($inspection->foto_apar && Storage::disk('s3')->exists($inspection->foto_apar)) {
+            Storage::disk('s3')->delete($inspection->foto_apar);
         }
 
         // Hapus data dari database
-        $aparInspection->delete();
+        $inspection->delete();
 
         return redirect()->route('inspection.apar.index')->with('success', 'Data berhasil dihapus!');
     }

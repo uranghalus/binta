@@ -47,7 +47,7 @@ export const InspectionAparColumns: ColumnDef<AparInspection>[] = [
         cell: ({ row }) => <span className="font-medium">{row.getValue('regu') || '-'}</span>,
     },
     {
-        accessorKey: 'apar.kode_apar',
+        id: 'apar.kode_apar',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Kode Apar" />,
         cell: ({ row }) => <span className="font-medium">{row.original.apar?.kode_apar || '-'}</span>,
     },

@@ -3,7 +3,7 @@ import { User } from '@/types';
 
 export interface HydrantInspectionsc {
     id: number;
-    // hydrant_id: number | null;
+    hydrant_id: number | null;
     user_id: number | null;
     regu: 'Regu A' | 'Regu B' | 'Regu C' | 'MIDDLE';
     valve_machino_coupling?: string | null;
@@ -15,6 +15,7 @@ export interface HydrantInspectionsc {
     box_hydrant?: string | null;
     alarm?: string | null;
     foto_hydrant?: string | null;
+    foto_hydrant_url?: string | null; // URL untuk foto hydrant
     tanggal_inspeksi: string; // ISO timestamp
     created_at: string;
     updated_at: string;

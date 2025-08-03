@@ -13,6 +13,7 @@ export interface AparInspection {
     tanggal_inspeksi: string; // format: ISO timestamp
     created_at: string;
     updated_at: string;
+    foto_apar_url: string;
     // Optional: relasi jika kamu kirim data apar atau user sekaligus
     apar?: {
         id: number;

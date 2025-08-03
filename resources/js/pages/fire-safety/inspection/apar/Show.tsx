@@ -89,7 +89,7 @@ export default function Show({ aparData }: Props) {
                     </div>
                     {aparData.foto_apar ? (
                         <div className="flex items-center justify-center rounded border border-gray-200 p-4">
-                            <img src={`/storage/${aparData.foto_apar}`} alt="Foto APAR" className="max-w-2xl" />
+                            <img src={aparData.foto_apar_url} alt="Foto APAR" className="max-w-2xl" />
                         </div>
                     ) : (
                         <div className="bg-muted flex h-full w-full items-center justify-center overflow-hidden rounded">
@@ -99,7 +99,7 @@ export default function Show({ aparData }: Props) {
                 </CardContent>
                 <CardFooter className="flex items-center justify-between">
                     <Button variant={'outline'} asChild>
-                        <Link href={route('apar.index')}>Kembali</Link>
+                        <Link href={route('inspection.apar.index')}>Kembali</Link>
                     </Button>
                     <div className="flex space-x-2">
                         <Button variant="outline" asChild>

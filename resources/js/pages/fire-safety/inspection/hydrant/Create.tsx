@@ -31,7 +31,7 @@ export default function Create({ hydrants }: Props) {
         kunci_box_hydrant: string;
         box_hydrant: string;
         alarm: string;
-        foto_hydrant: File | null;
+        foto_hydrant: string | null;
     }>({
         hydrant_id: '',
         regu: 'PAGI',

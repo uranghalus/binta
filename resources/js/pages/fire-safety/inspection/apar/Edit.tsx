@@ -24,7 +24,7 @@ interface Props {
 
 export default function Edit({ aparData, aparInspection }: Props) {
     const [openApar, setOpenApar] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(aparInspection.foto_apar ? `/storage/${aparInspection.foto_apar}` : null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(aparInspection.foto_apar ? `${aparInspection.foto_apar_url}` : null);
 
     const { data, setData, put, processing, errors } = useForm({
         apar_id: String(aparInspection.apar_id),
@@ -93,18 +93,23 @@ export default function Edit({ aparData, aparInspection }: Props) {
 
                             {/* Regu */}
                             <div className="grid gap-2">
-                                <Label>Regu</Label>
-                                <Select value={data.regu} onValueChange={(v) => setData('regu', v)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Pilih Regu" />
+                                <Label htmlFor="regu">Shift</Label>
+                                <Select
+                                    value={data.regu}
+                                    onValueChange={(value) => setData('regu', value as 'PAGI' | 'MIDDLE' | 'SIANG' | 'MALAM')}
+                                    defaultValue={data.regu}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Pilih Shift" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="REGU A">REGU A</SelectItem>
-                                        <SelectItem value="REGU B">REGU B</SelectItem>
-                                        <SelectItem value="REGU C">REGU C</SelectItem>
+                                        <SelectItem value="PAGI">PAGI</SelectItem>
                                         <SelectItem value="MIDDLE">MIDDLE</SelectItem>
+                                        <SelectItem value="SIANG">SIANG</SelectItem>
+                                        <SelectItem value="MALAM">MALAM</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                {errors.regu && <p className="text-xs text-red-500">{errors.regu}</p>}
                             </div>
 
                             {/* Tanggal kadaluarsa */}

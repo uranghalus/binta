@@ -1,6 +1,7 @@
 // resources/js/Components/CameraCapture.tsx
 
 import { Button } from '@/components/ui/button'; // jika pakai ShadCN
+import { Aperture, RotateCcw } from 'lucide-react';
 import { useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 
@@ -9,8 +10,8 @@ interface CameraCaptureProps {
 }
 
 const videoConstraints = {
-    width: 640,
-    height: 480,
+    width: 1280,
+    height: 720,
     facingMode: 'user',
 };
 
@@ -31,7 +32,7 @@ export default function CameraCapture({ onCapture }: CameraCaptureProps) {
     };
 
     return (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex w-full flex-col items-center gap-4 rounded-lg border border-gray-200 p-4">
             {!captured ? (
                 <>
                     <Webcam
@@ -39,16 +40,18 @@ export default function CameraCapture({ onCapture }: CameraCaptureProps) {
                         ref={webcamRef}
                         screenshotFormat="image/jpeg"
                         videoConstraints={videoConstraints}
-                        className="rounded-md border"
+                        className="rounded-lg border"
                     />
-                    <Button onClick={handleCapture}>Ambil Foto</Button>
+                    <Button onClick={handleCapture} className="h-12 w-full space-x-2" type="button">
+                        <Aperture className="size-5" /> Ambil Foto
+                    </Button>
                 </>
             ) : (
                 <>
                     <img src={captured} alt="Captured" className="rounded-md border" />
-                    <div className="flex gap-2">
-                        <Button variant="outline" onClick={handleRetake}>
-                            Ulangi
+                    <div className="flex w-full gap-2">
+                        <Button variant="outline" onClick={handleRetake} className="h-12 w-full space-x-2" type="button">
+                            <RotateCcw className="size-5" /> Ulangi
                         </Button>
                     </div>
                 </>

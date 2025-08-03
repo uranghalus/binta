@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class HydrantInspection extends Model
 {
@@ -29,6 +30,12 @@ class HydrantInspection extends Model
     protected $casts = [
         'tanggal_inspeksi' => 'datetime',
     ];
+    public function getFotoHydrantUrlAttribute(): ?string
+    {
+        if (!$this->foto_hydrant) return null;
+
+        return Storage::disk('s3')->url($this->foto_hydrant); // jika file public
+    }
 
     public function hydrant(): BelongsTo
     {

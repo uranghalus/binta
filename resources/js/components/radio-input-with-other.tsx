@@ -10,7 +10,7 @@ interface Props {
     options?: string[];
     error?: string; // tambahkan ini
 }
-export default function RadioInputWithOther({ label, name, error, value, onChange, options = ['Bagus', 'Rusak', 'Tidak Ada'] }: Props) {
+export default function RadioInputWithOther({ label, name, error, value, onChange, options = ['Baik', 'Rusak', 'Tidak Ada'] }: Props) {
     return (
         <div className="grid gap-2">
             <Label>{label}</Label>
