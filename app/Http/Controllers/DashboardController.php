@@ -54,7 +54,7 @@ class DashboardController extends Controller
             'totalAparExpired' => $totalAparExpired,
             'totalInspeksiApar' => $totalInspeksiApar,
             'dataGrafikInspeksi' => $dataGrafik,
-            'aparBermasalah' => $aparBermasalah
+            'aparBermasalah' => $aparBermasalah->append('foto_apar_url')
         ]);
     }
 }

@@ -59,7 +59,7 @@ class AparInspectionController extends Controller implements HasMiddleware
 
         $validated = $request->validate([
             'apar_id'            => ['required', 'exists:apar,id'],
-            'regu'               => ['required', 'in:PAGI, MIDDLE, SIANG, MALAM'],
+            'regu'               => ['required', 'in:PAGI,MIDDLE,SIANG,MALAM'],
             'tanggal_kadaluarsa' => ['required', 'date'],
             'tanggal_refill'     => ['required', 'date'],
             'kondisi'            => ['required', 'string', 'max:150'],

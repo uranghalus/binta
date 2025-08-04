@@ -135,7 +135,7 @@ export default function Dashboard({ dataGrafikInspeksi, totalApar, totalAparExpi
                                         <TableCell className="font-semibold text-red-600">{item.kondisi ?? '-'}</TableCell>
                                         <TableCell>{new Date(item.tanggal_inspeksi).toLocaleDateString()}</TableCell>
                                         <TableCell>
-                                            {item.foto_apar ? <img src={`/storage/${item.foto_apar}`} alt="foto" className="h-14 rounded-md" /> : '-'}
+                                            {item.foto_apar ? <img src={item.foto_apar_url} alt="foto" className="h-14 rounded-md" /> : '-'}
                                         </TableCell>
                                     </TableRow>
                                 ))}

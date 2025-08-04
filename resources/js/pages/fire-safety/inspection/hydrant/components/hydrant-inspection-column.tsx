@@ -41,7 +41,7 @@ export const HydrantInspectionColumn: ColumnDef<HydrantInspectionsc>[] = [
     },
     {
         accessorKey: 'regu',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Regu" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Shift" />,
         cell: ({ row }) => <span className="font-medium">{row.getValue('regu') || '-'}</span>,
     },
     {
@@ -59,7 +59,7 @@ export const HydrantInspectionColumn: ColumnDef<HydrantInspectionsc>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Selang Hydrant" />,
         cell: ({ row }) => (
             <Badge
-                variant={row.original.selang_hydrant === 'Tidak Ada' ? 'destructive' : row.original.selang_hydrant === 'Ada' ? 'success' : 'neutral'}
+                variant={row.original.selang_hydrant === 'Tidak Ada' ? 'destructive' : row.original.selang_hydrant === 'Baik' ? 'success' : 'neutral'}
             >
                 {row.original.selang_hydrant}
             </Badge>
@@ -67,10 +67,10 @@ export const HydrantInspectionColumn: ColumnDef<HydrantInspectionsc>[] = [
     },
     {
         accessorKey: 'noozle_hydrant',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Selang Hydrant" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Noozle Hydrant" />,
         cell: ({ row }) => (
             <Badge
-                variant={row.original.noozle_hydrant === 'Tidak Ada' ? 'destructive' : row.original.noozle_hydrant === 'Ada' ? 'success' : 'neutral'}
+                variant={row.original.noozle_hydrant === 'Tidak Ada' ? 'destructive' : row.original.noozle_hydrant === 'Baik' ? 'success' : 'neutral'}
             >
                 {row.original.noozle_hydrant}
             </Badge>
@@ -81,9 +81,7 @@ export const HydrantInspectionColumn: ColumnDef<HydrantInspectionsc>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Kaca Box Hydrant" />,
         cell: ({ row }) => (
             <Badge
-                variant={
-                    row.original.kaca_box_hydrant === 'Rusak' ? 'destructive' : row.original.kaca_box_hydrant === 'Bagus' ? 'success' : 'neutral'
-                }
+                variant={row.original.kaca_box_hydrant === 'Rusak' ? 'destructive' : row.original.kaca_box_hydrant === 'Baik' ? 'success' : 'neutral'}
             >
                 {row.original.kaca_box_hydrant}
             </Badge>
