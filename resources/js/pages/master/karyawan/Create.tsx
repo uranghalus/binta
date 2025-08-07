@@ -74,12 +74,12 @@ export default function Create({ departments, jabatans }: Props) {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="nik">NIK</Label>
-                                    <Input id="nik" value={data.nik} onChange={(e) => setData('nik', e.target.value)} />
+                                    <Input id="nik" value={data.nik} onChange={(e) => setData('nik', e.target.value)} maxLength={16} />
                                     {errors.nik && <p className="text-xs text-red-500">{errors.nik}</p>}
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="no_ktp">No KTP</Label>
-                                    <Input id="no_ktp" value={data.no_ktp} onChange={(e) => setData('no_ktp', e.target.value)} />
+                                    <Input id="no_ktp" value={data.no_ktp} onChange={(e) => setData('no_ktp', e.target.value)} maxLength={16} />
                                     {errors.no_ktp && <p className="text-xs text-red-500">{errors.no_ktp}</p>}
                                 </div>
                             </div>
@@ -110,7 +110,7 @@ export default function Create({ departments, jabatans }: Props) {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="telp">Telp</Label>
-                                    <Input id="telp" value={data.telp} onChange={(e) => setData('telp', e.target.value)} />
+                                    <Input id="telp" value={data.telp} onChange={(e) => setData('telp', e.target.value)} maxLength={15} />
                                     {errors.telp && <p className="text-xs text-red-500">{errors.telp}</p>}
                                 </div>
                             </div>
