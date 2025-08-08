@@ -56,7 +56,7 @@ export const UserColumn: ColumnDef<User>[] = [
     {
         id: 'actions',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Aksi" className="ml-auto" />,
-        cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('pengguna.edit', id)} resourceName="Users" />,
+        cell: ({ row }) => <RowAction row={row} resourceName="Users" />,
         meta: {
             className: cn(
                 'sticky right-0 z-10 w-[60px] px-2',
