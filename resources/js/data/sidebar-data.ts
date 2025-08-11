@@ -61,6 +61,10 @@ export const sidebarData: SidebarData = {
                     icon: FireExtinguisher,
                     items: [
                         {
+                            title: 'Data CP Security',
+                            url: '/fire-safety/cekpoin-security',
+                        },
+                        {
                             title: 'Data Apar',
                             url: '/fire-safety/apar',
                         },

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AparController;
 use App\Http\Controllers\AparInspectionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CekpointSecurityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HydrantController;
@@ -40,6 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('hydrant', HydrantController::class)
             ->parameters(['hydrant' => 'id'])
             ->names('hydrant');
+        Route::resource('cekpoin-security', CekpointSecurityController::class)
+            ->parameters(['cekpoin-security' => 'id'])
+            ->names('cekpoin-security');
     });
     // LINK Inspection
     Route::prefix('inspection')->group(function () {
