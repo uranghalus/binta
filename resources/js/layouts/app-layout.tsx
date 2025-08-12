@@ -34,10 +34,10 @@ export default function AppLayout({ children, title, description }: AppLayoutPro
                     id="content"
                     className={cn(
                         'ml-auto w-full max-w-full',
-                        'peer-data-[state=collapsed]:w-[calc(100%-var(--sidebar-width-icon)-1rem)]',
-                        'peer-data-[state=expanded]:w-[calc(100%-var(--sidebar-width))]',
-                        'sm:transition-[width] sm:duration-200 sm:ease-linear',
                         'flex h-svh flex-col',
+                        'sm:transition-[width] sm:duration-200 sm:ease-linear',
+                        'peer-data-[state=collapsed]:sm:w-[calc(100%-var(--sidebar-width-icon)-1rem)]',
+                        'peer-data-[state=expanded]:sm:w-[calc(100%-var(--sidebar-width))]',
                         'group-data-[scroll-locked=1]/body:h-full',
                         'has-[main.fixed-main]:group-data-[scroll-locked=1]/body:h-svh',
                     )}

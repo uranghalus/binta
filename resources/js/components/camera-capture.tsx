@@ -1,6 +1,4 @@
-// resources/js/Components/CameraCapture.tsx
-
-import { Button } from '@/components/ui/button'; // jika pakai ShadCN
+import { Button } from '@/components/ui/button';
 import { Aperture, RotateCcw } from 'lucide-react';
 import { useRef, useState } from 'react';
 import Webcam from 'react-webcam';
@@ -12,7 +10,7 @@ interface CameraCaptureProps {
 const videoConstraints = {
     width: 1280,
     height: 720,
-    facingMode: 'user',
+    facingMode: 'environment', // kamera belakang
 };
 
 export default function CameraCapture({ onCapture }: CameraCaptureProps) {
