@@ -67,6 +67,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/apar/qrcode/{id}', [AparController::class, 'generateQRCode'])->name('apar.qrcode');
     Route::get('/apar/print-qrcode', [AparController::class, 'generateMassQRCode'])->name('apar.print-qrcode');
     Route::get('/apar/qr/options', [AparController::class, 'getFilterOptions'])->name('apar.filter.options');
+    Route::get('/cekpoint/qr/options', [CekpointSecurityController::class, 'getFilterOptions'])->name('cp.filter.options');
+    Route::get('/cekpoin/print-qrcode', [CekpointSecurityController::class, 'generateMassCekPointQRCode'])->name('cp.print-qrcode');
     // LINK Master Data
     Route::prefix('master-data')->group(function () {
         Route::resource('pengguna', UserController::class)->parameters(['user' => 'id'])->names('pengguna');
@@ -91,6 +93,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/upload-apar-import', [AparController::class, 'import'])->name('apar.import');
         Route::get('/upload-hydrant', [HydrantController::class, 'showUploadForm'])->name('hydrant.upload');
         Route::post('/import-hydrant', [HydrantController::class, 'import'])->name('hydrant.import');
+        Route::get('/upload-cp', [CekpointSecurityController::class, 'showUploadForm'])->name('cekpoin-security.upload');
+        Route::post('/import-cp', [CekpointSecurityController::class, 'import'])->name('cekpoint-security.import');
     });
 });
 Route::prefix('reports')->group(function () {

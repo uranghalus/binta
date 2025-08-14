@@ -221,7 +221,7 @@ class HydrantController extends Controller implements HasMiddleware
             ->pluck('lantai');
 
         $total = Hydrant::count();
-        $perPage = 40;
+        $perPage = 30;
         $totalBatch = ceil($total / $perPage);
 
         return response()->json([

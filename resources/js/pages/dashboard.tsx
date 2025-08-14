@@ -80,7 +80,7 @@ export default function Dashboard({ dataGrafikInspeksi, totalApar, totalAparExpi
                     </CardContent>
                 </Card>
             </div>
-            <div className="mt-6 grid w-fit gap-4 sm:grid-cols-1 lg:grid-cols-2">
+            <div className="mt-6 grid w-full gap-4 sm:grid-cols-1 lg:grid-cols-2">
                 <div className="w-full space-y-4">
                     <Card>
                         <CardHeader>

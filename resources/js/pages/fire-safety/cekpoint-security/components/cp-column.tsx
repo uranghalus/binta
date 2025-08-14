@@ -56,7 +56,7 @@ export const CpColumn: ColumnDef<SecurityData>[] = [
     {
         id: 'actions',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Actions" />,
-        cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('cekpoin-security.edit', id)} resourceName="CP Security" />,
+        cell: ({ row }) => <RowAction row={row} editRoute={(id) => route('cekpoin-security.edit', id)} resourceName="Cekpoint" />,
         meta: {
             className: 'text-right',
         },
