@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('cek_point_security', function (Blueprint $table) {
             $table->id();
             $table->string('kode_cekpoint', 100)->unique();
-            $table->string('lokasi,100')->nullable();
+            $table->string('lokasi')->nullable();
             $table->string('lantai', 100)->nullable();
             $table->string('area', 100)->nullable();
             $table->timestamps();

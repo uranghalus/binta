@@ -82,7 +82,7 @@
                 </td>
                 @endfor
         </tr>
-        @endforeachd
+        @endforeach
 
         {{-- Add empty rows if less than 5 --}}
         @for ($i = 0; $i < $emptyRows; $i++)
