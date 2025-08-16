@@ -4,6 +4,7 @@ use App\Http\Controllers\AparController;
 use App\Http\Controllers\AparInspectionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CekpointSecurityController;
+use App\Http\Controllers\CPSecurityInspectionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HydrantController;
@@ -53,7 +54,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('hydrant', HydrantInspectionController::class)
             ->parameters(['hydrant' => 'id'])
             ->names('inspection.hydrant');
-
+        Route::resource('cekpoint-inspeksi', CPSecurityInspectionController::class)
+            ->parameters(['cp-security' => 'id'])
+            ->names('inspection.cp-security');
         Route::get('apar-inspeksi/{id}', [InspectionController::class, 'aparinspeksi'])->name('apar.inspection');
         Route::get('hydrant-inspeksi/{id}', [InspectionController::class, 'hydrantinspeksi'])->name('hydrant.inspection');
         Route::get('scan', function () {

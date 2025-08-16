@@ -86,6 +86,10 @@ export const sidebarData: SidebarData = {
                             title: 'Inspeksi Hydrant',
                             url: '/inspection/hydrant',
                         },
+                        {
+                            title: 'Inspeksi Cekpoint',
+                            url: '/inspection/cekpoint-inspeksi',
+                        },
                     ],
                 },
             ],

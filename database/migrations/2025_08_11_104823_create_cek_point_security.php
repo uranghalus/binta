@@ -26,12 +26,19 @@ return new class extends Migration
             $table->enum('regu', ['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])->default('PAGI');
 
             $table->string('kondisi', 150)->nullable(); // Bisa input bebas
+            $table->string('foto_kondisi', 150)->nullable(); // Bisa input bebas
             $table->string('bocoran', 150)->nullable(); // Bisa input bebas
+            $table->string('foto_bocoran', 150)->nullable(); // Bisa input bebas
             $table->string('penerangan_lampu', 150)->nullable(); // Bisa input bebas
+            $table->string('foto_penerangan_lampu', 150)->nullable(); // Bisa input bebas
             $table->string('kerusakan_fasum', 150)->nullable(); // Bisa input bebas
+            $table->string('foto_kerusakan_fasum', 150)->nullable(); // Bisa input bebas
             $table->string('potensi_bahaya_api', 150)->nullable(); // Bisa input bebas
+            $table->string('foto_potensi_bahaya_api', 150)->nullable(); // Bisa input bebas
             $table->string('potensi_bahaya_keorang', 150)->nullable(); // Bisa input bebas
+            $table->string('foto_potensi_bahaya_keorang', 150)->nullable(); // Bisa input bebas
             $table->string('orang_mencurigakan', 150)->nullable(); // Bisa input bebas
+            $table->string('foto_orang_mencurigakan', 150)->nullable(); // Bisa input bebas
             $table->timestamp('tanggal_patroli')->default(now());
             $table->timestamps();
         });
