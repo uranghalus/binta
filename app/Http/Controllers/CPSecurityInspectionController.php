@@ -21,7 +21,7 @@ class CPSecurityInspectionController extends Controller
     public function index()
     {
         $inspections = CPInspection::with(['cekPoint', 'user.karyawan'])->latest()->get();
-        return Inertia::render('fire-safety/inspection/cekpoint/Index', [
+        return Inertia::render('cekpoint/Index', [
             'inspections' => $inspections,
         ]);
     }
@@ -32,8 +32,8 @@ class CPSecurityInspectionController extends Controller
     public function create()
     {
         $cekPoints = CekPointSecurity::all();
-        return Inertia::render('fire-safety/inspection/cekpoint/Create', [
-            'cekPoints' => $cekPoints,
+        return Inertia::render('cekpoint/Create', [
+            'cekpoints' => $cekPoints,
         ]);
     }
 
@@ -42,6 +42,8 @@ class CPSecurityInspectionController extends Controller
      */
     public function store(Request $request)
     {
+        ini_set('max_execution_time', 120); // tambah jadi 2 menit
+        ini_set('memory_limit', '256M');   // kalau ada gambar besar
         $fileName = 'patroli_' . time() . '.jpg';
 
         $validated = $request->validate([
@@ -89,7 +91,6 @@ class CPSecurityInspectionController extends Controller
                     $fail('The ' . $attribute . ' must be a valid base64 image.');
                 }
             }],
-            'tanggal_patroli' => ['nullable', 'date'],
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -122,7 +123,7 @@ class CPSecurityInspectionController extends Controller
 
         CPInspection::create($validated);
 
-        return redirect()->route('inspection.cekpoint.index')->with('success', 'Inspeksi Cekpoint Security berhasil ditambahkan.');
+        return redirect()->route('inspection.cp-security.index')->with('success', 'Inspeksi Cekpoint Security berhasil ditambahkan.');
     }
 
     /**
@@ -131,7 +132,7 @@ class CPSecurityInspectionController extends Controller
     public function show($id)
     {
         $inspection = CPInspection::with(['cekPoint', 'user.karyawan'])->findOrFail($id);
-        return Inertia::render('fire-safety/inspection/cekpoint/Show', [
+        return Inertia::render('cekpoint/Show', [
             'inspection' => $inspection,
         ]);
     }
@@ -143,7 +144,7 @@ class CPSecurityInspectionController extends Controller
     {
         $inspection = CPInspection::with(['cekPoint', 'user.karyawan'])->findOrFail($id);
         $cekPoints = CekPointSecurity::all();
-        return Inertia::render('fire-safety/inspection/cekpoint/Edit', [
+        return Inertia::render('cekpoint/Edit', [
             'inspection' => $inspection,
             'cekPoints' => $cekPoints,
         ]);
@@ -238,7 +239,7 @@ class CPSecurityInspectionController extends Controller
 
         $inspection->update($validated);
 
-        return redirect()->route('inspection.cekpoint.index')->with('success', 'Inspeksi Cekpoint Security berhasil diperbarui.');
+        return redirect()->route('inspection.cp-security.index')->with('success', 'Inspeksi Cekpoint Security berhasil diperbarui.');
     }
 
     /**
@@ -267,7 +268,7 @@ class CPSecurityInspectionController extends Controller
 
         $inspection->delete();
 
-        return redirect()->route('inspection.cekpoint.index')->with('success', 'Inspeksi Cekpoint Security berhasil dihapus.');
+        return redirect()->route('inspection.cp-security.index')->with('success', 'Inspeksi Cekpoint Security berhasil dihapus.');
     }
 
     public function rekap(Request $request)

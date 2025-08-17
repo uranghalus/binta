@@ -1,0 +1,118 @@
+import ConfirmDialog from '@/components/confirm-dialog'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { useForm } from '@inertiajs/react'
+import { TriangleAlert } from 'lucide-react'
+import React, { useState } from 'react'
+import { toast } from 'sonner'
+import { CPInspection } from '../data/CPData'
+
+
+interface Props {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  currentRow: CPInspection
+}
+
+export default function CPInspectionDeleteDialog({
+  open,
+  onOpenChange,
+  currentRow,
+}: Props) {
+
+  const [value, setValue] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const { delete: destroy, processing } = useForm()
+
+  const uniqueCode = currentRow.cek_point?.kode_cekpoint || `CP-${currentRow.id}`
+  const handleClose = () => {
+    setValue('')
+    setErrorMessage('')
+    onOpenChange(false)
+  }
+
+  const handleDelete = () => {
+    if (value !== uniqueCode) {
+      setErrorMessage('Kode unik tidak sesuai')
+      return
+    }
+    destroy(route('inspection.cp-security.destroy', currentRow.id), {
+      preserveScroll: true,
+      onSuccess: () => {
+        toast.success('Data Patroli berhasil dihapus', {
+          description: 'Data CP Inspection berhasil dihapus.',
+        })
+        setTimeout(() => {
+          handleClose()
+        }, 1000)
+      },
+    })
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value)
+    if (errorMessage) setErrorMessage('')
+  }
+
+  return (
+    <ConfirmDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      handleConfirm={handleDelete}
+      title={
+        <span className="text-destructive">
+          <TriangleAlert className="stroke-destructive mr-1 inline-block" size={18} />{' '}
+          Hapus Data Patroli
+        </span>
+      }
+      desc={
+        <span className="text-gray-500">
+          Apakah Anda yakin ingin menghapus data patroli di cekpoint{' '}
+          <span className="font-bold">{currentRow.cek_point?.lantai}</span>?
+        </span>
+      }
+      confirmText={processing ? 'Menghapus...' : 'Delete'}
+      destructive
+    >
+      <div className="grid gap-2">
+        <Label className="text-sm text-gray-500">
+          Untuk mengkonfirmasi, silakan ketik kode unik{' '}
+          <span className="font-bold">{uniqueCode}</span>:
+        </Label>
+        <Alert variant={'destructive'}>
+          <AlertTitle>Perhatian!</AlertTitle>
+          <AlertDescription>
+            Tolong berhati-hati, aksi ini tidak dapat dikembalikan.
+          </AlertDescription>
+        </Alert>
+        <Separator />
+        <div className="flex w-full items-center gap-2 rounded-md border border-red-300 bg-red-50 p-2 text-sm text-red-500">
+          <div className="text-sm">
+            Ketik Ini: <span className="font-bold">{uniqueCode}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Input field for confirmation */}
+      <div className="mt-4 space-y-2">
+        <Label htmlFor="confirmation" className="text-sm font-medium">
+          Ketik kode unik untuk mengkonfirmasi:
+        </Label>
+        <Input
+          type="text"
+          id="confirmation"
+          value={value}
+          onChange={handleChange}
+          className={`w-full ${errorMessage ? 'border-red-500' : ''}`}
+          placeholder={`Ketik "${uniqueCode}" untuk mengkonfirmasi penghapusan`}
+          disabled={processing}
+        />
+        {errorMessage && (
+          <p className="text-xs text-red-500">{errorMessage}</p>
+        )}
+      </div>
+    </ConfirmDialog>
+  )
+}

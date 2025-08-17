@@ -16,6 +16,7 @@ use App\Http\Controllers\OfficesController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Models\CPInspection;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -59,6 +60,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->names('inspection.cp-security');
         Route::get('apar-inspeksi/{id}', [InspectionController::class, 'aparinspeksi'])->name('apar.inspection');
         Route::get('hydrant-inspeksi/{id}', [InspectionController::class, 'hydrantinspeksi'])->name('hydrant.inspection');
+        Route::get('cekpoint-inspeksi/{id}', [CPSecurityInspectionController::class, 'cpinspeksi'])->name('cp.inspection');
         Route::get('scan', function () {
             return Inertia::render('inspection/react-scan');
         })->name('apar.scan');

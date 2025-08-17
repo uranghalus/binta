@@ -14,4 +14,8 @@ class CekPointSecurity extends Model
         'lantai',
         'area',
     ];
+    public function inspections()
+    {
+        return $this->hasMany(CPInspection::class, 'kode_cp');
+    }
 }
