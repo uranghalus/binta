@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import RadioInputWithOther from '@/components/radio-input-with-other';
-import { ChevronsUpDownIcon, LoaderIcon } from 'lucide-react';
+import { Camera, ChevronsUpDownIcon, LoaderIcon } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { toast } from 'sonner';
 import { SecurityData } from '../fire-safety/cekpoint-security/data/SecurityData';
@@ -81,7 +81,7 @@ export default function Create({ cekpoints }: Props) {
                             <div className="grid gap-2">
                                 <Label htmlFor="kode_cp">Check Point</Label>
                                 <Popover open={openCP} onOpenChange={setOpenCP}>
-                                    <PopoverTrigger asChild>
+                                    <PopoverTrigger asChild className='w-full'>
                                         <Button variant="outline" role="combobox" aria-expanded={openCP} className="w-full justify-between">
                                             {data.kode_cp
                                                 ? cekpoints.find((cp) => cp.id === Number(data.kode_cp))?.kode_cekpoint || 'Pilih Cek Point'
@@ -89,7 +89,7 @@ export default function Create({ cekpoints }: Props) {
                                             <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                         </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="p-0">
+                                    <PopoverContent className="p-0 w-full" align='end'>
                                         <Command>
                                             <CommandInput placeholder="Cari Cek Point..." />
                                             <CommandList>
@@ -116,7 +116,7 @@ export default function Create({ cekpoints }: Props) {
 
                             {/* Pilih Regu */}
                             <div className="grid gap-2">
-                                <Label htmlFor="regu">Regu</Label>
+                                <Label htmlFor="regu">Shift</Label>
                                 <Select
                                     value={data.regu}
                                     onValueChange={(value) => setData('regu', value as 'PAGI' | 'SIANG' | 'MALAM')}
@@ -128,25 +128,26 @@ export default function Create({ cekpoints }: Props) {
                                         <SelectItem value="PAGI">PAGI</SelectItem>
                                         <SelectItem value="SIANG">SIANG</SelectItem>
                                         <SelectItem value="MALAM">MALAM</SelectItem>
+                                        <SelectItem value="MIDDLE">MIDDLE</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             {/* Kondisi */}
                             <InputFotoField
-                                label="Kondisi"
+                                label="Kondisi Kebersihan"
                                 field="kondisi"
                                 fotoField="foto_kondisi"
                                 value={data.kondisi}
                                 fotoValue={data.foto_kondisi}
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_kondisi")}
-                                options={["Baik", "Tidak Baik"]}
+                                options={["Ya", "Tidak"]}
                             />
 
                             {/* Bocoran */}
                             <InputFotoField
-                                label="Bocoran"
+                                label="Bocoran/Genangan Air"
                                 field="bocoran"
                                 fotoField="foto_bocoran"
                                 value={data.bocoran}
@@ -165,9 +166,11 @@ export default function Create({ cekpoints }: Props) {
                                 fotoValue={data.foto_penerangan_lampu}
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_penerangan_lampu")}
-                                options={["Terang", "Redup", "Mati"]}
+                                options={["Hidup", "Mati"]}
                             />
 
+                        </div>
+                        <div className="space-y-4">
                             {/* Kerusakan Fasum */}
                             <InputFotoField
                                 label="Kerusakan Fasum"
@@ -270,7 +273,7 @@ function InputFotoField({
             />
             <div className="flex items-center gap-2">
                 <Button type="button" variant="outline" onClick={onOpen}>
-                    Ambil Foto
+                    Ambil Foto <Camera className="ml-1 h-4 w-4" />
                 </Button>
                 {fotoValue && (
                     <img

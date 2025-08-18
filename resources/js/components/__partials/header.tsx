@@ -4,28 +4,28 @@ import { Separator } from '../ui/separator';
 import { SidebarTrigger } from '../ui/sidebar';
 
 interface HeaderProps extends React.HTMLAttributes<HTMLElement> {
-    fixed?: boolean;
+    sticky?: boolean;
     ref?: Ref<HTMLElement>;
 }
-export const Header = ({ className, fixed, children, ...props }: HeaderProps) => {
+
+export const Header = ({ className, sticky, children, ...props }: HeaderProps) => {
     const [offset, setOffset] = useState(0);
+
     useEffect(() => {
         const onScroll = () => {
-            setOffset(document.body.scrollTop || document.documentElement.scrollTop);
+            setOffset(window.scrollY); // lebih konsisten
         };
 
-        // Add scroll listener to the body
-        document.addEventListener('scroll', onScroll, { passive: true });
-
-        // Clean up the event listener on unmount
-        return () => document.removeEventListener('scroll', onScroll);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
     }, []);
+
     return (
         <header
             className={cn(
-                'bg-background flex h-16 items-center gap-3 p-4 sm:gap-4',
-                fixed && 'header-fixed peer/header fixed z-50 w-[inherit] rounded-md',
-                offset > 10 && fixed ? 'shadow-sm' : 'shadow-none',
+                'bg-background flex h-16 items-center gap-3 p-4 sm:gap-4 transition-shadow',
+                sticky && 'sticky top-0 z-50 w-full', // pastikan full width
+                offset > 10 && sticky ? 'shadow-sm' : 'shadow-none',
                 className,
             )}
             {...props}
@@ -36,4 +36,5 @@ export const Header = ({ className, fixed, children, ...props }: HeaderProps) =>
         </header>
     );
 };
+
 Header.displayName = 'Header';

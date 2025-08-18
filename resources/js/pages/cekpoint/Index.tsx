@@ -19,7 +19,7 @@ export default function Index({ inspections }: Props) {
     <AppLayout title="Inspeksi Cekpoint">
       <Head title="Inspeksi Cekpoint" />
       <DialogProvider>
-        <div className="mb-2 flex flex-wrap items-center justify-between space-y-2">
+        <div className="mb-2 flex flex-wrap items-center justify-between space-y-2 ">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Data Inspeksi Cekpoint</h2>
             <p className="text-muted-foreground">
