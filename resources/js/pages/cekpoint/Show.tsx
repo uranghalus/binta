@@ -75,7 +75,11 @@ export default function ShowInspectionCekpoint({ inspection }: Props) {
                             </div>
                             <div className="grid gap-1">
                                 <Label className="text-sm font-bold">Tanggal Patroli</Label>
-                                <div className="text-muted-foreground">{inspection.tanggal_patroli}</div>
+                                <div className="text-muted-foreground">
+                                    {inspection.tanggal_patroli
+                                        ? new Date(inspection.tanggal_patroli).toLocaleString('id-ID')
+                                        : '-'}
+                                </div>
                             </div>
                         </div>
                     </div>

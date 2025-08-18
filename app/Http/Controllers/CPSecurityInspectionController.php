@@ -159,55 +159,27 @@ class CPSecurityInspectionController extends Controller
 
         $validated = $request->validate([
             'kode_cp' => ['required', 'exists:cek_point_security,id'],
-            'regu'    => ['required', Rule::in(['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])],
+            'regu'    => ['required', 'in:PAGI,SIANG,MALAM,MIDDLE'],
             'kondisi' => ['nullable', 'string', 'max:150'],
-            'foto_kondisi' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
+            'foto_kondisi' => ['nullable', 'string'],
             'bocoran' => ['nullable', 'string', 'max:150'],
-            'foto_bocoran' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
+            'foto_bocoran' => ['nullable', 'string'],
             'penerangan_lampu' => ['nullable', 'string', 'max:150'],
-            'foto_penerangan_lampu' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
+            'foto_penerangan_lampu' => ['nullable', 'string'],
             'kerusakan_fasum' => ['nullable', 'string', 'max:150'],
-            'foto_kerusakan_fasum' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
+            'foto_kerusakan_fasum' => ['nullable', 'string'],
             'potensi_bahaya_api' => ['nullable', 'string', 'max:150'],
-            'foto_potensi_bahaya_api' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
+            'foto_potensi_bahaya_api' => ['nullable', 'string'],
             'potensi_bahaya_keorang' => ['nullable', 'string', 'max:150'],
-            'foto_potensi_bahaya_keorang' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
+            'foto_potensi_bahaya_keorang' => ['nullable', 'string'],
             'orang_mencurigakan' => ['nullable', 'string', 'max:150'],
-            'foto_orang_mencurigakan' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
+            'foto_orang_mencurigakan' => ['nullable', 'string'],
             'tanggal_patroli' => ['nullable', 'date'],
         ]);
 
         $validated['user_id'] = Auth::id();
 
-        // Update images if changed
+        // foto fields
         foreach (
             [
                 'foto_kondisi',
@@ -216,26 +188,28 @@ class CPSecurityInspectionController extends Controller
                 'foto_kerusakan_fasum',
                 'foto_potensi_bahaya_api',
                 'foto_potensi_bahaya_keorang',
-                'foto_orang_mencurigakan'
+                'foto_orang_mencurigakan',
             ] as $fotoField
         ) {
             if ($request->filled($fotoField) && Str::startsWith($request->$fotoField, 'data:image/')) {
-                // Delete old photo if exists
-                if ($inspection->$fotoField && Storage::disk('s3')->exists($inspection->$fotoField)) {
-                    Storage::disk('s3')->delete($inspection->$fotoField);
-                }
                 $imageData = explode(',', $request->$fotoField)[1];
                 $decodedImage = base64_decode($imageData);
                 $image = Image::read($decodedImage);
+
                 if ($image->width() > 1200) {
                     $image->resize(1200, null);
                 }
+
                 $compressed = $image->toJpeg(75);
                 $path = "inspection/cekpoint/{$fotoField}_" . time() . ".jpg";
                 Storage::disk('s3')->put($path, (string) $compressed);
                 $validated[$fotoField] = $path;
+            } else {
+                // jika tidak upload baru → tetap pakai foto lama
+                unset($validated[$fotoField]);
             }
         }
+
 
         $inspection->update($validated);
 
