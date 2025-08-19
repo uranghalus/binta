@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Apar;
+use App\Models\CPInspection;
 use App\Models\Hydrant;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -22,6 +23,13 @@ class InspectionController extends Controller
         $inspection = Hydrant::findOrFail($id);
         return Inertia::render('inspection/hydrant', [
             'hydrantData' => $inspection
+        ]);
+    }
+    public function cpinspeksi($id)
+    {
+        $inspection = CPInspection::findOrFail($id);
+        return Inertia::render('inspection/cekpoint', [
+            'cekpointData' => $inspection
         ]);
     }
 }

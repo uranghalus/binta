@@ -60,7 +60,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->names('inspection.cp-security');
         Route::get('apar-inspeksi/{id}', [InspectionController::class, 'aparinspeksi'])->name('apar.inspection');
         Route::get('hydrant-inspeksi/{id}', [InspectionController::class, 'hydrantinspeksi'])->name('hydrant.inspection');
-        Route::get('cekpoint-inspeksi/{id}', [CPSecurityInspectionController::class, 'cpinspeksi'])->name('cp.inspection');
+        Route::get('cekpoint-inspeksi/{id}', [InspectionController::class, 'cpinspeksi'])->name('cp.inspection');
         Route::get('scan', function () {
             return Inertia::render('inspection/react-scan');
         })->name('apar.scan');
