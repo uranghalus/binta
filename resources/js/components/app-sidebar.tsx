@@ -22,7 +22,9 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                 if (item.title === 'Data Master') {
                     return HasAnyPermission(['users index', 'karyawan index']);
                 }
-
+                if (item.title === "Data Fire Safety") {
+                    return HasAnyPermission(['apar index', 'hydrant index', 'cekpoin index']);
+                }
                 // Default tampilkan semua menu lainnya
                 return true;
             });

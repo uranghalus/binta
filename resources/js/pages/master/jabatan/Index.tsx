@@ -17,6 +17,8 @@ interface Props {
 }
 
 export default function JabatanIndex({ jabatans, departments }: Props) {
+    console.log('JabatanIndex jabatans:', jabatans);
+
     return (
         <AppLayout title="Master Jabatan">
             <Head title="Master Jabatan" />

@@ -52,4 +52,15 @@ class User extends Authenticatable
     {
         return $this->getAllPermissions()->mapWithKeys(fn($permission) => [$permission['name'] => true]);
     }
+    // 👇 tambahkan ini
+    protected static function booted()
+    {
+        static::updated(function ($karyawan) {
+            // cek kalau jabatan_id berubah & ada user terhubung
+            if ($karyawan->isDirty('jabatan_id') && $karyawan->user) {
+                $newRoles = $karyawan->jabatan->roles ?? [];
+                $karyawan->user->syncRoles($newRoles);
+            }
+        });
+    }
 }

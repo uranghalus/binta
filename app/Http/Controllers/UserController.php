@@ -45,7 +45,7 @@ class UserController extends Controller
         ]);
 
         // Ambil data karyawan
-        $karyawan = Karyawan::where('id_karyawan', $validated['karyawan_id'])->firstOrFail();
+        $karyawan = Karyawan::with('jabatan')->findOrFail($validated['karyawan_id']);
 
         // Validasi tambahan jika no_ktp kosong
         if (!$karyawan->no_ktp) {
@@ -56,8 +56,12 @@ class UserController extends Controller
         $user = User::create([
             'karyawan_id' => $karyawan->id_karyawan,
             'email' => $this->generateEmailFromKaryawan($karyawan), // bisa custom sesuai kebutuhan
-            'password' => $karyawan->no_ktp,
+            'password' => 'dm1234',
         ]);
+
+        if (!empty($karyawan->jabatan->roles)) {
+            $user->assignRole($karyawan->jabatan->roles);
+        }
 
         return redirect()->route('pengguna.index')->with('success', 'User berhasil dibuat.');
     }
