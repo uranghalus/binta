@@ -41,9 +41,12 @@ class JabatanController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'nama_jabatan' => 'required|string|max:255',
             'roles' => 'nullable|array',
-            'roles.*' => 'string|exist:roles,name'
+            'roles.*' => 'string|exists:roles,name'
         ]);
-        $jabatan = Jabatan::create($validated);
+        $jabatan = Jabatan::create([
+            'nama_jabatan' => $validated['nama_jabatan'],
+            'roles'        => $validated['roles'] ?? [],
+        ]);
         return redirect()->back()->with('success', 'Jabatan created successfully.');
     }
 
