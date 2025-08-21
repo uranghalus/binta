@@ -88,7 +88,7 @@ export const sidebarData: SidebarData = {
                         },
                         {
                             title: 'Inspeksi Cekpoint',
-                            url: '/inspection/cekpoint-inspeksi',
+                            url: '/inspection/cekpoint-security',
                         },
                     ],
                 },

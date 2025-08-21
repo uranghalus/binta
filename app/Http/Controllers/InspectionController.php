@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Apar;
+use App\Models\CekPointSecurity;
 use App\Models\CPInspection;
 use App\Models\Hydrant;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class InspectionController extends Controller
     }
     public function cpinspeksi($id)
     {
-        $inspection = CPInspection::findOrFail($id);
+        $inspection = CekPointSecurity::findOrFail($id);
         return Inertia::render('inspection/cekpoint', [
             'cekpointData' => $inspection
         ]);

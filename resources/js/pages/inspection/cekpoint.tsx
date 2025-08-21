@@ -20,7 +20,7 @@ export default function Cekpoint({ cekpointData }: Props) {
 
 
     const { data, setData, post, processing, reset, errors } = useForm({
-        kode_cp: "",
+        kode_cp: String(cekpointData.id), // langsung isi
         regu: "PAGI",
         kondisi: "",
         foto_kondisi: "",
@@ -47,6 +47,8 @@ export default function Cekpoint({ cekpointData }: Props) {
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log('Data', data);
+
         post(route('inspection.cp-security.store'), {
             forceFormData: true,
             onSuccess: () => {
@@ -55,7 +57,6 @@ export default function Cekpoint({ cekpointData }: Props) {
             },
             onError: () => {
                 toast.error('Gagal menambahkan data!', { description: 'Data CP Inspection gagal disimpan.' });
-                console.log(errors);
             },
             preserveScroll: true,
         });
@@ -90,7 +91,11 @@ export default function Cekpoint({ cekpointData }: Props) {
                                     <Label className="text-sm font-bold">Lantai</Label>
                                     <div className="text-muted-foreground">{cekpointData.lantai}</div>
                                 </div>
-                                <Input type="hidden" value={String(cekpointData.id)} onChange={(e) => setData('kode_cp', e.target.value)} />
+                                <Input
+                                    type="hidden"
+                                    name="kode_cp"
+                                    value={data.kode_cp}
+                                />
                             </div>
 
                             {/* Pilih Regu */}
@@ -110,6 +115,7 @@ export default function Cekpoint({ cekpointData }: Props) {
                                         <SelectItem value="MIDDLE">MIDDLE</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                {errors.regu && <p className="text-xs text-red-500">{errors.regu}</p>}
                             </div>
 
                             {/* Kondisi */}
@@ -122,6 +128,7 @@ export default function Cekpoint({ cekpointData }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_kondisi")}
                                 options={["Ya", "Tidak"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Bocoran */}
@@ -134,6 +141,7 @@ export default function Cekpoint({ cekpointData }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_bocoran")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Penerangan Lampu */}
@@ -146,6 +154,7 @@ export default function Cekpoint({ cekpointData }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_penerangan_lampu")}
                                 options={["Hidup", "Mati"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                         </div>
@@ -160,6 +169,7 @@ export default function Cekpoint({ cekpointData }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_kerusakan_fasum")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Potensi Bahaya Api */}
@@ -172,6 +182,7 @@ export default function Cekpoint({ cekpointData }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_potensi_bahaya_api")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Potensi Bahaya Keorang */}
@@ -184,6 +195,7 @@ export default function Cekpoint({ cekpointData }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_potensi_bahaya_keorang")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Orang Mencurigakan */}
@@ -196,6 +208,7 @@ export default function Cekpoint({ cekpointData }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_orang_mencurigakan")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
                         </div>
                     </form>
@@ -231,6 +244,7 @@ function InputFotoField({
     setData,
     onOpen,
     options,
+    errors
 }: {
     label: string;
     field: string;
@@ -240,6 +254,7 @@ function InputFotoField({
     setData: (field: string, value: any) => void;
     onOpen: () => void;
     options: string[];
+    errors: Record<string, string>;   // <<<<< tambahkan
 }) {
     return (
         <div className="space-y-2">
@@ -250,6 +265,7 @@ function InputFotoField({
                 onChange={(val) => setData(field, val)}
                 options={options}
             />
+            {errors[field] && <p className="text-xs text-red-500">{errors[field]}</p>}
             <div className="flex items-center gap-2">
                 <Button type="button" variant="outline" onClick={onOpen}>
                     Ambil Foto <Camera className="ml-1 h-4 w-4" />

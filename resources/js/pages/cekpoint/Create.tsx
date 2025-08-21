@@ -60,7 +60,6 @@ export default function Create({ cekpoints }: Props) {
             },
             onError: () => {
                 toast.error('Gagal menambahkan data!', { description: 'Data CP Inspection gagal disimpan.' });
-                console.log(errors);
             },
             preserveScroll: true,
         });
@@ -131,6 +130,7 @@ export default function Create({ cekpoints }: Props) {
                                         <SelectItem value="MIDDLE">MIDDLE</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                {errors.regu && <p className="text-xs text-red-500">{errors.regu}</p>}
                             </div>
 
                             {/* Kondisi */}
@@ -143,6 +143,7 @@ export default function Create({ cekpoints }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_kondisi")}
                                 options={["Ya", "Tidak"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Bocoran */}
@@ -155,6 +156,7 @@ export default function Create({ cekpoints }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_bocoran")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Penerangan Lampu */}
@@ -167,6 +169,7 @@ export default function Create({ cekpoints }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_penerangan_lampu")}
                                 options={["Hidup", "Mati"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                         </div>
@@ -181,6 +184,7 @@ export default function Create({ cekpoints }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_kerusakan_fasum")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Potensi Bahaya Api */}
@@ -193,6 +197,7 @@ export default function Create({ cekpoints }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_potensi_bahaya_api")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Potensi Bahaya Keorang */}
@@ -205,6 +210,7 @@ export default function Create({ cekpoints }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_potensi_bahaya_keorang")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
 
                             {/* Orang Mencurigakan */}
@@ -217,6 +223,7 @@ export default function Create({ cekpoints }: Props) {
                                 setData={setData}
                                 onOpen={() => setOpenModal("foto_orang_mencurigakan")}
                                 options={["Ada", "Tidak Ada"]}
+                                errors={errors}   // <<<<< tambahkan ini
                             />
                         </div>
                     </form>
@@ -252,6 +259,7 @@ function InputFotoField({
     setData,
     onOpen,
     options,
+    errors
 }: {
     label: string;
     field: string;
@@ -261,6 +269,7 @@ function InputFotoField({
     setData: (field: string, value: any) => void;
     onOpen: () => void;
     options: string[];
+    errors: Record<string, string>;   // <<<<< tambahkan
 }) {
     return (
         <div className="space-y-2">
@@ -271,6 +280,7 @@ function InputFotoField({
                 onChange={(val) => setData(field, val)}
                 options={options}
             />
+            {errors[field] && <p className="text-xs text-red-500">{errors[field]}</p>}
             <div className="flex items-center gap-2">
                 <Button type="button" variant="outline" onClick={onOpen}>
                     Ambil Foto <Camera className="ml-1 h-4 w-4" />
