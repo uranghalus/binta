@@ -25,6 +25,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
             $table->enum('regu', ['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])->default('PAGI');
 
+            $table->string('nama_petugas', 150)->nullable(); // Bisa input bebas
             $table->string('kondisi', 150)->nullable(); // Bisa input bebas
             $table->string('foto_kondisi', 150)->nullable(); // Bisa input bebas
             $table->string('bocoran', 150)->nullable(); // Bisa input bebas

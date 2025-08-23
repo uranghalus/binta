@@ -21,6 +21,7 @@ class AparInspection extends Model
         'kondisi',
         'catatan',
         'foto_apar',
+        'nama_petugas',
         // 'tanggal_inspeksi',
         'tanggal_refill'
     ];

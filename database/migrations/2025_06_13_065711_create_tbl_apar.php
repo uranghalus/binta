@@ -37,6 +37,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('apar_id')->nullable()->constrained('apar')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
+            $table->string('nama_petugas', 150)->nullable(); // Bisa input bebas
             $table->enum('regu', ['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])->default('PAGI');
             $table->date('tanggal_kadaluarsa')->nullable(); // Bisa kosong jika tidak ada
             $table->date('tanggal_refill')->nullable(); // Bisa kosong jika tidak ada
@@ -53,7 +54,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Pemeriksa
             $table->enum('regu', ['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])->default('PAGI');
             // Kolom fleksibel untuk input bebas (tanpa enum)
-
+            $table->string('nama_petugas', 150)->nullable(); // Bisa input bebas
             $table->string('valve_machino_coupling', 150)->nullable();
             $table->string('fire_hose_machino_coupling', 150)->nullable();
             $table->string('selang_hydrant', 150)->nullable();

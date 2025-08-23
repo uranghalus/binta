@@ -14,6 +14,7 @@ class CPInspection extends Model
         'kode_cp',
         'user_id',
         'regu',
+        'nama_petugas',
         'kondisi',
         'foto_kondisi',
         'bocoran',

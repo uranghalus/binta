@@ -50,6 +50,7 @@ class CPSecurityInspectionController extends Controller
             'kode_cp' => ['required', 'exists:cek_point_security,id'],
             'regu'    => ['required', Rule::in(['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])],
             'kondisi' => ['nullable', 'string', 'max:150'],
+            'nama_petugas' => ['required', 'string', 'max:150'],
             'foto_kondisi' => ['nullable', function ($attribute, $value, $fail) {
                 if ($value && !Str::startsWith($value, 'data:image')) {
                     $fail('The ' . $attribute . ' must be a valid base64 image.');

@@ -5,6 +5,7 @@ export interface AparInspection {
     apar_id: number;
     user_id: number | null;
     regu: 'Regu A' | 'Regu B' | 'Regu C' | 'MIDDLE';
+    nama_petugas: string;
     tanggal_kadaluarsa: string | null; // format: 'YYYY-MM-DD' atau null
     tanggal_refill: string | null;
     kondisi: string | null;

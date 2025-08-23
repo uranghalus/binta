@@ -60,6 +60,7 @@ class HydrantInspectionController extends Controller implements HasMiddleware
 
         $validated = $request->validate([
             'hydrant_id' => ['required', 'exists:hydrant,id'],
+            'nama_petugas' => ['required', 'string', 'max:150'],
             'regu'       => ['required', Rule::in(['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])],
             'valve_machino_coupling'     => ['nullable', 'string', 'max:150'],
             'fire_hose_machino_coupling' => ['nullable', 'string', 'max:150'],
@@ -146,6 +147,7 @@ class HydrantInspectionController extends Controller implements HasMiddleware
             'hydrant_id' => ['required', 'exists:hydrant,id'],
             'regu'       => ['required', Rule::in(['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])],
             'valve_machino_coupling'     => ['nullable', 'string', 'max:150'],
+            'nama_petugas' => ['required', 'string', 'max:150'],
             'fire_hose_machino_coupling' => ['nullable', 'string', 'max:150'],
             'selang_hydrant'             => ['nullable', 'string', 'max:150'],
             'noozle_hydrant'             => ['nullable', 'string', 'max:150'],

@@ -14,6 +14,7 @@ class HydrantInspection extends Model
     protected $fillable = [
         'hydrant_id',
         'user_id',
+        'nama_petugas',
         'regu',
         'valve_machino_coupling',
         'fire_hose_machino_coupling',

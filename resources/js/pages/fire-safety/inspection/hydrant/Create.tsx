@@ -22,6 +22,7 @@ export default function Create({ hydrants }: Props) {
     const { post, processing, reset, data, setData, errors } = useForm<{
         hydrant_id: string;
         regu: 'PAGI' | 'MIDDLE' | 'SIANG' | 'MALAM';
+        nama_petugas: string;
         tanggal_inspeksi: string;
         valve_machino_coupling: string;
         fire_hose_machino_coupling: string;
@@ -34,6 +35,7 @@ export default function Create({ hydrants }: Props) {
         foto_hydrant: string | null;
     }>({
         hydrant_id: '',
+        nama_petugas: '',
         regu: 'PAGI',
         tanggal_inspeksi: '',
         valve_machino_coupling: '',
@@ -113,6 +115,19 @@ export default function Create({ hydrants }: Props) {
                                     </PopoverContent>
                                 </Popover>
                                 {errors.hydrant_id && <p className="text-xs text-red-500">{errors.hydrant_id}</p>}
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="nama_petugas">Nama Petugas</Label>
+                                <input
+                                    type="text"
+                                    name="nama_petugas"
+                                    id="nama_petugas"
+                                    value={data.nama_petugas}
+                                    onChange={(e) => setData('nama_petugas', e.target.value)}
+                                    className="w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
+                                    placeholder="Masukkan nama petugas"
+                                />
+                                {errors.nama_petugas && <p className="text-xs text-red-500">{errors.nama_petugas}</p>}
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="regu">Regu</Label>

@@ -6,6 +6,7 @@ export interface HydrantInspectionsc {
     hydrant_id: number | null;
     user_id: number | null;
     regu: 'Regu A' | 'Regu B' | 'Regu C' | 'MIDDLE';
+    nama_petugas: string;
     valve_machino_coupling?: string | null;
     fire_hose_machino_coupling?: string | null;
     selang_hydrant?: string | null;

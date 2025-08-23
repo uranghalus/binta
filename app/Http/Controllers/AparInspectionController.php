@@ -64,6 +64,7 @@ class AparInspectionController extends Controller implements HasMiddleware
             'tanggal_refill'     => ['required', 'date'],
             'kondisi'            => ['required', 'string', 'max:150'],
             'catatan'            => ['required', 'string'],
+            'nama_petugas'  => ['required', 'string', 'max:150'],
             'foto_apar'          => ['required', function ($attribute, $value, $fail) {
                 if (!Str::startsWith($value, 'data:image')) {
                     $fail('The ' . $attribute . ' must be a valid base64 image.');
