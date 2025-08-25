@@ -7,6 +7,7 @@ import { AparColumn } from './components/apar-columns';
 import AparDialog from './components/apar-dialogs';
 import AparTable from './components/apar-table';
 import { Apar } from './data/aparSchema';
+import HasAnyPermission from '@/lib/permission';
 
 interface Props {
     apar: Apar[];
@@ -22,21 +23,22 @@ export default function index({ apar }: Props) {
                         <p className="text-muted-foreground">Pengelolaan data APAR</p>
                     </div>
                     {/* <CrudPrimaryButton title="Tambah Apar" /> */}
-                    <div className="flex items-center gap-4">
-                        {' '}
-                        <Button asChild variant={'outline'}>
-                            <Link href={route('apar.upload')} className="space-x-1">
-                                <span>Import Apar</span>
-                                <Upload className="size-4" />
-                            </Link>
-                        </Button>
-                        <Button asChild>
-                            <Link href={route('apar.create')} className="space-x-1">
-                                <span>Tambah Apar</span>
-                                <Plus className="size-4" />
-                            </Link>
-                        </Button>
-                    </div>
+                    {HasAnyPermission(['apar create']) && (
+                        <div className="flex items-center gap-4">
+                            <Button asChild variant={'outline'}>
+                                <Link href={route('apar.upload')} className="space-x-1">
+                                    <span>Import Apar</span>
+                                    <Upload className="size-4" />
+                                </Link>
+                            </Button>
+                            <Button asChild>
+                                <Link href={route('apar.create')} className="space-x-1">
+                                    <span>Tambah Apar</span>
+                                    <Plus className="size-4" />
+                                </Link>
+                            </Button>
+                        </div>
+                    )}
                 </div>
                 <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
                     <AparTable columns={AparColumn} data={apar} />

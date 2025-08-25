@@ -27,6 +27,7 @@ export default function Create({ cekpoints }: Props) {
     const { data, setData, post, processing, reset, errors } = useForm({
         kode_cp: "",
         regu: "PAGI",
+        nama_petugas: "",
         kondisi: "",
         foto_kondisi: "",
         bocoran: "",
@@ -132,7 +133,19 @@ export default function Create({ cekpoints }: Props) {
                                 </Select>
                                 {errors.regu && <p className="text-xs text-red-500">{errors.regu}</p>}
                             </div>
-
+                            <div className="grid gap-2">
+                                <Label htmlFor="nama_petugas">Nama Petugas</Label>
+                                <input
+                                    type="text"
+                                    name="nama_petugas"
+                                    id="nama_petugas"
+                                    value={data.nama_petugas}
+                                    onChange={(e) => setData('nama_petugas', e.target.value)}
+                                    className="w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
+                                    placeholder="Masukkan nama petugas"
+                                />
+                                {errors.nama_petugas && <p className="text-xs text-red-500">{errors.nama_petugas}</p>}
+                            </div>
                             {/* Kondisi */}
                             <InputFotoField
                                 label="Kondisi Kebersihan"

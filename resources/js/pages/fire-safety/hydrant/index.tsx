@@ -27,7 +27,7 @@ export default function index({ hydrantdata }: Props) {
                         <h2 className="text-2xl font-bold tracking-tight">Data Hydrant</h2>
                         <p className="text-muted-foreground">Pengelolaan data Hydrant</p>
                     </div>
-                    {HasAnyPermission(['permissions create']) && (
+                    {HasAnyPermission(['hydrant create']) && (
                         <div className="space-x-2">
                             <Button asChild variant={'outline'}>
                                 <Link href={route('hydrant.upload')} className="space-x-1">

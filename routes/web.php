@@ -55,9 +55,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('hydrant', HydrantInspectionController::class)
             ->parameters(['hydrant' => 'id'])
             ->names('inspection.hydrant');
+
         Route::resource('cekpoint-security', CPSecurityInspectionController::class)
             ->parameters(['cp-security' => 'id'])
-            ->names('inspection.cp-security');
+            ->names('inspection.cp-security')
+        ;
         Route::get('apar-inspeksi/{id}', [InspectionController::class, 'aparinspeksi'])->name('apar.inspection');
         Route::get('hydrant-inspeksi/{id}', [InspectionController::class, 'hydrantinspeksi'])->name('hydrant.inspection');
         Route::get('cekpoint-inspeksi/{id}', [InspectionController::class, 'cpinspeksi'])->name('cp.inspection');
