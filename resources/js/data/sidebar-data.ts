@@ -107,6 +107,11 @@ export const sidebarData: SidebarData = {
                     url: '/reports/hydrant-rekap',
                     icon: FilesIcon,
                 },
+                {
+                    title: 'Laporan Rekap Cekpoint',
+                    url: '/reports/cekpoint-rekap',
+                    icon: FilesIcon,
+                },
             ],
         },
         // {

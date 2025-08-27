@@ -40,6 +40,8 @@ return new class extends Migration
             $table->string('foto_potensi_bahaya_keorang', 150)->nullable(); // Bisa input bebas
             $table->string('orang_mencurigakan', 150)->nullable(); // Bisa input bebas
             $table->string('foto_orang_mencurigakan', 150)->nullable(); // Bisa input bebas
+            $table->string('kondisi_lain', 150)->nullable(); // Bisa input bebas
+            $table->string('foto_kondisi_lain', 150)->nullable(); // Bisa input bebas
             $table->timestamp('tanggal_patroli')->default(now());
             $table->timestamps();
         });

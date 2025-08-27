@@ -41,7 +41,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                     return HasAnyPermission(['apar index', 'hydrant index', 'cekpoint index']);
                 }
                 if ((item.title === 'Laporan Rekap Apar') || (item.title === 'Laporan Rekap Hydrant') || (item.title === 'Laporan Rekap Cekpoint')) {
-                    return HasAnyPermission(['apar rekap index', 'hydrant rekap index', 'cekpoin rekap index']);
+                    return HasAnyPermission(['apar rekap index', 'hydrant rekap index', 'cekpoint rekap index']);
                 }
                 // Default tampilkan semua menu lainnya
                 return true;

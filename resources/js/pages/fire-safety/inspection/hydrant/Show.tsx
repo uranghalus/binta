@@ -70,7 +70,7 @@ export default function ShowHydrantInspection({ inspection }: Props) {
                             <Separator />
                             <div className="grid gap-1">
                                 <Label className="text-sm font-bold">Nama Petugas</Label>
-                                <div className="text-muted-foreground">{inspection.user?.karyawan?.nama}</div>
+                                <div className="text-muted-foreground">{inspection.user?.karyawan.nama} - {inspection.nama_petugas}</div>
                             </div>
                             <div className="grid gap-1">
                                 <Label className="text-sm font-bold">Shift</Label>

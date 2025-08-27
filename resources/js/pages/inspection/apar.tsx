@@ -26,6 +26,7 @@ export default function apar({ aparData }: Props) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const { post, processing, reset, data, setData, errors } = useForm<{
         apar_id: string;
+        nama_petugas: string;
         regu: string;
         tanggal_kadaluarsa: string;
         tanggal_refill: string;
@@ -35,6 +36,7 @@ export default function apar({ aparData }: Props) {
     }>({
         apar_id: '',
         regu: ['PAGI', 'SIANG', 'MALAM', 'MIDDLE'][0],
+        nama_petugas: '',
         tanggal_kadaluarsa: '',
         tanggal_refill: '',
         kondisi: '',
@@ -114,6 +116,19 @@ export default function apar({ aparData }: Props) {
                                     </SelectContent>
                                 </Select>
                                 {errors.regu && <p className="text-xs text-red-500">{errors.regu}</p>}
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="nama_petugas">Nama Petugas</Label>
+                                <input
+                                    type="text"
+                                    name="nama_petugas"
+                                    id="nama_petugas"
+                                    value={data.nama_petugas}
+                                    onChange={(e) => setData('nama_petugas', e.target.value)}
+                                    className="w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
+                                    placeholder="Masukkan nama petugas"
+                                />
+                                {errors.nama_petugas && <p className="text-xs text-red-500">{errors.nama_petugas}</p>}
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="tanggal_kadaluarsa">Tanggal Kadaluarsa</Label>

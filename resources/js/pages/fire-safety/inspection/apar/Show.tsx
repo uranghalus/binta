@@ -75,7 +75,7 @@ export default function Show({ aparData }: Props) {
                             <Separator />
                             <div className="grid gap-1">
                                 <Label className="text-sm font-bold">Nama Petugas</Label>
-                                <div className="text-muted-foreground">{aparData.user?.karyawan.nama}</div>
+                                <div className="text-muted-foreground">{aparData.user?.karyawan.nama} - {aparData.nama_petugas}</div>
                             </div>
                             <div className="grid gap-1">
                                 <Label className="text-sm font-bold">Regu</Label>
