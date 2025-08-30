@@ -43,9 +43,9 @@ export default function Create({ aparData }: Props) {
         catatan: '',
         foto_apar: null,
     });
-    const handleCapture = (image: string) => {
-        setData('foto_apar', image); // base64 image
-        setPreviewUrl(image);
+    const handleCapture = (file: File) => {
+        setData('foto_apar', file);
+        setPreviewUrl(URL.createObjectURL(file));
     };
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

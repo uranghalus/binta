@@ -57,7 +57,6 @@ class HydrantInspectionController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $fileName = 'inspeksi_' . time() . '.jpg';
-
         $validated = $request->validate([
             'hydrant_id' => ['required', 'exists:hydrant,id'],
             'nama_petugas' => ['required', 'string', 'max:150'],
@@ -70,33 +69,38 @@ class HydrantInspectionController extends Controller implements HasMiddleware
             'kunci_box_hydrant'          => ['nullable', 'string', 'max:150'],
             'box_hydrant'                => ['nullable', 'string', 'max:150'],
             'alarm'                      => ['nullable', 'string', 'max:150'],
-            'foto_hydrant' => ['required', function ($attribute, $value, $fail) {
-                if (!Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
+            'foto_hydrant' => ['required'], // bisa base64 atau file
         ]);
-        // Format regu
         $validated['regu'] = str_replace('REGU ', 'Regu ', $validated['regu']);
         $validated['user_id'] = Auth::id();
-
-        // === Handle base64 image ===
-        if ($request->filled('foto_hydrant') && Str::startsWith($request->foto_hydrant, 'data:image/')) {
-            $imageData = explode(',', $request->foto_hydrant)[1]; // Remove base64 header
-            $decodedImage = base64_decode($imageData);
-
-            // Kompres dengan Intervention Image
-            $image = Image::read($decodedImage);
-
+        // === Case 1: Jika kirim File ===
+        if ($request->hasFile('foto_hydrant')) {
+            $file = $request->file('foto_hydrant');
+            // Kompres pakai Intervention Image
+            $image = Image::read($file);
             if ($image->width() > 1200) {
-                $image->resize(1200, null);
+                $image->resize(1200, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
             }
-
             $compressed = $image->toJpeg(75);
-
             $path = "inspection/hydrant/{$fileName}";
             Storage::disk('s3')->put($path, (string) $compressed);
-
+            $validated['foto_hydrant'] = $path;
+        }
+        // === Case 2: Jika kirim Base64 ===
+        elseif ($request->filled('foto_hydrant') && Str::startsWith($request->foto_hydrant, 'data:image/')) {
+            $imageData = explode(',', $request->foto_hydrant)[1];
+            $decodedImage = base64_decode($imageData);
+            $image = Image::read($decodedImage);
+            if ($image->width() > 1200) {
+                $image->resize(1200, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            }
+            $compressed = $image->toJpeg(75);
+            $path = "inspection/hydrant/{$fileName}";
+            Storage::disk('s3')->put($path, (string) $compressed);
             $validated['foto_hydrant'] = $path;
         }
         Log::info('Storing Hydrant Inspection', [

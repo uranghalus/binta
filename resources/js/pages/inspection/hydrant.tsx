@@ -30,7 +30,7 @@ export default function hydrant({ hydrantData }: Props) {
         kunci_box_hydrant: string;
         box_hydrant: string;
         alarm: string;
-        foto_hydrant: File | null;
+        foto_hydrant: File | null | string;
     }>({
         hydrant_id: '',
         regu: 'PAGI',
@@ -52,8 +52,8 @@ export default function hydrant({ hydrantData }: Props) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hydrantData]);
-    const handleCapture = (image: string) => {
-        setData('foto_hydrant', image); // base64 image
+    const handleCapture = (file: File) => {
+        setData('foto_hydrant', file);
     };
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
