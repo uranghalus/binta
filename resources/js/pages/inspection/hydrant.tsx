@@ -72,7 +72,7 @@ export default function hydrant({ hydrantData }: Props) {
         });
     };
     return (
-        <AppLayout title="Form Inspeksi Hydrant">
+        <AppLayout title="Form Inspeksi Hydrant" >
             <Head title="Form Inspeksi Hydrant" />
             <Card>
                 <CardHeader>
@@ -153,7 +153,6 @@ export default function hydrant({ hydrantData }: Props) {
                             onChange={(val) => setData('valve_machino_coupling', val)}
                             error={errors.valve_machino_coupling}
                         />
-
                         <RadioInputWithOther
                             label="Fire Hose Machino Coupling"
                             name="fire_hose_machino_coupling"
@@ -161,7 +160,6 @@ export default function hydrant({ hydrantData }: Props) {
                             onChange={(val) => setData('fire_hose_machino_coupling', val)}
                             error={errors.fire_hose_machino_coupling}
                         />
-
                         <RadioInputWithOther
                             label="Kunci Box Hydrant"
                             name="kunci_box_hydrant"
@@ -169,7 +167,6 @@ export default function hydrant({ hydrantData }: Props) {
                             onChange={(val) => setData('kunci_box_hydrant', val)}
                             error={errors.kunci_box_hydrant}
                         />
-
                         <RadioInputWithOther
                             label="Kaca Box Hydrant"
                             name="kaca_box_hydrant"
@@ -184,7 +181,6 @@ export default function hydrant({ hydrantData }: Props) {
                             onChange={(val) => setData('box_hydrant', val)}
                             error={errors.box_hydrant}
                         />
-
                         <RadioInputWithOther
                             label="Alarm"
                             name="alarm"
