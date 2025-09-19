@@ -107,9 +107,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::prefix('reports')->group(function () {
     Route::get('/apar-rekap', [AparInspectionController::class, 'rekap'])->name('apar.rekap');
     Route::get('/hydrant-rekap', [HydrantInspectionController::class, 'rekap'])->name('hydrant.rekap');
+    Route::get('/cekpoint-rekap', [CPSecurityInspectionController::class, 'rekap'])->name('cekpoint.rekap');
 
     Route::get('/apar-rekap/pdf', [AparInspectionController::class, 'exportPdf'])->name('apar.pdf');
     Route::get('/hydrant-rekap/pdf', [HydrantInspectionController::class, 'exportPdf'])->name('hydrant.pdf');
+    Route::get('/cekpoint-rekap/pdf', [CPSecurityInspectionController::class, 'exportPdf'])->name('cekpoint.pdf');
 });
 Route::get('/captcha', function () {
     return response()->json([

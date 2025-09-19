@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Intervention\Image\Laravel\Facades\Image;
@@ -248,34 +249,92 @@ class CPSecurityInspectionController extends Controller
 
     public function rekap(Request $request)
     {
-        $bulan = $request->input('bulan', now()->format('m'));
-        $tahun = $request->input('tahun', now()->format('Y'));
+        $tipe = $request->input('tipe', 'bulanan'); // default bulanan
+        $rekap = collect();
 
-        $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
-            ->whereMonth('tanggal_patroli', $bulan)
-            ->whereYear('tanggal_patroli', $tahun)
-            ->orderByDesc('tanggal_patroli')
-            ->get();
+        if ($tipe === 'mingguan') {
+            $minggu = $request->input('minggu', 1); // minggu ke berapa
+            $bulan = $request->input('bulan', now()->format('m'));
+            $tahun = $request->input('tahun', now()->format('Y'));
 
-        return inertia('Laporan/cekpoint-rekap', [
-            'rekap' => $rekap,
-            'bulan' => $bulan,
-            'tahun' => $tahun,
-        ]);
+            // cari awal bulan
+            $startOfMonth = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
+            // tentukan minggu ke-n
+            $startOfWeek = (clone $startOfMonth)->addWeeks($minggu - 1)->startOfWeek(Carbon::MONDAY);
+            $endOfWeek   = (clone $startOfWeek)->endOfWeek(Carbon::SUNDAY);
+
+            $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
+                ->whereBetween('tanggal_patroli', [$startOfWeek, $endOfWeek])
+                ->orderByDesc('tanggal_patroli')
+                ->get();
+
+            return inertia('Laporan/cekpoint-rekap', [
+                'rekap' => $rekap,
+                'tipe' => 'mingguan',
+                'minggu' => $minggu,
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+                'start' => $startOfWeek->toDateString(),
+                'end' => $endOfWeek->toDateString(),
+            ]);
+        } else {
+            // default bulanan
+            $bulan = $request->input('bulan', now()->format('m'));
+            $tahun = $request->input('tahun', now()->format('Y'));
+
+            $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
+                ->whereMonth('tanggal_patroli', $bulan)
+                ->whereYear('tanggal_patroli', $tahun)
+                ->orderByDesc('tanggal_patroli')
+                ->get();
+
+            return inertia('Laporan/cekpoint-rekap', [
+                'rekap' => $rekap,
+                'tipe' => 'bulanan',
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+            ]);
+        }
     }
 
     public function exportPdf(Request $request)
     {
-        $bulan = $request->input('bulan', now()->format('m'));
-        $tahun = $request->input('tahun', now()->format('Y'));
+        $tipe = $request->input('tipe', 'bulanan'); // default bulanan
+        $rekap = collect();
+        $fileName = "";
 
-        $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
-            ->whereMonth('tanggal_patroli', $bulan)
-            ->whereYear('tanggal_patroli', $tahun)
-            ->orderByDesc('tanggal_patroli')
-            ->get();
+        if ($tipe === 'mingguan') {
+            $minggu = $request->input('minggu', 1);
+            $bulan = $request->input('bulan', now()->format('m'));
+            $tahun = $request->input('tahun', now()->format('Y'));
 
-        $pdf = Pdf::loadView('report.rekap_cekpoint', compact('rekap', 'bulan', 'tahun'));
-        return $pdf->download("rekap_cekpoint_{$bulan}_{$tahun}.pdf");
+            $startOfMonth = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
+            $startOfWeek = (clone $startOfMonth)->addWeeks($minggu - 1)->startOfWeek(Carbon::MONDAY);
+            $endOfWeek   = (clone $startOfWeek)->endOfWeek(Carbon::SUNDAY);
+
+            $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
+                ->whereBetween('tanggal_patroli', [$startOfWeek, $endOfWeek])
+                ->orderByDesc('tanggal_patroli')
+                ->get();
+
+            $fileName = "rekap_cekpoint_minggu{$minggu}_{$bulan}_{$tahun}.pdf";
+
+            $pdf = Pdf::loadView('report.rekap_cekpoint', compact('rekap', 'minggu', 'bulan', 'tahun', 'startOfWeek', 'endOfWeek'));
+        } else {
+            $bulan = $request->input('bulan', now()->format('m'));
+            $tahun = $request->input('tahun', now()->format('Y'));
+
+            $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
+                ->whereMonth('tanggal_patroli', $bulan)
+                ->whereYear('tanggal_patroli', $tahun)
+                ->orderByDesc('tanggal_patroli')
+                ->get();
+
+            $fileName = "rekap_cekpoint_{$bulan}_{$tahun}.pdf";
+
+            $pdf = Pdf::loadView('report.rekap_cekpoint', compact('rekap', 'bulan', 'tahun'));
+        }
+
+        return $pdf->stream($fileName);
     }
 }

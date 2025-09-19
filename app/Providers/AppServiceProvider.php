@@ -22,5 +22,6 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         // URL::forceScheme('https');
+        ini_set('memory_limit', '1024M');
     }
 }
