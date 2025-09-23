@@ -249,92 +249,131 @@ class CPSecurityInspectionController extends Controller
 
     public function rekap(Request $request)
     {
-        $tipe = $request->input('tipe', 'bulanan'); // default bulanan
-        $rekap = collect();
+        $type  = $request->get('type', 'week'); // bulanan, mingguan, harian
+        $date = $request->get('date');
 
-        if ($tipe === 'mingguan') {
-            $minggu = $request->input('minggu', 1); // minggu ke berapa
-            $bulan = $request->input('bulan', now()->format('m'));
-            $tahun = $request->input('tahun', now()->format('Y'));
-
-            // cari awal bulan
-            $startOfMonth = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
-            // tentukan minggu ke-n
-            $startOfWeek = (clone $startOfMonth)->addWeeks($minggu - 1)->startOfWeek(Carbon::MONDAY);
-            $endOfWeek   = (clone $startOfWeek)->endOfWeek(Carbon::SUNDAY);
-
-            $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
-                ->whereBetween('tanggal_patroli', [$startOfWeek, $endOfWeek])
-                ->orderByDesc('tanggal_patroli')
-                ->get();
-
-            return inertia('Laporan/cekpoint-rekap', [
-                'rekap' => $rekap,
-                'tipe' => 'mingguan',
-                'minggu' => $minggu,
-                'bulan' => $bulan,
-                'tahun' => $tahun,
-                'start' => $startOfWeek->toDateString(),
-                'end' => $endOfWeek->toDateString(),
-            ]);
-        } else {
-            // default bulanan
-            $bulan = $request->input('bulan', now()->format('m'));
-            $tahun = $request->input('tahun', now()->format('Y'));
-
-            $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
-                ->whereMonth('tanggal_patroli', $bulan)
-                ->whereYear('tanggal_patroli', $tahun)
-                ->orderByDesc('tanggal_patroli')
-                ->get();
-
-            return inertia('Laporan/cekpoint-rekap', [
-                'rekap' => $rekap,
-                'tipe' => 'bulanan',
-                'bulan' => $bulan,
-                'tahun' => $tahun,
-            ]);
+        $query = CPInspection::query()->select([
+            'kode_cp',
+            'user_id',
+            'regu',
+            'nama_petugas',
+            'kondisi',
+            'foto_kondisi',
+            'bocoran',
+            'foto_bocoran',
+            'penerangan_lampu',
+            'foto_penerangan_lampu',
+            'kerusakan_fasum',
+            'foto_kerusakan_fasum',
+            'potensi_bahaya_api',
+            'foto_potensi_bahaya_api',
+            'potensi_bahaya_keorang',
+            'foto_potensi_bahaya_keorang',
+            'orang_mencurigakan',
+            'foto_orang_mencurigakan',
+            'tanggal_patroli'
+        ]);
+        if ($type === 'week') {
+            $ref = $date ? Carbon::parse($date) : Carbon::now();
+            $start = $ref->startOfWeek()->toDateString();
+            $end = $ref->endOfWeek()->toDateString();
+            $query->whereBetween('tanggal_patroli', [$start, $end]);
+        } else { // month
+            $ref = $date ? Carbon::parse($date) : Carbon::now();
+            $start = $ref->copy()->startOfMonth()->toDateString();
+            $end = $ref->copy()->endOfMonth()->toDateString();
+            $query->whereBetween('tanggal_patroli', [$start, $end]);
         }
+
+        // pagination ringan untuk tampilan (UI)
+        $items = $query->orderBy('tanggal_patroli', 'desc')->paginate(50);
+
+
+        return inertia('Reports/CPIndex', [
+            'items' => $items,
+            'filters' => [
+                'type' => $type,
+                'date' => $date ?: now()->toDateString(),
+            ],
+        ]);
     }
 
+    // Export PDF (streaming) - memory friendly
     public function exportPdf(Request $request)
     {
-        $tipe = $request->input('tipe', 'bulanan'); // default bulanan
-        $rekap = collect();
-        $fileName = "";
+        $type = $request->get('type', 'week');
+        $date = $request->get('date');
 
-        if ($tipe === 'mingguan') {
-            $minggu = $request->input('minggu', 1);
-            $bulan = $request->input('bulan', now()->format('m'));
-            $tahun = $request->input('tahun', now()->format('Y'));
+        $query = CPInspection::query()->select([
+            'kode_cp',
+            'nama_petugas',
+            'regu',
+            'kondisi',
+            'tanggal_patroli',
+            'foto_kondisi',
+            'foto_bocoran'
+        ]);
 
-            $startOfMonth = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
-            $startOfWeek = (clone $startOfMonth)->addWeeks($minggu - 1)->startOfWeek(Carbon::MONDAY);
-            $endOfWeek   = (clone $startOfWeek)->endOfWeek(Carbon::SUNDAY);
-
-            $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
-                ->whereBetween('tanggal_patroli', [$startOfWeek, $endOfWeek])
-                ->orderByDesc('tanggal_patroli')
-                ->get();
-
-            $fileName = "rekap_cekpoint_minggu{$minggu}_{$bulan}_{$tahun}.pdf";
-
-            $pdf = Pdf::loadView('report.rekap_cekpoint', compact('rekap', 'minggu', 'bulan', 'tahun', 'startOfWeek', 'endOfWeek'));
+        if ($type === 'week') {
+            $ref = $date ? Carbon::parse($date) : Carbon::now();
+            $start = $ref->startOfWeek()->toDateString();
+            $end = $ref->endOfWeek()->toDateString();
+            $query->whereBetween('tanggal_patroli', [$start, $end]);
+            $label = "week-{$start}-to-{$end}";
         } else {
-            $bulan = $request->input('bulan', now()->format('m'));
-            $tahun = $request->input('tahun', now()->format('Y'));
-
-            $rekap = CPInspection::with(['cekPoint', 'user.karyawan'])
-                ->whereMonth('tanggal_patroli', $bulan)
-                ->whereYear('tanggal_patroli', $tahun)
-                ->orderByDesc('tanggal_patroli')
-                ->get();
-
-            $fileName = "rekap_cekpoint_{$bulan}_{$tahun}.pdf";
-
-            $pdf = Pdf::loadView('report.rekap_cekpoint', compact('rekap', 'bulan', 'tahun'));
+            $ref = $date ? Carbon::parse($date) : Carbon::now();
+            $start = $ref->copy()->startOfMonth()->toDateString();
+            $end = $ref->copy()->endOfMonth()->toDateString();
+            $query->whereBetween('tanggal_patroli', [$start, $end]);
+            $label = $ref->format('Y-m');
         }
 
-        return $pdf->stream($fileName);
+        // Use cursor() to avoid memory spikes for large result set
+        $rows = $query->orderBy('tanggal_patroli', 'desc')->cursor();
+
+        // Build a simple HTML view (string) gradually. Keep layout very light.
+        $html = view('reports.report', [
+            'rows' => $rows,
+            'label' => $label,
+        ])->render();
+
+        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
+
+        // Stream the PDF directly (no large temporary file in PHP mem)
+        return $pdf->stream("laporan-cp-{$label}.pdf");
+    }
+    // Print-friendly view (opens a simple HTML page suitable for window.print)
+    public function print(Request $request)
+    {
+        // reuse the same logic as index but without pagination (careful with size)
+        $type = $request->get('type', 'week');
+        $date = $request->get('date');
+
+        $query = CPInspection::query()->select([
+            'kode_cp',
+            'nama_petugas',
+            'regu',
+            'kondisi',
+            'tanggal_patroli'
+        ]);
+
+        if ($type === 'week') {
+            $ref = $date ? Carbon::parse($date) : Carbon::now();
+            $start = $ref->startOfWeek()->toDateString();
+            $end = $ref->endOfWeek()->toDateString();
+            $query->whereBetween('tanggal_patroli', [$start, $end]);
+        } else {
+            $ref = $date ? Carbon::parse($date) : Carbon::now();
+            $start = $ref->copy()->startOfMonth()->toDateString();
+            $end = $ref->copy()->endOfMonth()->toDateString();
+            $query->whereBetween('tanggal_patroli', [$start, $end]);
+        }
+
+        // Use cursor if expecting many rows. But for print maybe limit or warn user.
+        $rows = $query->orderBy('tanggal_patroli', 'desc')->limit(1000)->get();
+
+        return view('reports.print', [
+            'rows' => $rows,
+        ]);
     }
 }
