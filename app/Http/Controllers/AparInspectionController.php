@@ -229,6 +229,6 @@ class AparInspectionController extends Controller implements HasMiddleware
             ->get();
 
         $pdf = Pdf::loadView('report.rekap_apar', compact('rekap', 'bulan', 'tahun'));
-        return $pdf->download("rekap_apar_{$bulan}_{$tahun}.pdf");
+        return $pdf->stream("rekap_apar_{$bulan}_{$tahun}.pdf");
     }
 }

@@ -241,6 +241,6 @@ class HydrantInspectionController extends Controller implements HasMiddleware
             ->get();
 
         $pdf = Pdf::loadView('report.rekap_hydrant', compact('rekap', 'bulan', 'tahun'));
-        return $pdf->download("rekap_hydrant_{$bulan}_{$tahun}.pdf");
+        return $pdf->stream("rekap_hydrant_{$bulan}_{$tahun}.pdf");
     }
 }

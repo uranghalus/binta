@@ -43,89 +43,72 @@ class CPSecurityInspectionController extends Controller
      */
     public function store(Request $request)
     {
-        ini_set('max_execution_time', 120); // tambah jadi 2 menit
-        ini_set('memory_limit', '256M');   // kalau ada gambar besar
-        $fileName = 'patroli_' . time() . '.jpg';
+        ini_set('max_execution_time', 120);
+        ini_set('memory_limit', '256M');
 
         $validated = $request->validate([
             'kode_cp' => ['required', 'exists:cek_point_security,id'],
             'regu'    => ['required', Rule::in(['PAGI', 'SIANG', 'MALAM', 'MIDDLE'])],
             'kondisi' => ['nullable', 'string', 'max:150'],
             'nama_petugas' => ['required', 'string', 'max:150'],
-            'foto_kondisi' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
             'bocoran' => ['nullable', 'string', 'max:150'],
-            'foto_bocoran' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
             'penerangan_lampu' => ['nullable', 'string', 'max:150'],
-            'foto_penerangan_lampu' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
             'kerusakan_fasum' => ['nullable', 'string', 'max:150'],
-            'foto_kerusakan_fasum' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
             'potensi_bahaya_api' => ['nullable', 'string', 'max:150'],
-            'foto_potensi_bahaya_api' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
             'potensi_bahaya_keorang' => ['nullable', 'string', 'max:150'],
-            'foto_potensi_bahaya_keorang' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
             'orang_mencurigakan' => ['nullable', 'string', 'max:150'],
-            'foto_orang_mencurigakan' => ['nullable', function ($attribute, $value, $fail) {
-                if ($value && !Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
         ]);
 
         $validated['user_id'] = Auth::id();
 
-        // Handle base64 images for each foto_* field
-        foreach (
-            [
-                'foto_kondisi',
-                'foto_bocoran',
-                'foto_penerangan_lampu',
-                'foto_kerusakan_fasum',
-                'foto_potensi_bahaya_api',
-                'foto_potensi_bahaya_keorang',
-                'foto_orang_mencurigakan'
-            ] as $fotoField
-        ) {
-            if ($request->filled($fotoField) && Str::startsWith($request->$fotoField, 'data:image/')) {
-                $imageData = explode(',', $request->$fotoField)[1];
-                $decodedImage = base64_decode($imageData);
-                $image = Image::read($decodedImage);
+        $fotoFields = [
+            'foto_kondisi',
+            'foto_bocoran',
+            'foto_penerangan_lampu',
+            'foto_kerusakan_fasum',
+            'foto_potensi_bahaya_api',
+            'foto_potensi_bahaya_keorang',
+            'foto_orang_mencurigakan',
+        ];
+
+        foreach ($fotoFields as $field) {
+            $value = $request->$field ?? null;
+
+            if (!$value) continue;
+
+            // --- CASE 1: base64 dari Android/web ---
+            if (is_string($value) && Str::startsWith($value, 'data:image/')) {
+                $imageData = explode(',', $value)[1];
+                $decoded = base64_decode($imageData);
+                $image = Image::read($decoded);
+
                 if ($image->width() > 1200) {
                     $image->resize(1200, null);
                 }
+
                 $compressed = $image->toJpeg(75);
-                $path = "inspection/cekpoint/{$fotoField}_" . time() . ".jpg";
+                $path = "inspection/cekpoint/{$field}_" . time() . ".jpg";
                 Storage::disk('s3')->put($path, (string) $compressed);
-                $validated[$fotoField] = $path;
+
+                $validated[$field] = $path;
+            }
+
+            // --- CASE 2: File upload dari iPhone ---
+            elseif ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $path = $file->storeAs(
+                    'inspection/cekpoint',
+                    "{$field}_" . time() . '.' . $file->getClientOriginalExtension(),
+                    's3'
+                );
+                $validated[$field] = $path;
             }
         }
 
         CPInspection::create($validated);
 
-        return redirect()->route('inspection.cp-security.index')->with('success', 'Inspeksi Cekpoint Security berhasil ditambahkan.');
+        return redirect()->route('inspection.cp-security.index')
+            ->with('success', 'Inspeksi Cekpoint Security berhasil ditambahkan.');
     }
 
     /**

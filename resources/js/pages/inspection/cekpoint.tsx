@@ -42,7 +42,7 @@ export default function Cekpoint({ cekpointData }: Props) {
 
     const [openModal, setOpenModal] = useState<string | null>(null);
 
-    const handleCapture = (field: string, image: string) => {
+    const handleCapture = (field: string, image: string | File) => {
         setData(field as keyof typeof data, image);
     };
 
@@ -285,7 +285,7 @@ function InputFotoField({
                 </Button>
                 {fotoValue && (
                     <img
-                        src={fotoValue}
+                        src={typeof fotoValue === 'string' ? fotoValue : URL.createObjectURL(fotoValue)}
                         alt={label}
                         className="w-20 h-20 object-cover rounded"
                     />

@@ -15,6 +15,7 @@ use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OfficesController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ScanController;
 use App\Http\Controllers\UserController;
 use App\Models\CPInspection;
 use Illuminate\Support\Facades\Request;
@@ -24,6 +25,8 @@ use Inertia\Inertia;
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/scanner', [ScanController::class, 'index'])->name('scanner.index');
+    Route::post('/api/scan/upload', [ScanController::class, 'upload'])->name('scan.upload');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // LINK Role Management
     Route::prefix('role-management')->group(function () {
