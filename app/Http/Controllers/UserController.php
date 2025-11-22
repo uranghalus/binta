@@ -56,7 +56,7 @@ class UserController extends Controller
         $user = User::create([
             'karyawan_id' => $karyawan->id_karyawan,
             'email' => $this->generateEmailFromKaryawan($karyawan), // bisa custom sesuai kebutuhan
-            'password' => 'dm1234',
+            'password' => strtolower(str_replace(' ', '', $karyawan->nama)),
         ]);
 
         if (!empty($karyawan->jabatan->roles)) {
