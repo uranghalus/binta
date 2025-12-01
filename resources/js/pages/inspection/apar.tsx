@@ -56,6 +56,7 @@ export default function apar({ aparData }: Props) {
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         post(route('inspection.apar.store'), {
+            forceFormData: true,
             onSuccess: () => {
                 toast.success('Data berhasil ditambahkan!', { description: 'Data APAR berhasil ditambah.' });
                 reset();

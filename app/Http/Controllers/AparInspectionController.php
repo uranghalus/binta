@@ -55,48 +55,76 @@ class AparInspectionController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        $fileName = 'inspeksi_' . time() . '.jpg';
+        try {
+            $validated = $request->validate([
+                'apar_id'            => ['required', 'exists:apar,id'],
+                'regu'               => ['required', 'in:PAGI,MIDDLE,SIANG,MALAM'],
+                'tanggal_kadaluarsa' => ['required', 'date'],
+                'tanggal_refill'     => ['required', 'date'],
+                'kondisi'            => ['required', 'string', 'max:150'],
+                'catatan'            => ['required', 'string'],
+                'nama_petugas'       => ['required', 'string', 'max:150'],
+                'foto_apar'          => ['required'], // file OR base64
+            ]);
 
-        $validated = $request->validate([
-            'apar_id'            => ['required', 'exists:apar,id'],
-            'regu'               => ['required', 'in:PAGI,MIDDLE,SIANG,MALAM'],
-            'tanggal_kadaluarsa' => ['required', 'date'],
-            'tanggal_refill'     => ['required', 'date'],
-            'kondisi'            => ['required', 'string', 'max:150'],
-            'catatan'            => ['required', 'string'],
-            'nama_petugas'  => ['required', 'string', 'max:150'],
-            'foto_apar'          => ['required', function ($attribute, $value, $fail) {
-                if (!Str::startsWith($value, 'data:image')) {
-                    $fail('The ' . $attribute . ' must be a valid base64 image.');
-                }
-            }],
-        ]);
+            $validated['regu'] = str_replace('REGU ', 'Regu ', $validated['regu']);
+            $validated['user_id'] = Auth::id();
 
-        // Format regu
-        $validated['regu'] = str_replace('REGU ', 'Regu ', $validated['regu']);
-        $validated['user_id'] = Auth::id();
+            $finalPath = null;
 
-        // === Handle base64 image ===
-        if ($request->filled('foto_apar') && Str::startsWith($request->foto_apar, 'data:image/')) {
-            $imageData = explode(',', $request->foto_apar)[1]; // Remove base64 header
-            $decodedImage = base64_decode($imageData);
+            // CASE 1 — FILE UPLOAD
+            if ($request->hasFile('foto_apar')) {
 
-            // Kompres dengan Intervention Image
-            $image = Image::read($decodedImage);
+                $request->validate([
+                    'foto_apar' => ['image', 'mimes:jpg,jpeg,png', 'max:4096'],
+                ]);
 
-            if ($image->width() > 1200) {
-                $image->resize(1200, null);
+                $image = Image::make($request->file('foto_apar'))->encode('jpg', 75);
+
+                $filename = 'apar-' . time() . '-' . Str::random(5) . '.jpg';
+                $path = "inspection/apar/{$filename}";
+
+                Storage::disk('s3')->put($path, $image->stream());
+
+                $finalPath = $path;
             }
 
-            $compressed = $image->toJpeg(75);
+            // CASE 2 — BASE64
+            else if (Str::startsWith($request->foto_apar, 'data:image')) {
 
-            $path = "inspection/apar/{$fileName}";
-            Storage::disk('s3')->put($path, (string) $compressed);
+                $data = explode(',', $request->foto_apar)[1];
+                $decoded = base64_decode($data);
 
-            $validated['foto_apar'] = $path;
+                $image = Image::make($decoded)->encode('jpg', 75);
+
+                $filename = 'apar-' . time() . '-' . Str::random(5) . '.jpg';
+                $path = "inspection/apar/{$filename}";
+
+                Storage::disk('s3')->put($path, $image->stream());
+
+                $finalPath = $path;
+            }
+
+            // INVALID
+            else {
+                return back()->withErrors(['foto_apar' => 'Foto tidak valid']);
+            }
+
+            $validated['foto_apar'] = $finalPath;
+
+            AparInspection::create($validated);
+
+            return redirect()->route('inspection.apar.index')
+                ->with('success', 'Data berhasil ditambahkan!');
+        } catch (\Exception $e) {
+
+            Log::error('APAR Upload Failed', [
+                'msg' => $e->getMessage(),
+                'line' => $e->getLine(),
+            ]);
+
+            return back()->withErrors(['error' => 'Terjadi kesalahan!'])->withInput();
         }
-        AparInspection::create($validated);
-        return redirect()->route('inspection.apar.index')->with('success', 'Data berhasil ditambahkan!');
     }
 
     /**
