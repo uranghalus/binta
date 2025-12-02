@@ -58,63 +58,70 @@ class HydrantInspectionController extends Controller implements HasMiddleware
     {
         ini_set('max_execution_time', 120);
         ini_set('memory_limit', '256M');
+        try {
+            //code...
+            $validated = $request->validate([
+                'hydrant_id' => ['required', 'exists:hydrant,id'],
+                'regu' => ['required', 'in:PAGI,MIDDLE,SIANG,MALAM'],
+                'nama_petugas' => ['required', 'string', 'max:150'],
+                'selang_hydrant' => ['required', 'string'],
+                'noozle_hydrant' => ['required', 'string'],
+                'valve_machino_coupling' => ['required', 'string'],
+                'fire_hose_machino_coupling' => ['required', 'string'],
+                'kunci_box_hydrant' => ['required', 'string'],
+                'kaca_box_hydrant' => ['required', 'string'],
+                'box_hydrant' => ['required', 'string'],
+                'alarm' => ['required', 'string'],
 
-        $validated = $request->validate([
-            'hydrant_id' => ['required', 'exists:hydrant,id'],
-            'regu' => ['required', 'in:PAGI,MIDDLE,SIANG,MALAM'],
-            'nama_petugas' => ['required', 'string', 'max:150'],
-            'selang_hydrant' => ['required', 'string'],
-            'noozle_hydrant' => ['required', 'string'],
-            'valve_machino_coupling' => ['required', 'string'],
-            'fire_hose_machino_coupling' => ['required', 'string'],
-            'kunci_box_hydrant' => ['required', 'string'],
-            'kaca_box_hydrant' => ['required', 'string'],
-            'box_hydrant' => ['required', 'string'],
-            'alarm' => ['required', 'string'],
+                // terima base64 ATAU file
+                'foto_hydrant' => ['required'],
+            ]);
+            $validated['user_id'] = Auth::id();
 
-            // terima base64 ATAU file
-            'foto_hydrant' => ['required'],
-        ]);
+            $finalPath = null;
+            // CASE 1 — FILE UPLOAD
+            if ($request->hasFile('foto_hydrant')) {
+                $request->validate([
+                    'foto_hydrant' => ['image', 'mimes:jpg,jpeg,png', 'max:4096'],
+                ]);
+                $image = Image::read($request->file('foto_hydrant'));
+                $filename = 'hydrant-' . time() . '-' . Str::random(5) . '.jpg';
+                $path = "inspection/hydrant/{$filename}";
+                $uploadedFile = $image->toJpeg(75);
+                Storage::disk('s3')->put($path, (string) $uploadedFile);
 
-        $validated['user_id'] = Auth::id();
+                $finalPath = $path;
+            } elseif (Str::startsWith($request->foto_hydrant, 'data:image')) {
+                $data = explode(',', $request->foto_hydrant)[1];
+                $decoded = base64_decode($data);
 
-        $foto = $request->foto_hydrant;
+                $image = Image::read($decoded);
 
-        // CASE 1: Base64
-        if (is_string($foto) && Str::startsWith($foto, 'data:image/')) {
+                $filename = 'hydrant-' . time() . '-' . Str::random(5) . '.jpg';
+                $path = "inspection/hydrant/{$filename}";
 
-            $imageData = explode(',', $foto)[1];
-            $decoded = base64_decode($imageData);
+                $compressed = $image->toJpeg(75);
+                Storage::disk('s3')->put($path, $compressed);
 
-            $image = Image::read($decoded);
-            if ($image->width() > 1200) {
-                $image->resize(1200);
+                $finalPath = $path;
+            } else {
+                return back()->withErrors(['foto_hydrant' => 'Foto tidak valid']);
             }
 
-            $compressed = $image->toJpeg(75);
-            $fileName = 'hydrant_' . time() . '.jpg';
-            $path = "inspection/hydrant/{$fileName}";
-            Storage::disk('s3')->put($path, (string) $compressed);
+            $validated['foto_hydrant'] = $finalPath;
+            HydrantInspection::create($validated);
+            return redirect()->route('inspection.hydrant.index')->with('success', 'Inspeksi Hydrant berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            Log::error('Hydrant Upload Failed', [
+                'msg' => $e->getMessage(),
+                'line' => $e->getLine(),
+            ]);
 
-            $validated['foto_hydrant'] = $path;
+            return back()->withErrors([
+                'msg' => $e->getMessage(),
+                'line' => $e->getLine(),
+            ])->withInput();
         }
-
-        // CASE 2: File upload (iPhone)
-        elseif ($request->hasFile('foto_hydrant')) {
-
-            $file = $request->file('foto_hydrant');
-            $fileName = 'hydrant_' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('inspection/hydrant', $fileName, 's3');
-
-            $validated['foto_hydrant'] = $path;
-        } else {
-            return back()->withErrors(['foto_hydrant' => 'Foto tidak valid']);
-        }
-
-        HydrantInspection::create($validated);
-
-        return redirect()->route('inspection.hydrant.index')
-            ->with('success', 'Data berhasil ditambahkan!');
     }
 
     /**

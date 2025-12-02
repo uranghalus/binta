@@ -15,6 +15,9 @@ export default defineConfig({
     //         host: 'localhost', // ganti dengan IP host kamu jika perlu (lihat di bawah)
     //     },
     // },
+    build: {
+        minify: false,
+    },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],

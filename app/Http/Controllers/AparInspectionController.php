@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Encoders\JpegEncoder;
 
 class AparInspectionController extends Controller implements HasMiddleware
 {
@@ -62,7 +63,7 @@ class AparInspectionController extends Controller implements HasMiddleware
                 'tanggal_kadaluarsa' => ['required', 'date'],
                 'tanggal_refill'     => ['required', 'date'],
                 'kondisi'            => ['required', 'string', 'max:150'],
-                'catatan'            => ['required', 'string'],
+                'catatan'            => ['nullable', 'string'],
                 'nama_petugas'       => ['required', 'string', 'max:150'],
                 'foto_apar'          => ['required'], // file OR base64
             ]);
@@ -79,12 +80,13 @@ class AparInspectionController extends Controller implements HasMiddleware
                     'foto_apar' => ['image', 'mimes:jpg,jpeg,png', 'max:4096'],
                 ]);
 
-                $image = Image::make($request->file('foto_apar'))->encode('jpg', 75);
+                $image = Image::read($request->file('foto_apar'));
 
                 $filename = 'apar-' . time() . '-' . Str::random(5) . '.jpg';
                 $path = "inspection/apar/{$filename}";
+                $uploadedFile = $image->toJpeg(75);
+                Storage::disk('s3')->put($path, $uploadedFile);
 
-                Storage::disk('s3')->put($path, $image->stream());
 
                 $finalPath = $path;
             }
@@ -95,12 +97,13 @@ class AparInspectionController extends Controller implements HasMiddleware
                 $data = explode(',', $request->foto_apar)[1];
                 $decoded = base64_decode($data);
 
-                $image = Image::make($decoded)->encode('jpg', 75);
+                $image = Image::read($decoded);
 
                 $filename = 'apar-' . time() . '-' . Str::random(5) . '.jpg';
                 $path = "inspection/apar/{$filename}";
 
-                Storage::disk('s3')->put($path, $image->stream());
+                $compressed = $image->toJpeg(75);
+                Storage::disk('s3')->put($path, $compressed);
 
                 $finalPath = $path;
             }
@@ -123,7 +126,10 @@ class AparInspectionController extends Controller implements HasMiddleware
                 'line' => $e->getLine(),
             ]);
 
-            return back()->withErrors(['error' => 'Terjadi kesalahan!'])->withInput();
+            return back()->withErrors([
+                'msg' => $e->getMessage(),
+                'line' => $e->getLine(),
+            ])->withInput();
         }
     }
 
