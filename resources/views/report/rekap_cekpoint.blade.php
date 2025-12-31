@@ -2,39 +2,45 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
     <title>Rekap Inspeksi Cekpoint Security</title>
     <style>
         body {
             font-family: sans-serif;
-            font-size: 12px;
+            font-size: 11px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 12px;
         }
 
         th,
         td {
             border: 1px solid #999;
-            padding: 5px;
-            text-align: left;
+            padding: 4px;
+            vertical-align: top;
+        }
+
+        th {
+            background: #eee;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-    <h2 style="text-align: center;">
+
+    <h2>
         Rekap Inspeksi Cekpoint Security <br>
-        @if(request('tipe') === 'minggu' && request('minggu'))
-        Minggu ke-{{ request('minggu') }}
-        ({{ \Carbon\Carbon::create($tahun, $bulan, 1)->addWeeks(request('minggu') - 1)->startOfWeek()->format('d-m-Y') }}
-        s/d
-        {{ \Carbon\Carbon::create($tahun, $bulan, 1)->addWeeks(request('minggu') - 1)->endOfWeek()->format('d-m-Y') }})
-        @else
-        Bulan {{ \Carbon\Carbon::create()->month($bulan)->translatedFormat('F') }} {{ $tahun }}
-        @endif
+        Bulan {{ \Carbon\Carbon::create()->month($bulan)->translatedFormat('F') }}
+        {{ $tahun }}
     </h2>
 
     <table>
@@ -57,9 +63,9 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($rekap as $i => $r)
+            @forelse ($rekap as $i => $r)
             <tr>
-                <td>{{ $i + 1 }}</td>
+                <td style="text-align:center;">{{ $i + 1 }}</td>
                 <td>{{ $r->cekPoint->kode_cekpoint ?? '-' }}</td>
                 <td>{{ $r->cekPoint->lokasi ?? '-' }}</td>
                 <td>{{ $r->cekPoint->area ?? '-' }}</td>
@@ -72,15 +78,20 @@
                 <td>{{ $r->potensi_bahaya_api ?? '-' }}</td>
                 <td>{{ $r->potensi_bahaya_keorang ?? '-' }}</td>
                 <td>{{ $r->orang_mencurigakan ?? '-' }}</td>
-                <td>{{ \Carbon\Carbon::parse($r->tanggal_patroli)->format('d-m-Y') }}</td>
+                <td style="text-align:center;">
+                    {{ \Carbon\Carbon::parse($r->tanggal_patroli)->format('d-m-Y') }}
+                </td>
             </tr>
             @empty
             <tr>
-                <td colspan="14" style="text-align: center;">Tidak ada data</td>
+                <td colspan="14" style="text-align:center;">
+                    Tidak ada data
+                </td>
             </tr>
             @endforelse
         </tbody>
     </table>
+
 </body>
 
 </html>

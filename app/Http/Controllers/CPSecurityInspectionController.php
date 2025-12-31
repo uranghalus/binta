@@ -232,98 +232,37 @@ class CPSecurityInspectionController extends Controller
 
     public function rekap(Request $request)
     {
-        $type  = $request->get('type', 'week'); // bulanan, mingguan, harian
-        $date = $request->get('date');
+        $bulan = $request->input('bulan', now()->format('m'));
+        $tahun = $request->input('tahun', now()->format('Y'));
 
-        $query = CPInspection::query()->select([
-            'kode_cp',
-            'user_id',
-            'regu',
-            'nama_petugas',
-            'kondisi',
-            'foto_kondisi',
-            'bocoran',
-            'foto_bocoran',
-            'penerangan_lampu',
-            'foto_penerangan_lampu',
-            'kerusakan_fasum',
-            'foto_kerusakan_fasum',
-            'potensi_bahaya_api',
-            'foto_potensi_bahaya_api',
-            'potensi_bahaya_keorang',
-            'foto_potensi_bahaya_keorang',
-            'orang_mencurigakan',
-            'foto_orang_mencurigakan',
-            'tanggal_patroli'
-        ]);
-        if ($type === 'week') {
-            $ref = $date ? Carbon::parse($date) : Carbon::now();
-            $start = $ref->startOfWeek()->toDateString();
-            $end = $ref->endOfWeek()->toDateString();
-            $query->whereBetween('tanggal_patroli', [$start, $end]);
-        } else { // month
-            $ref = $date ? Carbon::parse($date) : Carbon::now();
-            $start = $ref->copy()->startOfMonth()->toDateString();
-            $end = $ref->copy()->endOfMonth()->toDateString();
-            $query->whereBetween('tanggal_patroli', [$start, $end]);
-        }
+        $rekap = CPInspection::with(['user']) // sesuaikan relasi jika ada
+            ->whereMonth('tanggal_patroli', $bulan)
+            ->whereYear('tanggal_patroli', $tahun)
+            ->orderByDesc('tanggal_patroli')
+            ->get();
 
-        // pagination ringan untuk tampilan (UI)
-        $items = $query->orderBy('tanggal_patroli', 'desc')->paginate(50);
-
-
-        return inertia('Reports/CPIndex', [
-            'items' => $items,
-            'filters' => [
-                'type' => $type,
-                'date' => $date ?: now()->toDateString(),
-            ],
+        return inertia('Laporan/cekpoint-rekap', [
+            'rekap' => $rekap,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
         ]);
     }
 
     // Export PDF (streaming) - memory friendly
     public function exportPdf(Request $request)
     {
-        $type = $request->get('type', 'week');
-        $date = $request->get('date');
+        $bulan = $request->input('bulan', now()->format('m'));
+        $tahun = $request->input('tahun', now()->format('Y'));
 
-        $query = CPInspection::query()->select([
-            'kode_cp',
-            'nama_petugas',
-            'regu',
-            'kondisi',
-            'tanggal_patroli',
-            'foto_kondisi',
-            'foto_bocoran'
-        ]);
+        $rekap = CPInspection::with(['user']) // sesuaikan relasi jika ada
+            ->whereMonth('tanggal_patroli', $bulan)
+            ->whereYear('tanggal_patroli', $tahun)
+            ->orderByDesc('tanggal_patroli')
+            ->get();
 
-        if ($type === 'week') {
-            $ref = $date ? Carbon::parse($date) : Carbon::now();
-            $start = $ref->startOfWeek()->toDateString();
-            $end = $ref->endOfWeek()->toDateString();
-            $query->whereBetween('tanggal_patroli', [$start, $end]);
-            $label = "week-{$start}-to-{$end}";
-        } else {
-            $ref = $date ? Carbon::parse($date) : Carbon::now();
-            $start = $ref->copy()->startOfMonth()->toDateString();
-            $end = $ref->copy()->endOfMonth()->toDateString();
-            $query->whereBetween('tanggal_patroli', [$start, $end]);
-            $label = $ref->format('Y-m');
-        }
+        $pdf = Pdf::loadView('report.rekap_cekpoint', compact('rekap', 'bulan', 'tahun'));
 
-        // Use cursor() to avoid memory spikes for large result set
-        $rows = $query->orderBy('tanggal_patroli', 'desc')->cursor();
-
-        // Build a simple HTML view (string) gradually. Keep layout very light.
-        $html = view('reports.report', [
-            'rows' => $rows,
-            'label' => $label,
-        ])->render();
-
-        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
-
-        // Stream the PDF directly (no large temporary file in PHP mem)
-        return $pdf->stream("laporan-cp-{$label}.pdf");
+        return $pdf->stream("rekap_cp_{$bulan}_{$tahun}.pdf");
     }
     // Print-friendly view (opens a simple HTML page suitable for window.print)
     public function print(Request $request)
