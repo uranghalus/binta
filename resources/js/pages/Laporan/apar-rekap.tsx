@@ -80,7 +80,7 @@ export default function AparRekap({ rekap, bulan, tahun, filters }: Props) {
         router.get(route('apar.rekap'), { bulan, tahun, search, page }, { preserveScroll: true });
     };
     const handleExport = () => {
-        window.open(route('apar.pdf', { bulan, tahun, search }), '_blank');
+        window.open(route('apar.print', { bulan, tahun, search }), '_blank');
     };
 
     const getPageNumbers = () => {

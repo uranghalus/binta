@@ -280,7 +280,7 @@ class HydrantInspectionController extends Controller implements HasMiddleware
             'filters' => $request->only(['bulan', 'tahun', 'search']),
         ]);
     }
-    public function exportPdf(Request $request)
+    public function exportPrint(Request $request)
     {
         $bulan = $request->input('bulan', now()->format('m'));
         $tahun = $request->input('tahun', now()->format('Y'));
@@ -304,15 +304,8 @@ class HydrantInspectionController extends Controller implements HasMiddleware
                 });
             })
             ->orderByDesc('tanggal_inspeksi')
-            ->get()
-            ->makeHidden(['foto_hydrant', 'foto_hydrant_url']);
+            ->get();
 
-        $pdf = Pdf::loadView('report.rekap_hydrant', compact('rekap', 'bulan', 'tahun'));
-
-        if (ob_get_length()) {
-            ob_clean();
-        }
-
-        return $pdf->download("rekap_hydrant_{$bulan}_{$tahun}.pdf");
+        return view('report.rekap_hydrant', compact('rekap', 'bulan', 'tahun'));
     }
 }

@@ -102,7 +102,7 @@ export default function CPRekap({ rekap, bulan, tahun, filters }: Props) {
     };
 
     const handleExport = () => {
-        window.open(route('cekpoint.pdf', { bulan, tahun, search }), '_blank');
+        window.open(route('cekpoint.print', { bulan, tahun, search }), '_blank');
     };
 
     const getPageNumbers = () => {

@@ -292,8 +292,8 @@ class CPSecurityInspectionController extends Controller
         ]);
     }
 
-    // Export PDF (streaming) - memory friendly
-    public function exportPdf(Request $request)
+    // Export print view - memory friendly browser-native print
+    public function exportPrint(Request $request)
     {
         $bulan = $request->input('bulan', now()->format('m'));
         $tahun = $request->input('tahun', now()->format('Y'));
@@ -317,21 +317,9 @@ class CPSecurityInspectionController extends Controller
                 });
             })
             ->orderByDesc('tanggal_patroli')
-            ->get()
-            ->makeHidden([
-                'foto_kondisi', 'foto_bocoran', 'foto_penerangan_lampu', 'foto_kerusakan_fasum', 
-                'foto_potensi_bahaya_api', 'foto_potensi_bahaya_keorang', 'foto_orang_mencurigakan',
-                'foto_kondisi_url', 'foto_bocoran_url', 'foto_penerangan_lampu_url', 'foto_kerusakan_fasum_url', 
-                'foto_potensi_bahaya_api_url', 'foto_potensi_bahaya_keorang_url', 'foto_orang_mencurigakan_url'
-            ]);
+            ->get();
 
-        $pdf = Pdf::loadView('report.rekap_cekpoint', compact('rekap', 'bulan', 'tahun'));
-
-        if (ob_get_length()) {
-            ob_clean();
-        }
-
-        return $pdf->download("rekap_cp_{$bulan}_{$tahun}.pdf");
+        return view('report.rekap_cekpoint', compact('rekap', 'bulan', 'tahun'));
     }
     // Print-friendly view (opens a simple HTML page suitable for window.print)
     public function print(Request $request)

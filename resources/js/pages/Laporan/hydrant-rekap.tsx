@@ -81,7 +81,7 @@ export default function HydrantRekap({ rekap, bulan, tahun, filters }: Props) {
         router.get(route('hydrant.rekap'), { bulan, tahun, search, page }, { preserveScroll: true });
     };
     const handleExport = () => {
-        window.open(route('hydrant.pdf', { bulan, tahun, search }), '_blank');
+        window.open(route('hydrant.print', { bulan, tahun, search }), '_blank');
     };
 
     const getPageNumbers = () => {

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Rekap Inspeksi APAR</title>
+    <title>rekap_hydrant_{{ $bulan }}_{{ $tahun }}</title>
     <style>
         body {
             font-family: sans-serif;
@@ -20,6 +20,24 @@
             border: 1px solid #999;
             padding: 5px;
             text-align: left;
+        }
+
+        @media print {
+            body {
+                margin: 1cm;
+                color: #000;
+                background-color: #fff;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            thead {
+                display: table-header-group;
+            }
         }
     </style>
 </head>
@@ -56,6 +74,14 @@
             @endforeach
         </tbody>
     </table>
+    <script>
+        window.onload = function() {
+            window.print();
+            window.onafterprint = function() {
+                window.close();
+            };
+        }
+    </script>
 </body>
 
 </html>

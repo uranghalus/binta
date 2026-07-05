@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Rekap Inspeksi Cekpoint Security</title>
+    <title>rekap_cp_{{ $bulan }}_{{ $tahun }}</title>
     <style>
         body {
             font-family: sans-serif;
@@ -31,6 +31,24 @@
         th {
             background: #eee;
             text-align: center;
+        }
+
+        @media print {
+            body {
+                margin: 1cm;
+                color: #000;
+                background-color: #fff;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            thead {
+                display: table-header-group;
+            }
         }
     </style>
 </head>
@@ -91,7 +109,14 @@
             @endforelse
         </tbody>
     </table>
-
+    <script>
+        window.onload = function() {
+            window.print();
+            window.onafterprint = function() {
+                window.close();
+            };
+        }
+    </script>
 </body>
 
 </html>

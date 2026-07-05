@@ -112,9 +112,9 @@ Route::prefix('reports')->group(function () {
     Route::get('/hydrant-rekap', [HydrantInspectionController::class, 'rekap'])->name('hydrant.rekap');
     Route::get('/cekpoint-rekap', [CPSecurityInspectionController::class, 'rekap'])->name('cekpoint.rekap');
 
-    Route::get('/apar-rekap/pdf', [AparInspectionController::class, 'exportPdf'])->name('apar.pdf');
-    Route::get('/hydrant-rekap/pdf', [HydrantInspectionController::class, 'exportPdf'])->name('hydrant.pdf');
-    Route::get('/cekpoint-rekap/pdf', [CPSecurityInspectionController::class, 'exportPdf'])->name('cekpoint.pdf');
+    Route::get('/apar-rekap/print', [AparInspectionController::class, 'exportPrint'])->name('apar.print');
+    Route::get('/hydrant-rekap/print', [HydrantInspectionController::class, 'exportPrint'])->name('hydrant.print');
+    Route::get('/cekpoint-rekap/print', [CPSecurityInspectionController::class, 'exportPrint'])->name('cekpoint.print');
 });
 Route::get('/captcha', function () {
     return response()->json([
