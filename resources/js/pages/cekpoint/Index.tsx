@@ -7,14 +7,16 @@ import { CPInspection } from './data/CPData'
 import { CPInspectionColumn } from './components/cpi-column'
 import CpiTable from './components/cpi-table'
 import CPInspectionDialog from './components/cpi-dialogs'
-
-
+import { PaginatedData } from '@/types'
 
 interface Props {
-  inspections: CPInspection[]
+  inspections: PaginatedData<CPInspection>
+  filters: {
+    search?: string
+  }
 }
 
-export default function Index({ inspections }: Props) {
+export default function Index({ inspections, filters }: Props) {
   return (
     <AppLayout title="Inspeksi Cekpoint">
       <Head title="Inspeksi Cekpoint" />
@@ -43,7 +45,7 @@ export default function Index({ inspections }: Props) {
         </div>
 
         <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
-          <CpiTable data={inspections} columns={CPInspectionColumn} />
+          <CpiTable data={inspections} columns={CPInspectionColumn} filters={filters} />
         </div>
 
         <CPInspectionDialog />
@@ -51,3 +53,4 @@ export default function Index({ inspections }: Props) {
     </AppLayout>
   )
 }
+

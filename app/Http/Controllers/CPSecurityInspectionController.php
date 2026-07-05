@@ -19,13 +19,32 @@ class CPSecurityInspectionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $inspections = CPInspection::with(['cekPoint', 'user.karyawan'])->latest()->get();
+        $search = $request->input('search');
+
+        $query = CPInspection::with(['cekPoint', 'user.karyawan'])->latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('cekPoint', function ($sub) use ($search) {
+                    $sub->where('nama', 'like', '%' . $search . '%');
+                })->orWhere('nama_petugas', 'like', '%' . $search . '%')
+                  ->orWhere('regu', 'like', '%' . $search . '%')
+                  ->orWhere('kondisi', 'like', '%' . $search . '%');
+            });
+        }
+
+        $inspections = $query->paginate(15)->withQueryString();
+
         return Inertia::render('cekpoint/Index', [
             'inspections' => $inspections,
+            'filters' => [
+                'search' => $search
+            ]
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

@@ -8,12 +8,16 @@ import { HydrantInspectionColumn } from './components/hydrant-inspection-column'
 import HydrantInspectionDialog from './components/hydrant-inspection-dialog';
 import HydrantInspectionTable from './components/hydrant-inspection-table';
 import { HydrantInspectionsc } from './data/HydrantInspectionsc';
+import { PaginatedData } from '@/types';
 
 interface Props {
-    inspections: HydrantInspectionsc[];
+    inspections: PaginatedData<HydrantInspectionsc>;
+    filters: {
+        search?: string;
+    };
 }
 
-export default function Index({ inspections }: Props) {
+export default function Index({ inspections, filters }: Props) {
     return (
         <AppLayout title="Inspeksi Hydrant">
             <Head title="Inspeksi Hydrant" />
@@ -39,10 +43,11 @@ export default function Index({ inspections }: Props) {
                     </div>
                 </div>
                 <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
-                    <HydrantInspectionTable data={inspections} columns={HydrantInspectionColumn} />
+                    <HydrantInspectionTable data={inspections} columns={HydrantInspectionColumn} filters={filters} />
                 </div>
                 <HydrantInspectionDialog />
             </DialogProvider>
         </AppLayout>
     );
 }
+

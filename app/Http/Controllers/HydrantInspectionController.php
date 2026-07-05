@@ -30,14 +30,32 @@ class HydrantInspectionController extends Controller implements HasMiddleware
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $inspections = HydrantInspection::with(['hydrant', 'user.karyawan'])->latest()->get();
+        $search = $request->input('search');
+
+        $query = HydrantInspection::with(['hydrant', 'user.karyawan'])->latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('hydrant', function ($sub) use ($search) {
+                    $sub->where('kode_hydrant', 'like', '%' . $search . '%')
+                        ->orWhere('lokasi', 'like', '%' . $search . '%');
+                })->orWhere('nama_petugas', 'like', '%' . $search . '%')
+                  ->orWhere('regu', 'like', '%' . $search . '%');
+            });
+        }
+
+        $inspections = $query->paginate(15)->withQueryString();
+
         return Inertia::render('fire-safety/inspection/hydrant/Index', [
             'inspections' => $inspections,
+            'filters' => [
+                'search' => $search
+            ]
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

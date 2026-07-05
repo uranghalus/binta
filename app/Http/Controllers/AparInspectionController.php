@@ -30,14 +30,33 @@ class AparInspectionController extends Controller implements HasMiddleware
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $aparInspections = AparInspection::with(['apar', 'user.karyawan'])->get();
+        $search = $request->input('search');
+
+        $query = AparInspection::with(['apar', 'user.karyawan'])->latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('apar', function ($sub) use ($search) {
+                    $sub->where('kode_apar', 'like', '%' . $search . '%')
+                        ->orWhere('lokasi', 'like', '%' . $search . '%');
+                })->orWhere('nama_petugas', 'like', '%' . $search . '%')
+                  ->orWhere('regu', 'like', '%' . $search . '%')
+                  ->orWhere('kondisi', 'like', '%' . $search . '%');
+            });
+        }
+
+        $aparInspections = $query->paginate(15)->withQueryString();
+
         return Inertia::render('fire-safety/inspection/apar/index', [
             'aparInspections' => $aparInspections,
+            'filters' => [
+                'search' => $search
+            ]
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

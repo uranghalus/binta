@@ -7,11 +7,15 @@ import { InspectionAparColumns } from './components/inspection-apar-column';
 import InspectionAparDialogs from './components/inspection-apar-dialogs';
 import InspectionAparTable from './components/inspection-apar-table';
 import { AparInspection } from './data/inspectionAparSchema';
+import { PaginatedData } from '@/types';
 
 interface Props {
-    aparInspections: AparInspection[]; // Replace 'any' with the actual type of aparInspections
+    aparInspections: PaginatedData<AparInspection>;
+    filters: {
+        search?: string;
+    };
 }
-export default function index({ aparInspections }: Props) {
+export default function index({ aparInspections, filters }: Props) {
     return (
         <AppLayout title="Inspeksi Apar">
             <Head title="Inspeksi Apar" />
@@ -37,10 +41,11 @@ export default function index({ aparInspections }: Props) {
                     </div>
                 </div>
                 <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
-                    <InspectionAparTable data={aparInspections} columns={InspectionAparColumns} />
+                    <InspectionAparTable data={aparInspections} columns={InspectionAparColumns} filters={filters} />
                 </div>
                 <InspectionAparDialogs />
             </DialogProvider>
         </AppLayout>
     );
 }
+
