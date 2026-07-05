@@ -129,6 +129,8 @@ class HydrantInspectionController extends Controller implements HasMiddleware
             $validated['foto_hydrant'] = $finalPath;
             HydrantInspection::create($validated);
             return redirect()->route('inspection.hydrant.index')->with('success', 'Inspeksi Hydrant berhasil ditambahkan.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Hydrant Upload Failed', [
                 'msg' => $e->getMessage(),

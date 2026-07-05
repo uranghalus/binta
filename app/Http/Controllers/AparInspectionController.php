@@ -138,6 +138,8 @@ class AparInspectionController extends Controller implements HasMiddleware
 
             return redirect()->route('inspection.apar.index')
                 ->with('success', 'Data berhasil ditambahkan!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
 
             Log::error('APAR Upload Failed', [
