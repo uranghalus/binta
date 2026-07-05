@@ -239,8 +239,12 @@ class CPSecurityInspectionController extends Controller
                 'foto_orang_mencurigakan'
             ] as $fotoField
         ) {
-            if ($inspection->$fotoField && Storage::disk('s3')->exists($inspection->$fotoField)) {
-                Storage::disk('s3')->delete($inspection->$fotoField);
+            try {
+                if ($inspection->$fotoField && Storage::disk('s3')->exists($inspection->$fotoField)) {
+                    Storage::disk('s3')->delete($inspection->$fotoField);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Gagal menghapus foto {$fotoField} dari S3 (Destroy): " . $e->getMessage());
             }
         }
 

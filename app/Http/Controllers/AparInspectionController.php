@@ -228,8 +228,12 @@ class AparInspectionController extends Controller implements HasMiddleware
             Storage::disk('s3')->put($path, (string) $compressed);
 
             // Hapus foto lama
-            if ($inspection->foto_apar && Storage::disk('s3')->exists($inspection->foto_apar)) {
-                Storage::disk('s3')->delete($inspection->foto_apar);
+            try {
+                if ($inspection->foto_apar && Storage::disk('s3')->exists($inspection->foto_apar)) {
+                    Storage::disk('s3')->delete($inspection->foto_apar);
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Gagal menghapus foto dari S3 (Update): " . $e->getMessage());
             }
 
             $validated['foto_apar'] = $path;
@@ -248,8 +252,12 @@ class AparInspectionController extends Controller implements HasMiddleware
         $inspection = AparInspection::findOrFail($id);
 
         // Hapus foto dari S3 jika ada
-        if ($inspection->foto_apar && Storage::disk('s3')->exists($inspection->foto_apar)) {
-            Storage::disk('s3')->delete($inspection->foto_apar);
+        try {
+            if ($inspection->foto_apar && Storage::disk('s3')->exists($inspection->foto_apar)) {
+                Storage::disk('s3')->delete($inspection->foto_apar);
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Gagal menghapus foto dari S3 (Destroy): " . $e->getMessage());
         }
 
         // Hapus data dari database

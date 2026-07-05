@@ -203,8 +203,12 @@ class HydrantInspectionController extends Controller implements HasMiddleware
         // === Update image if changed ===
         if ($request->filled('foto_hydrant') && Str::startsWith($request->foto_hydrant, 'data:image/')) {
             // Delete old photo if exists
-            if ($inspection->foto_hydrant && Storage::disk('s3')->exists($inspection->foto_hydrant)) {
-                Storage::disk('s3')->delete($inspection->foto_hydrant);
+            try {
+                if ($inspection->foto_hydrant && Storage::disk('s3')->exists($inspection->foto_hydrant)) {
+                    Storage::disk('s3')->delete($inspection->foto_hydrant);
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Gagal menghapus foto dari S3 (Update): " . $e->getMessage());
             }
 
             $imageData = explode(',', $request->foto_hydrant)[1];
@@ -235,8 +239,12 @@ class HydrantInspectionController extends Controller implements HasMiddleware
         $inspection = HydrantInspection::findOrFail($id);
 
         // Delete image from S3
-        if ($inspection->foto_hydrant && Storage::disk('s3')->exists($inspection->foto_hydrant)) {
-            Storage::disk('s3')->delete($inspection->foto_hydrant);
+        try {
+            if ($inspection->foto_hydrant && Storage::disk('s3')->exists($inspection->foto_hydrant)) {
+                Storage::disk('s3')->delete($inspection->foto_hydrant);
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Gagal menghapus foto dari S3 (Destroy): " . $e->getMessage());
         }
 
         $inspection->delete();
