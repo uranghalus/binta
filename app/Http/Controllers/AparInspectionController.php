@@ -261,29 +261,70 @@ class AparInspectionController extends Controller implements HasMiddleware
     {
         $bulan = $request->input('bulan', now()->format('m'));
         $tahun = $request->input('tahun', now()->format('Y'));
+        $search = $request->input('search');
+
+        $startDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth()->toDateTimeString();
+        $endDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->toDateTimeString();
+
         $rekap = AparInspection::with(['apar', 'user.karyawan'])
-            ->whereMonth('tanggal_inspeksi', $bulan)
-            ->whereYear('tanggal_inspeksi', $tahun)
+            ->whereBetween('tanggal_inspeksi', [$startDate, $endDate])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('apar', function ($sq) use ($search) {
+                        $sq->where('kode_apar', 'like', "%{$search}%")
+                            ->orWhere('lokasi', 'like', "%{$search}%");
+                    })
+                    ->orWhere('nama_petugas', 'like', "%{$search}%")
+                    ->orWhere('regu', 'like', "%{$search}%")
+                    ->orWhere('kondisi', 'like', "%{$search}%");
+                });
+            })
             ->orderByDesc('tanggal_inspeksi')
-            ->get();
+            ->paginate(15)
+            ->withQueryString()
+            ->through(function ($item) {
+                return $item->makeHidden(['foto_apar', 'foto_apar_url']);
+            });
+
         return Inertia::render('Laporan/apar-rekap', [
             'rekap' => $rekap,
             'bulan' => $bulan,
             'tahun' => $tahun,
+            'filters' => $request->only(['bulan', 'tahun', 'search']),
         ]);
     }
     public function exportPdf(Request $request)
     {
         $bulan = $request->input('bulan', now()->format('m'));
         $tahun = $request->input('tahun', now()->format('Y'));
+        $search = $request->input('search');
+
+        $startDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth()->toDateTimeString();
+        $endDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->toDateTimeString();
 
         $rekap = AparInspection::with(['apar', 'user.karyawan'])
-            ->whereMonth('tanggal_inspeksi', $bulan)
-            ->whereYear('tanggal_inspeksi', $tahun)
+            ->whereBetween('tanggal_inspeksi', [$startDate, $endDate])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('apar', function ($sq) use ($search) {
+                        $sq->where('kode_apar', 'like', "%{$search}%")
+                            ->orWhere('lokasi', 'like', "%{$search}%");
+                    })
+                    ->orWhere('nama_petugas', 'like', "%{$search}%")
+                    ->orWhere('regu', 'like', "%{$search}%")
+                    ->orWhere('kondisi', 'like', "%{$search}%");
+                });
+            })
             ->orderByDesc('tanggal_inspeksi')
-            ->get();
+            ->get()
+            ->makeHidden(['foto_apar', 'foto_apar_url']);
 
         $pdf = Pdf::loadView('report.rekap_apar', compact('rekap', 'bulan', 'tahun'));
-        return $pdf->stream("rekap_apar_{$bulan}_{$tahun}.pdf");
+
+        if (ob_get_length()) {
+            ob_clean();
+        }
+
+        return $pdf->download("rekap_apar_{$bulan}_{$tahun}.pdf");
     }
 }

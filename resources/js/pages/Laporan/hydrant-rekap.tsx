@@ -1,13 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
+import { PaginatedData } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { CheckIcon, ChevronsUpDownIcon, Printer } from 'lucide-react';
-import { useState } from 'react';
+import { CheckIcon, ChevronsUpDownIcon, Printer, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 const bulanList = [
     { value: '01', label: 'Januari' },
     { value: '02', label: 'Februari' },
@@ -22,24 +24,97 @@ const bulanList = [
     { value: '11', label: 'November' },
     { value: '12', label: 'Desember' },
 ];
+
+interface HydrantRekapData {
+    id: number;
+    hydrant?: {
+        kode_hydrant: string;
+        lokasi: string;
+    };
+    user: {
+        karyawan: {
+            nama: string;
+        };
+    };
+    selang_hydrant: string;
+    noozle_hydrant: string;
+    kaca_box_hydrant: string;
+    tanggal_inspeksi: string;
+}
+
 interface Props {
-    rekap;
+    rekap: PaginatedData<HydrantRekapData>;
     bulan: string;
     tahun: string;
+    filters: {
+        bulan: string;
+        tahun: string;
+        search?: string;
+    };
 }
-export default function HydrantRekap({ bulan, rekap, tahun }: Props) {
+export default function HydrantRekap({ rekap, bulan, tahun, filters }: Props) {
     const tahunList = [2024, 2025, 2026];
     const [openTahun, setOpenTahun] = useState(false);
     const [tahunVal, setTahunVal] = useState(tahun);
     const [openBulan, setOpenBulan] = useState(false);
     const [bulanVal, setBulanVal] = useState(bulan);
+    const [search, setSearch] = useState(filters.search || '');
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (search !== (filters.search || '')) {
+                router.get(
+                    route('hydrant.rekap'),
+                    { bulan, tahun, page: 1, search },
+                    { preserveScroll: true, replace: true }
+                );
+            }
+        }, 300);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [search]);
+
     const handleFilterChange = (key: string, value: string) => {
-        router.get(route('hydrant.rekap'), { bulan, tahun, [key]: value }, { preserveScroll: true });
+        router.get(route('hydrant.rekap'), { bulan, tahun, search, page: 1, [key]: value }, { preserveScroll: true });
+    };
+    const handlePageChange = (page: number) => {
+        router.get(route('hydrant.rekap'), { bulan, tahun, search, page }, { preserveScroll: true });
+    };
+    const handleExport = () => {
+        window.open(route('hydrant.pdf', { bulan, tahun, search }), '_blank');
     };
 
-    const handleExport = () => {
-        window.open(route('hydrant.pdf', { bulan, tahun }), '_blank');
+    const getPageNumbers = () => {
+        const totalPages = rekap.last_page;
+        const currentPage = rekap.current_page;
+        const pageNumbers: (number | string)[] = [];
+
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            pageNumbers.push(1);
+            if (currentPage > 3) {
+                pageNumbers.push('...');
+            }
+
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+
+            for (let i = start; i <= end; i++) {
+                pageNumbers.push(i);
+            }
+
+            if (currentPage < totalPages - 2) {
+                pageNumbers.push('...');
+            }
+            pageNumbers.push(totalPages);
+        }
+
+        return pageNumbers;
     };
+
     return (
         <AppLayout title="Rekap Laporan Hydrant">
             <Head title="Rekap Laporan Hydrant" />
@@ -52,7 +127,13 @@ export default function HydrantRekap({ bulan, rekap, tahun }: Props) {
                 </div>
             </div>
             <div className="mb-4 flex items-center justify-between">
-                <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
+                <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:space-x-2">
+                    <Input
+                        placeholder="Cari kode hydrant, lokasi, petugas, regu, selang, nozzle..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="h-9 w-[250px] lg:w-[350px]"
+                    />
                     <Popover open={openTahun} onOpenChange={setOpenTahun}>
                         <PopoverTrigger asChild>
                             <Button variant="outline" role="combobox" aria-expanded={openTahun} className="w-[120px] justify-between">
@@ -139,16 +220,16 @@ export default function HydrantRekap({ bulan, rekap, tahun }: Props) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {rekap.length === 0 ? (
+                            {rekap.data.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={8} className="text-center">
                                         Tidak ada data
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                rekap.map((item, index) => (
+                                rekap.data.map((item, index) => (
                                     <TableRow key={item.id}>
-                                        <TableCell>{index + 1}</TableCell>
+                                        <TableCell>{(rekap.from ?? 1) + index}</TableCell>
                                         <TableCell>{item.hydrant?.kode_hydrant || '-'}</TableCell>
                                         <TableCell>{item.hydrant?.lokasi || '-'}</TableCell>
                                         <TableCell>{item.user.karyawan.nama || '-'}</TableCell>
@@ -167,6 +248,57 @@ export default function HydrantRekap({ bulan, rekap, tahun }: Props) {
                             )}
                         </TableBody>
                     </Table>
+
+                    {/* PAGINATION */}
+                    {rekap.total > 0 && (
+                        <div className="mt-4 flex items-center justify-between px-2">
+                            <div className="text-muted-foreground text-sm">
+                                Menampilkan {rekap.from ?? 0} sampai {rekap.to ?? 0} dari {rekap.total ?? 0} data
+                            </div>
+                            <div className="flex items-center space-x-1">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handlePageChange(rekap.current_page - 1)}
+                                    disabled={rekap.current_page <= 1}
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+
+                                {getPageNumbers().map((page, idx) => {
+                                    if (page === '...') {
+                                        return (
+                                            <span key={idx} className="px-2 text-muted-foreground text-sm">
+                                                ...
+                                            </span>
+                                        );
+                                    }
+                                    return (
+                                        <Button
+                                            key={idx}
+                                            variant={rekap.current_page === page ? 'default' : 'outline'}
+                                            size="icon"
+                                            className="h-8 w-8 text-sm"
+                                            onClick={() => handlePageChange(page as number)}
+                                        >
+                                            {page}
+                                        </Button>
+                                    );
+                                })}
+
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handlePageChange(rekap.current_page + 1)}
+                                    disabled={rekap.current_page >= rekap.last_page}
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </AppLayout>

@@ -8,6 +8,7 @@ import {
     CommandItem,
     CommandList,
 } from '@/components/ui/command';
+import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
     Table,
@@ -19,9 +20,10 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
+import { PaginatedData } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { CheckIcon, ChevronsUpDownIcon, Printer } from 'lucide-react';
-import { useState } from 'react';
+import { CheckIcon, ChevronsUpDownIcon, Printer, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const bulanList = [
     { value: '01', label: 'Januari' },
@@ -48,12 +50,17 @@ interface CPInspection {
 }
 
 interface Props {
-    rekap: CPInspection[];
+    rekap: PaginatedData<CPInspection>;
     bulan: string;
     tahun: string;
+    filters: {
+        bulan: string;
+        tahun: string;
+        search?: string;
+    };
 }
 
-export default function CPRekap({ rekap, bulan, tahun }: Props) {
+export default function CPRekap({ rekap, bulan, tahun, filters }: Props) {
     const tahunList = [2024, 2025, 2026];
 
     const [openTahun, setOpenTahun] = useState(false);
@@ -62,16 +69,71 @@ export default function CPRekap({ rekap, bulan, tahun }: Props) {
     const [openBulan, setOpenBulan] = useState(false);
     const [bulanVal, setBulanVal] = useState(bulan);
 
+    const [search, setSearch] = useState(filters.search || '');
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (search !== (filters.search || '')) {
+                router.get(
+                    route('cekpoint.rekap'),
+                    { bulan, tahun, page: 1, search },
+                    { preserveScroll: true, replace: true }
+                );
+            }
+        }, 300);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [search]);
+
     const handleFilterChange = (key: string, value: string) => {
         router.get(
             route('cekpoint.rekap'),
-            { bulan, tahun, [key]: value },
+            { bulan, tahun, search, page: 1, [key]: value },
+            { preserveScroll: true }
+        );
+    };
+
+    const handlePageChange = (page: number) => {
+        router.get(
+            route('cekpoint.rekap'),
+            { bulan, tahun, search, page },
             { preserveScroll: true }
         );
     };
 
     const handleExport = () => {
-        window.open(route('cekpoint.pdf', { bulan, tahun }), '_blank');
+        window.open(route('cekpoint.pdf', { bulan, tahun, search }), '_blank');
+    };
+
+    const getPageNumbers = () => {
+        const totalPages = rekap.last_page;
+        const currentPage = rekap.current_page;
+        const pageNumbers: (number | string)[] = [];
+
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            pageNumbers.push(1);
+            if (currentPage > 3) {
+                pageNumbers.push('...');
+            }
+
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+
+            for (let i = start; i <= end; i++) {
+                pageNumbers.push(i);
+            }
+
+            if (currentPage < totalPages - 2) {
+                pageNumbers.push('...');
+            }
+            pageNumbers.push(totalPages);
+        }
+
+        return pageNumbers;
     };
 
     return (
@@ -92,6 +154,12 @@ export default function CPRekap({ rekap, bulan, tahun }: Props) {
             {/* FILTER */}
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-2">
+                    <Input
+                        placeholder="Cari kode cp, regu, petugas, kondisi..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="h-9 w-[250px] lg:w-[350px]"
+                    />
                     {/* Tahun */}
                     <Popover open={openTahun} onOpenChange={setOpenTahun}>
                         <PopoverTrigger asChild>
@@ -204,16 +272,16 @@ export default function CPRekap({ rekap, bulan, tahun }: Props) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {rekap.length === 0 ? (
+                            {rekap.data.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={6} className="text-center">
                                         Tidak ada data
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                rekap.map((item, index) => (
+                                rekap.data.map((item, index) => (
                                     <TableRow key={item.id}>
-                                        <TableCell>{index + 1}</TableCell>
+                                        <TableCell>{(rekap.from ?? 1) + index}</TableCell>
                                         <TableCell>{item.kode_cp}</TableCell>
                                         <TableCell>{item.nama_petugas}</TableCell>
                                         <TableCell>{item.regu}</TableCell>
@@ -235,6 +303,57 @@ export default function CPRekap({ rekap, bulan, tahun }: Props) {
                             )}
                         </TableBody>
                     </Table>
+
+                    {/* PAGINATION */}
+                    {rekap.total > 0 && (
+                        <div className="mt-4 flex items-center justify-between px-2">
+                            <div className="text-muted-foreground text-sm">
+                                Menampilkan {rekap.from ?? 0} sampai {rekap.to ?? 0} dari {rekap.total ?? 0} data
+                            </div>
+                            <div className="flex items-center space-x-1">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handlePageChange(rekap.current_page - 1)}
+                                    disabled={rekap.current_page <= 1}
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+
+                                {getPageNumbers().map((page, idx) => {
+                                    if (page === '...') {
+                                        return (
+                                            <span key={idx} className="px-2 text-muted-foreground text-sm">
+                                                ...
+                                            </span>
+                                        );
+                                    }
+                                    return (
+                                        <Button
+                                            key={idx}
+                                            variant={rekap.current_page === page ? 'default' : 'outline'}
+                                            size="icon"
+                                            className="h-8 w-8 text-sm"
+                                            onClick={() => handlePageChange(page as number)}
+                                        >
+                                            {page}
+                                        </Button>
+                                    );
+                                })}
+
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handlePageChange(rekap.current_page + 1)}
+                                    disabled={rekap.current_page >= rekap.last_page}
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </AppLayout>

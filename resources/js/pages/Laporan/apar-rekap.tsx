@@ -1,13 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
+import { PaginatedData } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { CheckIcon, ChevronsUpDownIcon, Printer } from 'lucide-react';
-import { useState } from 'react';
+import { CheckIcon, ChevronsUpDownIcon, Printer, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 const bulanList = [
     { value: '01', label: 'Januari' },
     { value: '02', label: 'Februari' },
@@ -22,31 +24,115 @@ const bulanList = [
     { value: '11', label: 'November' },
     { value: '12', label: 'Desember' },
 ];
-export default function AparRekap({ rekap, bulan, tahun }) {
+
+interface APARRekapData {
+    id: number;
+    apar?: {
+        kode_apar: string;
+        lokasi: string;
+    };
+    user?: {
+        karyawan: {
+            nama: string;
+        };
+    };
+    kondisi: string;
+    tanggal_inspeksi: string;
+}
+
+interface Props {
+    rekap: PaginatedData<APARRekapData>;
+    bulan: string;
+    tahun: string;
+    filters: {
+        bulan: string;
+        tahun: string;
+        search?: string;
+    };
+}
+
+export default function AparRekap({ rekap, bulan, tahun, filters }: Props) {
     const tahunList = [2024, 2025, 2026];
     const [openTahun, setOpenTahun] = useState(false);
     const [tahunVal, setTahunVal] = useState(tahun);
     const [openBulan, setOpenBulan] = useState(false);
     const [bulanVal, setBulanVal] = useState(bulan);
+    const [search, setSearch] = useState(filters.search || '');
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (search !== (filters.search || '')) {
+                router.get(
+                    route('apar.rekap'),
+                    { bulan, tahun, page: 1, search },
+                    { preserveScroll: true, replace: true }
+                );
+            }
+        }, 300);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [search]);
+
     const handleFilterChange = (key: string, value: string) => {
-        router.get(route('apar.rekap'), { bulan, tahun, [key]: value }, { preserveScroll: true });
+        router.get(route('apar.rekap'), { bulan, tahun, search, page: 1, [key]: value }, { preserveScroll: true });
+    };
+    const handlePageChange = (page: number) => {
+        router.get(route('apar.rekap'), { bulan, tahun, search, page }, { preserveScroll: true });
     };
     const handleExport = () => {
-        window.open(route('apar.pdf', { bulan, tahun }), '_blank');
+        window.open(route('apar.pdf', { bulan, tahun, search }), '_blank');
     };
+
+    const getPageNumbers = () => {
+        const totalPages = rekap.last_page;
+        const currentPage = rekap.current_page;
+        const pageNumbers: (number | string)[] = [];
+
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            pageNumbers.push(1);
+            if (currentPage > 3) {
+                pageNumbers.push('...');
+            }
+
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+
+            for (let i = start; i <= end; i++) {
+                pageNumbers.push(i);
+            }
+
+            if (currentPage < totalPages - 2) {
+                pageNumbers.push('...');
+            }
+            pageNumbers.push(totalPages);
+        }
+
+        return pageNumbers;
+    };
+
     return (
         <AppLayout title="Rekap Laporan Apar">
             <Head title="Rekap Laporan Apar" />
             <div className="mb-2 flex flex-wrap items-center justify-between space-y-2">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Rekap Laporan Inspeksi Hydrant</h2>
+                    <h2 className="text-2xl font-bold tracking-tight">Rekap Laporan Inspeksi APAR</h2>
                     <p className="text-muted-foreground">
                         Periode bulan {bulanList.find((b) => b.value === bulan)?.label} {tahun}
                     </p>
                 </div>
             </div>
             <div className="mb-4 flex items-center justify-between">
-                <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
+                <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:space-x-2">
+                    <Input
+                        placeholder="Cari kode apar, lokasi, petugas, regu, kondisi..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="h-9 w-[250px] lg:w-[350px]"
+                    />
                     <Popover open={openTahun} onOpenChange={setOpenTahun}>
                         <PopoverTrigger asChild>
                             <Button variant="outline" role="combobox" aria-expanded={openTahun} className="w-[120px] justify-between">
@@ -131,25 +217,83 @@ export default function AparRekap({ rekap, bulan, tahun }) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {rekap.map((r, i) => (
-                                <TableRow key={r.id}>
-                                    <TableCell>{i + 1}</TableCell>
-                                    <TableCell>{r.apar?.kode_apar}</TableCell>
-                                    <TableCell>{r.apar?.lokasi}</TableCell>
-                                    <TableCell>{r.user?.karyawan.nama ?? '-'}</TableCell>
-                                    <TableCell>{r.kondisi}</TableCell>
-                                    <TableCell>
-                                        {' '}
-                                        {new Date(r.tanggal_inspeksi).toLocaleDateString('id-ID', {
-                                            day: '2-digit',
-                                            month: 'long',
-                                            year: 'numeric',
-                                        })}
+                            {rekap.data.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="text-center">
+                                        Tidak ada data
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : (
+                                rekap.data.map((r, i) => (
+                                    <TableRow key={r.id}>
+                                        <TableCell>{(rekap.from ?? 1) + i}</TableCell>
+                                        <TableCell>{r.apar?.kode_apar}</TableCell>
+                                        <TableCell>{r.apar?.lokasi}</TableCell>
+                                        <TableCell>{r.user?.karyawan.nama ?? '-'}</TableCell>
+                                        <TableCell>{r.kondisi}</TableCell>
+                                        <TableCell>
+                                            {new Date(r.tanggal_inspeksi).toLocaleDateString('id-ID', {
+                                                day: '2-digit',
+                                                month: 'long',
+                                                year: 'numeric',
+                                            })}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
+
+                    {/* PAGINATION */}
+                    {rekap.total > 0 && (
+                        <div className="mt-4 flex items-center justify-between px-2">
+                            <div className="text-muted-foreground text-sm">
+                                Menampilkan {rekap.from ?? 0} sampai {rekap.to ?? 0} dari {rekap.total ?? 0} data
+                            </div>
+                            <div className="flex items-center space-x-1">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handlePageChange(rekap.current_page - 1)}
+                                    disabled={rekap.current_page <= 1}
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+
+                                {getPageNumbers().map((page, idx) => {
+                                    if (page === '...') {
+                                        return (
+                                            <span key={idx} className="px-2 text-muted-foreground text-sm">
+                                                ...
+                                            </span>
+                                        );
+                                    }
+                                    return (
+                                        <Button
+                                            key={idx}
+                                            variant={rekap.current_page === page ? 'default' : 'outline'}
+                                            size="icon"
+                                            className="h-8 w-8 text-sm"
+                                            onClick={() => handlePageChange(page as number)}
+                                        >
+                                            {page}
+                                        </Button>
+                                    );
+                                })}
+
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handlePageChange(rekap.current_page + 1)}
+                                    disabled={rekap.current_page >= rekap.last_page}
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </AppLayout>

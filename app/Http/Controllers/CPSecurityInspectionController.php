@@ -253,17 +253,42 @@ class CPSecurityInspectionController extends Controller
     {
         $bulan = $request->input('bulan', now()->format('m'));
         $tahun = $request->input('tahun', now()->format('Y'));
+        $search = $request->input('search');
 
-        $rekap = CPInspection::with(['user']) // sesuaikan relasi jika ada
-            ->whereMonth('tanggal_patroli', $bulan)
-            ->whereYear('tanggal_patroli', $tahun)
+        $startDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth()->toDateTimeString();
+        $endDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->toDateTimeString();
+
+        $rekap = CPInspection::with(['user.karyawan', 'cekPoint'])
+            ->whereBetween('tanggal_patroli', [$startDate, $endDate])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('kode_cp', 'like', "%{$search}%")
+                        ->orWhere('nama_petugas', 'like', "%{$search}%")
+                        ->orWhere('regu', 'like', "%{$search}%")
+                        ->orWhere('kondisi', 'like', "%{$search}%")
+                        ->orWhereHas('cekPoint', function ($sq) use ($search) {
+                            $sq->where('lokasi', 'like', "%{$search}%")
+                                ->orWhere('area', 'like', "%{$search}%");
+                        });
+                });
+            })
             ->orderByDesc('tanggal_patroli')
-            ->get();
+            ->paginate(15)
+            ->withQueryString()
+            ->through(function ($item) {
+                return $item->makeHidden([
+                    'foto_kondisi', 'foto_bocoran', 'foto_penerangan_lampu', 'foto_kerusakan_fasum', 
+                    'foto_potensi_bahaya_api', 'foto_potensi_bahaya_keorang', 'foto_orang_mencurigakan',
+                    'foto_kondisi_url', 'foto_bocoran_url', 'foto_penerangan_lampu_url', 'foto_kerusakan_fasum_url', 
+                    'foto_potensi_bahaya_api_url', 'foto_potensi_bahaya_keorang_url', 'foto_orang_mencurigakan_url'
+                ]);
+            });
 
         return inertia('Laporan/cekpoint-rekap', [
             'rekap' => $rekap,
             'bulan' => $bulan,
             'tahun' => $tahun,
+            'filters' => $request->only(['bulan', 'tahun', 'search']),
         ]);
     }
 
@@ -272,16 +297,41 @@ class CPSecurityInspectionController extends Controller
     {
         $bulan = $request->input('bulan', now()->format('m'));
         $tahun = $request->input('tahun', now()->format('Y'));
+        $search = $request->input('search');
 
-        $rekap = CPInspection::with(['user']) // sesuaikan relasi jika ada
-            ->whereMonth('tanggal_patroli', $bulan)
-            ->whereYear('tanggal_patroli', $tahun)
+        $startDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth()->toDateTimeString();
+        $endDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->toDateTimeString();
+
+        $rekap = CPInspection::with(['user.karyawan', 'cekPoint'])
+            ->whereBetween('tanggal_patroli', [$startDate, $endDate])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('kode_cp', 'like', "%{$search}%")
+                        ->orWhere('nama_petugas', 'like', "%{$search}%")
+                        ->orWhere('regu', 'like', "%{$search}%")
+                        ->orWhere('kondisi', 'like', "%{$search}%")
+                        ->orWhereHas('cekPoint', function ($sq) use ($search) {
+                            $sq->where('lokasi', 'like', "%{$search}%")
+                                ->orWhere('area', 'like', "%{$search}%");
+                        });
+                });
+            })
             ->orderByDesc('tanggal_patroli')
-            ->get();
+            ->get()
+            ->makeHidden([
+                'foto_kondisi', 'foto_bocoran', 'foto_penerangan_lampu', 'foto_kerusakan_fasum', 
+                'foto_potensi_bahaya_api', 'foto_potensi_bahaya_keorang', 'foto_orang_mencurigakan',
+                'foto_kondisi_url', 'foto_bocoran_url', 'foto_penerangan_lampu_url', 'foto_kerusakan_fasum_url', 
+                'foto_potensi_bahaya_api_url', 'foto_potensi_bahaya_keorang_url', 'foto_orang_mencurigakan_url'
+            ]);
 
         $pdf = Pdf::loadView('report.rekap_cekpoint', compact('rekap', 'bulan', 'tahun'));
 
-        return $pdf->stream("rekap_cp_{$bulan}_{$tahun}.pdf");
+        if (ob_get_length()) {
+            ob_clean();
+        }
+
+        return $pdf->download("rekap_cp_{$bulan}_{$tahun}.pdf");
     }
     // Print-friendly view (opens a simple HTML page suitable for window.print)
     public function print(Request $request)
