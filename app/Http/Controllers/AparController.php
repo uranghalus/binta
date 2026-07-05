@@ -110,6 +110,10 @@ class AparController extends Controller implements HasMiddleware
             'qr_base64' => $base64,
         ])->setPaper('A4');
 
+        if (ob_get_length()) {
+            ob_clean();
+        }
+
         return $pdf->download("qr_apar_{$apar->kode_apar}.pdf");
     }
     // generate Mass QR Code
@@ -153,6 +157,10 @@ class AparController extends Controller implements HasMiddleware
         ])->render();
 
         $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
+
+        if (ob_get_length()) {
+            ob_clean();
+        }
 
         return $pdf->download('qr-code-apar-batch-' . $batch . '.pdf');
     }

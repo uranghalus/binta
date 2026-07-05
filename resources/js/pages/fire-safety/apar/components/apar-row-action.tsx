@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useDialog } from '@/context/dialog-context';
 import HasAnyPermission from '@/lib/permission';
-import { Link } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
 import { Download, SquarePen, Trash2 } from 'lucide-react';
 import { Apar } from '../data/aparSchema';
@@ -32,14 +31,14 @@ export default function AparRowAction({ row }: Props) {
 
     if (HasAnyPermission(['apar view'])) {
         buttons.push(
-            <Link
+            <a
                 key="view"
                 href={route('apar.qrcode', row.original.id)}
                 className="-ml-px flex items-center space-x-2 border border-sky-300 bg-sky-400 p-2.5 text-xs font-medium text-white hover:bg-sky-500 focus:z-10 focus:ring-1 focus:ring-sky-500 dark:border-gray-600 dark:bg-sky-600 dark:text-gray-100 dark:hover:bg-sky-700 dark:focus:ring-sky-700"
                 title={`Download QR Code for ${row.original.kode_apar}`}
             >
                 <Download className="size-4" />
-            </Link>,
+            </a>,
         );
     }
 
