@@ -39,7 +39,7 @@
 
     <h2>
         Rekap Inspeksi Cekpoint Security <br>
-        Bulan {{ \Carbon\Carbon::create()->month($bulan)->translatedFormat('F') }}
+        Bulan {{ \Carbon\Carbon::create()->month((int)$bulan)->translatedFormat('F') }}
         {{ $tahun }}
     </h2>
 

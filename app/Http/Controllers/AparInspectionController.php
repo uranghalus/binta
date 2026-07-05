@@ -263,8 +263,8 @@ class AparInspectionController extends Controller implements HasMiddleware
         $tahun = $request->input('tahun', now()->format('Y'));
         $search = $request->input('search');
 
-        $startDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth()->toDateTimeString();
-        $endDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->toDateTimeString();
+        $startDate = \Carbon\Carbon::createFromDate((int) $tahun, (int) $bulan, 1)->startOfMonth()->toDateTimeString();
+        $endDate = \Carbon\Carbon::createFromDate((int) $tahun, (int) $bulan, 1)->endOfMonth()->toDateTimeString();
 
         $rekap = AparInspection::with(['apar', 'user.karyawan'])
             ->whereBetween('tanggal_inspeksi', [$startDate, $endDate])
@@ -299,8 +299,8 @@ class AparInspectionController extends Controller implements HasMiddleware
         $tahun = $request->input('tahun', now()->format('Y'));
         $search = $request->input('search');
 
-        $startDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth()->toDateTimeString();
-        $endDate = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->toDateTimeString();
+        $startDate = \Carbon\Carbon::createFromDate((int) $tahun, (int) $bulan, 1)->startOfMonth()->toDateTimeString();
+        $endDate = \Carbon\Carbon::createFromDate((int) $tahun, (int) $bulan, 1)->endOfMonth()->toDateTimeString();
 
         $rekap = AparInspection::with(['apar', 'user.karyawan'])
             ->whereBetween('tanggal_inspeksi', [$startDate, $endDate])
